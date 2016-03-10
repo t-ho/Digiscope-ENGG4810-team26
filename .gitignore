@@ -16,3 +16,8 @@ bin/*
 /bin/
 *DS_STORE
 
+# Latex output files
+*.pdf
+*.log
+*.aux
+*.synctex.gz
