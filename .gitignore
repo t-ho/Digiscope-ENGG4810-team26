@@ -16,6 +16,11 @@ bin/*
 /bin/
 *DS_STORE
 
+# Vim temp
+*~
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+
 # Latex output files
 *.pdf
 *.log
