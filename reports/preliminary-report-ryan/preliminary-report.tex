@@ -1,0 +1,304 @@
+\documentclass[12pt]{report}
+
+\usepackage[margin=1.5cm]{geometry}
+%\usepackage{mathptmx} %Closest to Times New Roman
+
+\usepackage[nottoc,numbib]{tocbibind}
+
+\usepackage{enumitem}
+\setlist{nosep}
+
+\usepackage{pbox}
+
+\usepackage{longtable}
+
+\usepackage[compact]{titlesec}
+\titleformat{\chapter}[hang]{\bfseries\huge}{\thechapter}{2pc}{}
+\titlespacing*{\chapter}{0pt}{*0}{0pt}
+
+\usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+\renewcommand{\arraystretch}{1.1}
+
+\usepackage{hyperref}
+
+%opening
+\title{\vspace{-2cm}ENGG4810 Team 26\\
+	Preliminary Design Report\vspace{1cm}}
+\author{
+	\makebox[.4\linewidth]{Ryan Fitzimon}\\
+	43214907\\
+	\texttt{ryan.fitzsimon@uq.net.au}
+	\and
+	\makebox[.4\linewidth]{Minh Toan Ho}\\
+	43129560\\
+	\texttt{minh.ho2@uq.net.au}
+	\and
+	\makebox[.4\linewidth]{Christopher Low}\\
+	42897367\\
+	\texttt{christopher.low@uq.net.au}
+	\and
+	\makebox[.4\linewidth]{Joshua Mason}\\
+	43237746\\
+	\texttt{joshua.mason1@uq.net.au}
+	\vspace{1cm}
+}
+
+\begin{document}
+
+\maketitle
+
+\chapter{Team Design Overview}
+\section{Hardware}
+content
+\section{Firmware}
+\section{Software}
+
+\chapter{Team Roles and Project Plan}
+Each team member has been assigned as the leader for a specific section of the project. The leader of a section is not expected to complete all related work without assistance, but they will be responsible for verifying the quality of work and ensuring adequate progress is made. Each team member will be expected to have a thorough understanding of their entire section and keep up to date with any relevant developments. Responsibilities have been clearly defined in order to allow each member to understand their role in the team and be aware of what is required from them.
+
+\vspace{.8cm}
+\begin{tabular}{l p{0.7\textwidth}}
+	
+	\pbox{20cm}{\textbf{Ryan Fitzsimon} \\ Firmware Section Leader} &
+	{\begin{itemize}
+		\item Firmware readme and repository maintenance
+		\item Signal sampling
+		\item Trigger event detection
+		\item Communication protocol specification
+		\item Touch screen communication and interface design
+		\item Electronic control of analog front end
+		\item Firmware component of function generator
+	\end{itemize}}\\
+	
+	\pbox{20cm}{\textbf{Minh Toan Ho} \\ Software Section Leader} &
+	{\begin{itemize}
+		\item Software readme and repository maintenance
+		\item Communication protocol specification
+		\item Graphical user interface (GUI) of software
+		\item Waveform visualization
+		\item Waveform data manipulation
+	\end{itemize}}\\
+	
+	\pbox{20cm}{\textbf{Christopher Low} \\ Hardware Section Co-leader} &
+	{\begin{itemize}
+		\item Component purchases/BOM
+		\item Hardware section of function generator
+		\item Analog Frontend
+		\begin{itemize}
+			\item Low pass anti aliasing filter (0-250kHz)
+			\item Bandpass filter (650kHz - 750kHz)
+			\item Voltage Clipping / Restrictor Circuits
+			\item DC Offset (+/- 4.5V)
+			\item Amplifiers
+		\end{itemize}
+		\item Assisting Ryan with firmware to make sure that the hardware and firmware design complement one another (e.g. anti aliasing filter and digital filter)
+	\end{itemize}}\\
+
+	\pbox{20cm}{\textbf{Joshua Mason} \\ Hardware Section Co-leader} &
+	{\begin{itemize}
+		\item Altium PCB design
+		\item Power supply
+		\item Hardware layout
+		\item Analog front end (with Chris)
+		\item Soldering (with Chris)
+		\item Assisting Ryan with Firmware after PCB has been completed
+	\end{itemize}}\\
+	
+\end{tabular}
+
+\chapter{Team Communication Strategy}
+\section{Communication Methods}
+In order to succeed in this project, effective communication between our team members is vital. The team communication tool Slack will be used as the primary means of communication and for team updates. Phone numbers have been exchanged for emergency contact. Team members should remain contactable during the week and be ready to reply to any messages within 24 hours.
+\section{File Management}
+Files other than source code will be stored in a shared Google Drive folder. This will include reports, datasheets, an up to date bill of materials and any other design files from programs such as LTspice and Altium Designer. Google Drive will be used to enable collaborative editing of reports.
+\section{Meetings}
+The team plans to meet once a week formally, and at least once a week informally in a prac. The team plans to meet Monday from 2pm for a formal meeting to discuss progress, issues and problems faced from the week before, as well as goals for the week ahead. Later in the semester and as assessment requires, the team will meet more often, and meetings will be recorded on Slack.
+
+Team attendance is very important to operating effectively. As such team members should check Slack regularly and attend all meetings and prac times. If a team member cannot make it to a meeting they should inform the team prior to the session and make an effort to catch up on any missed information from that meeting.
+\section{Coding Practice}
+As the head developers in the sections of software and firmware respectively, Toan and Ryan will be responsible for all changes in those areas on the master branch of the git repository. Other team members will not be permitted to modify the master branch directly. Instead, separate individual branches will be created to allow contributions. After changes are made Toan and/or Ryan should be alerted (depending on the section modified) so that they can be reviewed and merged into the master branch.
+
+The master branch should be in a compilable state at all times. Any changes likely to compromise this should be introduced in separate branches and merged after testing. Instructions for environment setup and project building will be added to the repository readme so that any team member can build the software and firmware if desired.
+\section{Coding Style}
+The MCU firmware, which will be written in C, will follow the OpenBSD Kernel Source File Style Guide\cite{CStyle}. Sensible adaptations will be made where necessary (i.e. TI-RTOS \#includes will replace kernel \#includes).
+The PC-based software, which will be written in Java, will follow the Java Programming Style Guidelines from Geotechnical Software Services\cite{JavaStyle}. 
+
+\chapter{Individual Design Overview}
+\section{Toolchain and Libraries}
+Code Composer Studio (CCS) will be used to develop the project firmware. The TI Code Generation Tools, including the proprietary compiler, will be used for program compilation. This choice has been made due to the official support, additional analysis tools and higher levels of optimization\cite{TICompilers}. Tivaware libraries will be used for peripherals, graphics and communication and TI-RTOS will be used.
+
+The TI tools and libraries are available under a variety of licenses. CCS and the included tools are available under a free limited license which permits production use. For the EK-TM4C1294XL, use of the built in Stellaris in-circuit debug interface is permitted and code size is not restricted. Most components of TI-RTOS are licensed under the BSD license and Tivaware is completely royalty free. This means that no licensing issues are expected with the use of these tools and libraries.
+
+The use of a completely open (GPL licensed) toolchain using GCC, OpenOCD, GDB and lm4flash was also investigated but the CCS based toolchain was ultimately chosen due to better support, ease of use and compatibility with lab computers.
+
+\section{RTOS Selection}
+Using a real-time operating system (RTOS) offers a number advantages over a bare-metal firmware implementation, including preemption, middleware and increased portability\cite{rtosfactors}. Preemption will allow for control of priorities which will be useful when scheduling sampling, processing and communication tasks. Available middleware, specifically the network stack, will reduce the amount of work required to communicate with the software component of the system.
+
+The major drawbacks of using an RTOS are higher memory usage and increased debugging difficulty due to additional abstraction layers. The relatively large amount (256 kB) of RAM available on the TM4C1294NCPDT means that the increased memory usage is of little concern.
+
+TI-RTOS has been chosen due to pre-existing support for the hardware platform, integration with CCS and availability of support. The analysis tools for TI-RTOS available in CCS will help deal the increased complexity and debugging difficulty compared to bare-metal.
+
+\section{Communication Protocols}
+At this stage, it is planned that communication with the PC software will use the TCP protocol due to its reliability and availability of libraries. Reliability is desirable because samples must not be skipped under any circumstances. Using mature and well tested libraries will allow for faster development and reduce the risk of bugs likely to be present in a custom stack. It is possible that the flow and congestion control mechanisms of the TCP protocol may result in unacceptable latency or throughput reduction. However, this is not expected because these mechanisms have the greatest impact in networks where packets are lost frequently\cite{RTOSorBM}. This is very unlikely to occur when using a direct ethernet connection. If unavoidable issues with the TCP protocol are encountered, UDP will be used instead with reliability implemented at the application layer.
+
+The format of messages to be exchanged will be described in a formal protocol specification at an early stage in the project to facilitate parallel development of the software and firmware subsystems.
+
+\section{Front End Control}
+content
+
+\section{Sampling}
+Two 50 kB buffers, one for each input channel, will be statically allocated. In 8 bit mode, each sample will occupy a byte of the buffer and in 12 bit mode samples will be aligned so that 2 consecutive samples occupy 3 adjacent bytes. Samples will be continuously written to the buffers in a circular fashion until a trigger event occurs. At this point an additional 12.5 thousand or 25 thousand samples (depending on the selected resolution) will be taken before sampling is halted. The current scaling settings, followed by the entire content of the buffers will then be sent to the PC over the Ethernet cable using TCP.
+
+When the sampling scaling or resolution is changed, the buffers will be zeroed to prevent invalid data from being sent.
+
+\section{Touch Screen Interface}
+The ITDB02-3.2S TFT display will be controlled using a 16 bit parallel interface to the built-in SSD1289 TFT Driver. The touch screen will be controlled using the built-in TSC2046 touch screen controller. In order to simplify the drawing of interface components on the display, the TivaWare Graphics Library will be used. It is expected that this will involve writing a graphics driver specifically for the SSD1289. This process is well documented\cite{TIgrlib}, but likely to take some time.
+
+\section{Function Generator Control}
+The function generator will be implemented using a DAC chip and lookup tables. A separate lookup table will be used for each waveform shape with the exception of the random noise function, which will be implemented using a linear-feedback shift register. Scaling of the output signal will be achieved through a combination of firmware and hardware systems. Frequency scaling will be implemented completely in firmware by varying the amount of time between each sample output to the DAC. Voltage or amplitude scaling will be achieved through an amplification circuit similar to the one on each of the input channels. Finer adjustment of the output amplitude will be achieved by scaling the DAC output in firmware.
+
+\chapter{Individual Milestones}
+\autoref{milestones} shows the milestones that will be used to demonstrate progress over the duration of the project.
+\begin{longtable}{|p{5cm}|p{4cm}|p{2.8cm}|p{2.5cm}|p{1.8cm}|}
+	\hline
+	\textbf{Milestone} &
+	\textbf{Required Resources} &
+	\textbf{Prerequisites} &
+	\textbf{Completion} \textbf{Criteria} &
+	\textbf{Deadline}\\	
+	
+	\hline
+	\textbf{Acquire Logic Analyser} - Borrow LA from ETSG &
+	N/A & 
+	N/A & 
+	Logic Analyser in team locker &
+	17/03\\
+	
+	\hline
+	\textbf{Environment Setup} - Install CCS and libraries, try example code&
+	PC, EK-TM4C1294XL &
+	N/A &
+	Example program on board and functioning &
+	17/03\\
+
+	\hline
+	\textbf{Enable Hardware FPU} - Ensure the use of hardware FPU, not emulation &
+	PC &
+	Environment Setup &
+	objdump shows floating point instructions in binary file &
+	24/03\\
+		
+	\hline
+	\textbf{TCP Communication} - Establish a TCP connection over Ethernet with a host PC &
+	PC, EK-TM4C1294XL &
+	Environment Setup &
+	Show communication with board using netcat &
+	04/04\\
+		
+	\hline
+	\textbf{Read Samples with ADC} - Use the on-board ADC to acquire samples of DC voltage and display values on the PC &
+	PC, power supply, breadboard, multimeter, EK-TM4C1294XL &
+	Environment Setup &
+	Values matching measurements are displayed on PC&
+	04/04\\
+		
+	\hline
+	\textbf{Initial LCD Screen Control} - Use the datasheet and example code to display something on the LCD screen &
+	EK-TM4C1294XL, ITDB02, PC&
+	Environment Setup &
+	Display simple image on LCD screen &
+	07/04\\
+	
+	\hline
+	\textbf{Touch Screen Control} - Use the datasheet and example code to respond to touch screen input &
+	EK-TM4C1294XL, ITDB02, PC&
+	Initial LCD Screen Control &
+	Read touch input and show response (show coordinates on PC) &
+	07/04\\
+
+	\hline
+	\multicolumn{4}{|c|}{\textbf{Client Review Meeting}} & 11/04\\	
+	
+	\hline
+	\textbf{Communication Protocol Specification} - Create a formal document specifying packet structure and identification values for MCU/PC communication &
+	N/A &
+	N/A &
+	Document complete and committed to Git repository &
+	14/04\\
+	
+	\hline
+	\textbf{DAC Output} - Communicate with the DAC and output some signal &
+	PC, DAC chip, \mbox{EK-TM4C1294XL}, Lab Oscilloscope &
+	Environment Setup &
+	Display DAC signals on lab oscilloscope &
+	18/04\\
+		
+	\hline
+	\textbf{TivaWare Graphics Driver} - Write a TivaWare Graphics Library driver for the SSD1289 &
+	EK-TM4C1294XL, ITDB02, PC &
+	Initial LCD Screen Control &
+	Driver complete, tested and commited &
+	31/04\\
+	
+	\hline
+	\multicolumn{4}{|c|}{\textbf{Seminar 1}} & 25/04\\	
+	
+	\hline
+	\textbf{Analog Front End Control} - Control amplification, offset and coupling from MCU &
+	EK-TM4C1294XL, Analog Front End Hardware, PC, Lab Oscilloscope &
+	Environment Setup &
+	Show control of gain, offset and coupling on oscilloscope &
+	28/04\\
+			
+	\hline
+	\textbf{Function Generator Control} - Output required waveforms (at all required amplitudes) &
+	EK-TM4C1294XL, Function Generator Hardware, PC, Lab Oscilloscope &
+	DAC Output &
+	Show all waveforms on oscilloscope &
+	28/04\\
+	
+	\hline
+	\textbf{Trigger Identification} - Ensure that trigger events are correctly identified &
+	EK-TM4C1294XL, Analog Front End Hardware, PC, Lab Oscilloscope &
+	Analog Front End Control, Read Samples with ADC &
+	Send samples to PC and verify they are centred at trigger event &
+	02/05\\
+	
+	\hline
+	\textbf{PC Communication Implementation} - Implement communication to allow control and viewing from software according to specification &
+	EK-TM4C1294XL, PC &
+	Communication Protocol Specification, Software Connected (Toan) &
+	Successful settings \hbox{control} and wave viewing from software &
+	09/05\\
+	
+	\hline
+	\textbf{Complete Touch Screen Interface} - Implement all necessary controls on touch screen &
+	EK-TM4C1294XL, ITDB02, PC, Lab Oscilloscope &
+	TivaWare Graphics Driver, Touch Screen Control &
+	All controls shown on touch screen and tested &
+	12/05\\
+	
+	\hline
+	\multicolumn{4}{|c|}{\textbf{Seminar 2}} & 16/05\\
+	
+	\hline
+	\textbf{Code Tidy-up and Commenting} - Codebase will likely require some tidying or refactoring &
+	PC &
+	All other milestones &
+	Code complete and committed (\emph{Final} tag) &
+	28/05\\
+	
+	\hline
+	\multicolumn{4}{|c|}{\textbf{Final Product Deadline}} & 16/05\\
+	
+	\hline
+	
+	\caption{Project Milestones}
+	\label{milestones}
+\end{longtable}
+
+\bibliographystyle{ieeetr}
+\bibliography{preliminary-report}
+
+\end{document}
