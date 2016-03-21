@@ -26,8 +26,8 @@
 \title{\vspace{-2cm}ENGG4810 Team 26\\
 	Preliminary Design Report\vspace{1cm}}
 \author{
-	\makebox[.4\linewidth]{Ryan Fitzimon}\\
-	43214907\\
+	\makebox[.4\linewidth]{\textbf{Ryan Fitzimon}}\\
+	\textbf{43214907}\\
 	\texttt{ryan.fitzsimon@uq.net.au}
 	\and
 	\makebox[.4\linewidth]{Minh Toan Ho}\\
@@ -68,7 +68,7 @@ The firmware running on the TM4C1294NCPDT will:
 \begin{itemize}
 	\item control the analog frontend amplification and offset using digital potentiometers, multiplexers and possibly programmable gain amplifiers;
 	\item sample both input channels simultaneously using onboard ADCs at a frequency adjustable up to at least 1 MHz and a resolution switchable between 8 bit and 12 bit;
-	\item store at least 50 thousand samples in 8 bit mode or 25 thousand samples in 12 bit mode when a trigger event occurs (with samples centred at the trigger point);
+	\item record samples into a circular buffer of at least 50 thousand samples in 8 bit mode or 25 thousand samples in 12 bit mode;
 	\item process the recorded samples in real time and recognise a trigger event when certain conditions are met and the trigger is armed;
 	\item send the stored samples (centred at the trigger event) for both channels to the PC software over an ethernet connection using TCP in well under 5 seconds;
 	\item display an interface on the touchscreen LCD using the SSD1289 and TSC2046 controllers allowing the user to view and control the function generator, channel coupling, range adjustment and trigger settings;
@@ -179,24 +179,30 @@ The major drawbacks of using an RTOS are higher memory usage and increased debug
 
 TI-RTOS has been chosen due to pre-existing support for the hardware platform, integration with CCS and availability of support. The analysis tools for TI-RTOS available in CCS will help deal the increased complexity and debugging difficulty compared to bare-metal.
 
-\section{Communication Protocols}
-At this stage, it is planned that communication with the PC software will use the TCP protocol due to its reliability and availability of libraries. Reliability is desirable because samples must not be skipped under any circumstances. Using mature and well tested libraries will allow for faster development and reduce the risk of bugs likely to be present in a custom stack. It is possible that the flow and congestion control mechanisms of the TCP protocol may result in unacceptable latency or throughput reduction. However, this is not expected because these mechanisms have the greatest impact in networks where packets are lost frequently\cite{RTOSorBM}. This is very unlikely to occur when using a direct ethernet connection. If unavoidable issues with the TCP protocol are encountered, UDP will be used instead with reliability implemented at the application layer.
-
-The format of messages to be exchanged will be described in a formal protocol specification at an early stage in the project to facilitate parallel development of the software and firmware subsystems.
-
 \section{Front End Control}
-content
+The analog front end is required to provide adjustable offset and amplification. Gain will be controlled by manipulating resistor ratios of sequential inverting amplifiers. The MCU will use multiplexers to select a specific combination of resistors in order to change the gain.
+
+A summing amplifier will be used to adjust the signal offset. The offset component of the signal will be produced using a voltage divider circuit containing a digital potentiometer. The resistance of the potentiometer will be manipulated by the MCU over either SPI or I$^2$C in order to control the offset.
 
 \section{Sampling}
 Two 50 kB buffers, one for each input channel, will be statically allocated. In 8 bit mode, each sample will occupy a byte of the buffer and in 12 bit mode samples will be aligned so that 2 consecutive samples occupy 3 adjacent bytes. Samples will be continuously written to the buffers in a circular fashion until a trigger event occurs. At this point an additional 12.5 thousand or 25 thousand samples (depending on the selected resolution) will be taken before sampling is halted. The current scaling settings, followed by the entire content of the buffers will then be sent to the PC over the Ethernet cable using TCP.
 
-When the sampling scaling or resolution is changed, the buffers will be zeroed to prevent invalid data from being sent.
+When the sampling scaling or resolution is changed, sampling will be paused and the buffers will be zeroed before it resumes. This will prevent invalid data from being sent to the PC.
+
+\section{Function Generator Control}
+The function generator will be implemented using a DAC chip and lookup tables. A separate lookup table will be used for each waveform shape with the exception of the random noise function, which will be implemented using a linear-feedback shift register. 
+
+Scaling of the output signal will be achieved through a combination of firmware and hardware systems. Frequency scaling will be implemented completely in firmware by varying the amount of time between each sample output to the DAC. Amplitude scaling will be achieved through an amplification circuit similar to the one on each of the input channels. Finer adjustment of the output amplitude will be achieved by scaling the DAC output in firmware.
+
+Offset of the output signal will be adjusted using a summing amplifier and a digital potentiometer controlled over either SPI or I$^2$C.
 
 \section{Touch Screen Interface}
 The ITDB02-3.2S TFT display will be controlled using a 16 bit parallel interface to the built-in SSD1289 TFT Driver. The touch screen will be controlled using the built-in TSC2046 touch screen controller. In order to simplify the drawing of interface components on the display, the TivaWare Graphics Library will be used. It is expected that this will involve writing a graphics driver specifically for the SSD1289. This process is well documented\cite{TIgrlib}, but likely to take some time.
 
-\section{Function Generator Control}
-The function generator will be implemented using a DAC chip and lookup tables. A separate lookup table will be used for each waveform shape with the exception of the random noise function, which will be implemented using a linear-feedback shift register. Scaling of the output signal will be achieved through a combination of firmware and hardware systems. Frequency scaling will be implemented completely in firmware by varying the amount of time between each sample output to the DAC. Voltage or amplitude scaling will be achieved through an amplification circuit similar to the one on each of the input channels. Finer adjustment of the output amplitude will be achieved by scaling the DAC output in firmware.
+\section{Communication with Host PC Software}
+At this stage, it is planned that communication with the PC software will use the TCP protocol due to its reliability and availability of libraries. Reliability is desirable because samples must not be skipped under any circumstances. Using mature and well tested libraries will allow for faster development and reduce the risk of bugs likely to be present in a custom stack. It is possible that the flow and congestion control mechanisms of the TCP protocol may result in unacceptable latency or throughput reduction. However, this is not expected because these mechanisms have the greatest impact in networks where packets are lost frequently\cite{TCPCongestion} and packet loss should be very rare when using a direct ethernet connection. If unavoidable issues with the TCP protocol are encountered, UDP will be used instead with reliability implemented at the application layer.
+
+The format of messages to be exchanged will be described in a formal protocol specification at an early stage in the project to facilitate parallel development of the software and firmware subsystems.
 
 \chapter{Individual Milestones}
 \autoref{milestones} shows the milestones that will be used to demonstrate progress over the duration of the project.
