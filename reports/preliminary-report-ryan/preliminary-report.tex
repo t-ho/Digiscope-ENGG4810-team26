@@ -50,14 +50,51 @@
 
 \chapter{Team Design Overview}
 \section{Hardware}
-content
+\subsection{Analog Frontend}
+The analog front end will consist of analog circuitry which will provide filtering, offset and amplification for the two input ADC channels as requested by the user. The frontend will consist of multiple circuits, selected by digital multiplexers, which provide different amplification and offset properties. Multiplexers have been chosen as the selection mechanism because they are cheap and easy to implement. The sequential order for the analog frontend is DC offset, filtering, coupling, amplification and finally voltage limiting. The PCB will be powered by a single 24 V DC supply regulated down to $\pm$5 V using a switching regulator in orderto power individual components such as the LCD and microcontroller.
+
+The first stage of the analog frontend will allow the user to introduce an offset of $\pm$4.5 V to the input signal with a 10 bit resolution. The offset will be created through the use of a non-inverting summing amplifier. The summing amplifier will have two inputs; the signal and the offset voltage, which will be manipulated using a voltage divider with a 10-bit digital potentiometer controlled by the microcontroller.
+
+The frontend will allow the user to select bandpass or lowpass anti aliasing filters for the input signals. The bandpass and lowpass filters will have gentle roll-offs and low ripple characteristics. They will eliminate frequencies outside of 550 kHz - 850 kHz and 0 - 300 kHz respectively. The signal will be sampled at a rate of approximately 1 MHz by the microcontroller ADC, after which a much steeper digital filter will be applied in software to reduce the passbands to 650 kHz - 750 kHz and 0 - 300 kHz. This will allow for greater control, reduce aliasing and increase the signal to noise ratio (SNR).
+
+The amplification of the input signal will be determined by the user’s requested range. An AC signal filling the entire displayed range will be scaled to 3.3 Vp-p with an offset of +1.65 V so that the full resolution of the ADC can be used. This will be achieved using sequential inverting amplifiers with multiplexed resistors connected to ground, followed by a summing amplifier. The final stage in the analog frontend is a voltage clipping/limiting circuit used to clip any voltages outside the 0-3.3 V range to protect the microcontroller. This circuitry is completed using zener diodes, a resistor and a -5 V source.
+
+\subsection{Function Generator}
+The hardware for the function generator will consist of a 12-bit Digital-Analog Converter (DAC) and an amplification circuit. After being amplified to the correct amplitude with sequential inverting amplifiers in a similar configuration to that used in the front end, the signal will be fed into a summing amplifier with an offset voltage as the other input. To generate an offset of $\pm$2.5 V, a voltage divider between \hbox{$\pm$5 V} rails with a 10-bit digital potentiometer will be used. The signal will then be able to be amplified to give a configurable peak to peak voltage of 100 mV, 200 mV, 500 mV, 1 V or 2 V.
+
+\newpage
 \section{Firmware}
+The firmware running on the TM4C1294NCPDT will:
+\begin{itemize}
+	\item control the analog frontend amplification and offset using digital potentiometers, multiplexers and possibly programmable gain amplifiers;
+	\item sample both input channels simultaneously using onboard ADCs at a frequency adjustable up to at least 1 MHz and a resolution switchable between 8 bit and 12 bit;
+	\item store at least 50 thousand samples in 8 bit mode or 25 thousand samples in 12 bit mode when a trigger event occurs (with samples centred at the trigger point);
+	\item process the recorded samples in real time and recognise a trigger event when certain conditions are met and the trigger is armed;
+	\item send the stored samples (centred at the trigger event) for both channels to the PC software over an ethernet connection using TCP in well under 5 seconds;
+	\item display an interface on the touchscreen LCD using the SSD1289 and TSC2046 controllers allowing the user to view and control the function generator, channel coupling, range adjustment and trigger settings;
+	\item control the DAC of the function generator to output the selected signal and the attached amplification circuit to scale the signal to the correct voltage; and
+	\item alert the user to the current status of the device using a power LED and over-voltage warnings on the LCD display.
+\end{itemize}
+
 \section{Software}
+A top down design approach is implemented for the development of the products. To achieve the best results, the approach focuses on collaborating the iterative delivery of systems. To develop the software our team will use a myriad of design and coding principles including object-oriented programming language, design patterns such as model view controllers and listeners, and diagrams including UML class diagram, state, program flow chart.
+
+The desktop-based software will:
+\begin{itemize}
+	\item enable users to establish communication between it and Digiscope device via Ethernet by entering the IP address from TFT display into the graphical user interface;
+	\item acquire data from the device;
+	\item display the data as a single plot of voltage versus time for each oscilloscope channel;
+	\item allow the user to inspect the acquired data interactively;
+	\item implement digital filters to limit displayed frequencies to the selected range;
+	\item be able to derive and display a single Math channel;
+	\item be able to generate a single filter channel trace; and
+	\item provide at least five measurement functions per channel.
+\end{itemize}
 
 \chapter{Team Roles and Project Plan}
 Each team member has been assigned as the leader for a specific section of the project. The leader of a section is not expected to complete all related work without assistance, but they will be responsible for verifying the quality of work and ensuring adequate progress is made. Each team member will be expected to have a thorough understanding of their entire section and keep up to date with any relevant developments. Responsibilities have been clearly defined in order to allow each member to understand their role in the team and be aware of what is required from them.
 
-\vspace{.8cm}
+\vspace{0.4cm}
 \begin{tabular}{l p{0.7\textwidth}}
 	
 	\pbox{20cm}{\textbf{Ryan Fitzsimon} \\ Firmware Section Leader} &
@@ -65,7 +102,7 @@ Each team member has been assigned as the leader for a specific section of the p
 		\item Firmware readme and repository maintenance
 		\item Signal sampling
 		\item Trigger event detection
-		\item Communication protocol specification
+		\item Communication protocol specification and implementation
 		\item Touch screen communication and interface design
 		\item Electronic control of analog front end
 		\item Firmware component of function generator
@@ -74,10 +111,12 @@ Each team member has been assigned as the leader for a specific section of the p
 	\pbox{20cm}{\textbf{Minh Toan Ho} \\ Software Section Leader} &
 	{\begin{itemize}
 		\item Software readme and repository maintenance
-		\item Communication protocol specification
+		\item Communication protocol specification and implementation
 		\item Graphical user interface (GUI) of software
 		\item Waveform visualization
 		\item Waveform data manipulation
+		\item Digital filtering
+		\item Software installer
 	\end{itemize}}\\
 	
 	\pbox{20cm}{\textbf{Christopher Low} \\ Hardware Section Co-leader} &
@@ -87,12 +126,12 @@ Each team member has been assigned as the leader for a specific section of the p
 		\item Analog Frontend
 		\begin{itemize}
 			\item Low pass anti aliasing filter (0-250kHz)
-			\item Bandpass filter (650kHz - 750kHz)
+			\item Bandpass filter (650 kHz - 750 kHz)
 			\item Voltage Clipping / Restrictor Circuits
-			\item DC Offset (+/- 4.5V)
+			\item DC Offset ($\pm$4.5 V)
 			\item Amplifiers
 		\end{itemize}
-		\item Assisting Ryan with firmware to make sure that the hardware and firmware design complement one another (e.g. anti aliasing filter and digital filter)
+		\item Assisting Ryan with firmware to make sure that the hardware and firmware design complement one another
 	\end{itemize}}\\
 
 	\pbox{20cm}{\textbf{Joshua Mason} \\ Hardware Section Co-leader} &
@@ -113,27 +152,28 @@ In order to succeed in this project, effective communication between our team me
 \section{File Management}
 Files other than source code will be stored in a shared Google Drive folder. This will include reports, datasheets, an up to date bill of materials and any other design files from programs such as LTspice and Altium Designer. Google Drive will be used to enable collaborative editing of reports.
 \section{Meetings}
-The team plans to meet once a week formally, and at least once a week informally in a prac. The team plans to meet Monday from 2pm for a formal meeting to discuss progress, issues and problems faced from the week before, as well as goals for the week ahead. Later in the semester and as assessment requires, the team will meet more often, and meetings will be recorded on Slack.
+The team plans to meet once a week formally, and at least once a week informally in a prac. The team plans to meet Monday from 2pm for a formal meeting to discuss progress, issues and problems faced from the week before, as well as goals for the week ahead. Later in the semester and as assessment requires, the team will meet more often. Meetings will be recorded on Slack.
 
 Team attendance is very important to operating effectively. As such team members should check Slack regularly and attend all meetings and prac times. If a team member cannot make it to a meeting they should inform the team prior to the session and make an effort to catch up on any missed information from that meeting.
 \section{Coding Practice}
 As the head developers in the sections of software and firmware respectively, Toan and Ryan will be responsible for all changes in those areas on the master branch of the git repository. Other team members will not be permitted to modify the master branch directly. Instead, separate individual branches will be created to allow contributions. After changes are made Toan and/or Ryan should be alerted (depending on the section modified) so that they can be reviewed and merged into the master branch.
 
-The master branch should be in a compilable state at all times. Any changes likely to compromise this should be introduced in separate branches and merged after testing. Instructions for environment setup and project building will be added to the repository readme so that any team member can build the software and firmware if desired.
+The master branch should be in a compilable state at all times. Any changes likely to compromise this should be introduced in separate branches and merged after testing. Instructions for environment setup and project building will be added to the repository readme so that any team member can build the software and firmware.
+
 \section{Coding Style}
 The MCU firmware, which will be written in C, will follow the OpenBSD Kernel Source File Style Guide\cite{CStyle}. Sensible adaptations will be made where necessary (i.e. TI-RTOS \#includes will replace kernel \#includes).
 The PC-based software, which will be written in Java, will follow the Java Programming Style Guidelines from Geotechnical Software Services\cite{JavaStyle}. 
 
 \chapter{Individual Design Overview}
 \section{Toolchain and Libraries}
-Code Composer Studio (CCS) will be used to develop the project firmware. The TI Code Generation Tools, including the proprietary compiler, will be used for program compilation. This choice has been made due to the official support, additional analysis tools and higher levels of optimization\cite{TICompilers}. Tivaware libraries will be used for peripherals, graphics and communication and TI-RTOS will be used.
+Code Composer Studio (CCS) will be used to develop the project firmware. The TI Code Generation Tools, including the proprietary compiler, will be used for program compilation. This choice has been made due to the official support, additional analysis tools and higher levels of optimization\cite{TICompilers}. TivaWare libraries will be used for peripherals, graphics and communication and TI-RTOS will be used.
 
-The TI tools and libraries are available under a variety of licenses. CCS and the included tools are available under a free limited license which permits production use. For the EK-TM4C1294XL, use of the built in Stellaris in-circuit debug interface is permitted and code size is not restricted. Most components of TI-RTOS are licensed under the BSD license and Tivaware is completely royalty free. This means that no licensing issues are expected with the use of these tools and libraries.
+The TI tools and libraries are available under a variety of licenses. CCS and the included tools are available under a free limited license which permits production use. For the EK-TM4C1294XL, use of the built in Stellaris in-circuit debug interface is permitted and code size is not restricted. Most components of TI-RTOS are licensed under the BSD license and TivaWare is completely royalty free. This means that no licensing issues are expected with the use of these tools and libraries.
 
 The use of a completely open (GPL licensed) toolchain using GCC, OpenOCD, GDB and lm4flash was also investigated but the CCS based toolchain was ultimately chosen due to better support, ease of use and compatibility with lab computers.
 
 \section{RTOS Selection}
-Using a real-time operating system (RTOS) offers a number advantages over a bare-metal firmware implementation, including preemption, middleware and increased portability\cite{rtosfactors}. Preemption will allow for control of priorities which will be useful when scheduling sampling, processing and communication tasks. Available middleware, specifically the network stack, will reduce the amount of work required to communicate with the software component of the system.
+Using a real-time operating system (RTOS) offers a number advantages over a bare-metal firmware implementation, including preemption, middleware and increased portability\cite{RTOSorBM}. Preemption will allow for control of priorities which will be useful when scheduling sampling, processing and communication tasks. Available middleware, specifically the network stack, will reduce the amount of work required to communicate with the software component of the system.
 
 The major drawbacks of using an RTOS are higher memory usage and increased debugging difficulty due to additional abstraction layers. The relatively large amount (256 kB) of RAM available on the TM4C1294NCPDT means that the increased memory usage is of little concern.
 
@@ -247,14 +287,14 @@ The function generator will be implemented using a DAC chip and lookup tables. A
 	\hline
 	\textbf{Analog Front End Control} - Control amplification, offset and coupling from MCU &
 	EK-TM4C1294XL, Analog Front End Hardware, PC, Lab Oscilloscope &
-	Environment Setup &
+	Environment Setup, Preliminary Board Soldered (Josh) &
 	Show control of gain, offset and coupling on oscilloscope &
 	28/04\\
 			
 	\hline
 	\textbf{Function Generator Control} - Output required waveforms (at all required amplitudes) &
 	EK-TM4C1294XL, Function Generator Hardware, PC, Lab Oscilloscope &
-	DAC Output &
+	DAC Output, Preliminary Board Soldered (Josh) &
 	Show all waveforms on oscilloscope &
 	28/04\\
 	

@@ -27,4 +27,5 @@ bin/*
 *.aux
 *.synctex.gz
 *.bbl
+*.blg
 *.out
