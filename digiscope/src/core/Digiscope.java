@@ -1,10 +1,29 @@
 package core;
 
+import java.awt.EventQueue;
+
+import core.LaunchWindow;
+
+/**
+ *
+ * @author ToanHo
+ */
 public class Digiscope {
+	
+	private LaunchWindow launchWindow_;
+	
+	public Digiscope() {
+		launchWindow_ = new LaunchWindow();
+		launchWindow_.setVisible(true);
+	}
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		System.out.println("Welcome to ENGG4810 - Team 26");
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new Digiscope();
+			}
+		});
 	}
 
 }
