@@ -34,12 +34,6 @@ public class LaunchWindowUI extends JFrame {
 	}
 
 	private void initializeComponents() {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
-		catch (Exception exception) {
-			exception.printStackTrace();
-		}
 		
 		mainPanel_ = new JPanel();
 		firstRowPanel_ = new JPanel();
