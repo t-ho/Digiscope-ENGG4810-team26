@@ -1,6 +1,6 @@
 package core;
 
-import java.awt.EventQueue;
+import javax.swing.SwingUtilities;
 
 import core.LaunchWindow;
 import data.Constant;
@@ -20,7 +20,7 @@ public class Digiscope {
 
 	public static void main(String[] args) {
 		Constant.setLookAndFeel();
-		EventQueue.invokeLater(new Runnable() {
+		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				new Digiscope();

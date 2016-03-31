@@ -11,7 +11,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 /**
@@ -74,8 +73,8 @@ public class LaunchWindowUI extends JFrame {
 		mainPanel_.add(statusLabel);
 		
 		// secondRowPanel contains connectButton
-		secondRowPanel_.setPreferredSize(new Dimension(460, 80));
-		secondRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 20));
+		secondRowPanel_.setPreferredSize(new Dimension(460, 75));
+		secondRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 15));
 
 		connectButton.setPreferredSize(new Dimension(140, 40));
 		connectButton.setFont(new Font("Lucida Grande", 1, 16));
