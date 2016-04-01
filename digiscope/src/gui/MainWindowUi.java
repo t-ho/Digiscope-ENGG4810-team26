@@ -10,6 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -26,7 +27,7 @@ import data.Constant;
  *
  * @author ToanHo
  */
-public class MainWindowUI extends javax.swing.JFrame {
+public class MainWindowUi extends JFrame {
 
     protected JButton aButton;
     protected JLabel averageVoltageLabel;
@@ -189,7 +190,7 @@ public class MainWindowUI extends javax.swing.JFrame {
     /**
      * Creates new form MainWindowUI
      */
-    public MainWindowUI() {
+    public MainWindowUi() {
         initializeComponents();
         validate();
         //Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -382,7 +383,7 @@ public class MainWindowUI extends javax.swing.JFrame {
         horizontalRangeALabel1_.setText("Range:");
         horizontalALeftPanel_.add(horizontalRangeALabel1_);
 
-        horizontalRangeAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_RANGE_VALUES));
+        horizontalRangeAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_RANGE_VALUES));
         horizontalRangeAComboBox.setPreferredSize(new Dimension(95, 20));
         horizontalALeftPanel_.add(horizontalRangeAComboBox);
 

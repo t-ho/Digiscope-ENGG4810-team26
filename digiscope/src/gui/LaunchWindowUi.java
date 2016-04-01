@@ -19,7 +19,7 @@ import data.Constant;
  *
  * @author ToanHo
  */
-public class LaunchWindowUI extends JFrame {
+public class LaunchWindowUi extends JFrame {
 
 	private JPanel mainPanel_;
 	private JPanel firstRowPanel_;
@@ -29,7 +29,7 @@ public class LaunchWindowUI extends JFrame {
 	protected JTextField ipAddressTextField;
 	protected JButton connectButton;
 	
-	public LaunchWindowUI() {
+	public LaunchWindowUi() {
 		initializeComponents();
 		validate();
 	}
