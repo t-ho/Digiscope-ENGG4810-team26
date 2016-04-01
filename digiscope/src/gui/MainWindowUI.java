@@ -1,13 +1,15 @@
 package gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -16,179 +18,182 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+
+import data.Constant;
 
 /**
  *
  * @author ToanHo
  */
-public class MainWindowUI extends JFrame {
+public class MainWindowUI extends javax.swing.JFrame {
 
-    private JButton aButton;
+    protected JButton aButton;
     protected JLabel averageVoltageLabel;
-    private JButton bButton;
-    private JButton browseButton;
+    private JLabel averageVoltageLabel_;
+    protected JButton bButton;
+    protected JButton browseButton;
     private JPanel canvasPanel;
     private JPanel channelAPanel_;
     private JPanel channelBPanel_;
-    private JTabbedPane channelTabbedPane;
-    private JTextField csvFilePathTextField;
+    protected JTextField csvFilePathTextField;
     private JPanel cursorPanel_;
-    private JButton divideButton;
-    private JButton eButton;
-    private JToggleButton enableFilterToggleButton;
-    private JToggleButton enableMathToggleButton;
+    protected JButton divideButton;
+    protected JButton eButton;
+    protected JToggleButton enableFilterToggleButton;
+    protected JToggleButton enableMathToggleButton;
+    private JPanel equationBottomPanel_;
     private JPanel equationPannel_;
-    private JTextField equationTextField;
-    private JButton fButton;
+    protected JTextField equationTextField;
+    private JPanel equationTopPanel_;
+    protected JButton fButton;
     private JPanel filterChannelPanel_;
-    private JButton forceTriggerButton;
+    protected JButton forceTriggerButton;
     protected JLabel frequencyLabel;
-    private JSpinner functionGeneratorOffsetSpinner;
+    private JLabel frequencyLabel_;
+    private JPanel functionGeneratorBottomLeftPanel_;
+    private JPanel functionGeneratorBottomRightPanel_;
+    private JPanel functionGeneratorMiddlePanel_;
+    private JLabel functionGeneratorOffsetLabel_;
+    protected JSpinner functionGeneratorOffsetSpinner;
     private JPanel functionGeneratorPanel_;
+    private JPanel functionGeneratorTopPanel_;
+    private JPanel horizontalALeftPanel_;
     private JPanel horizontalAPanel_;
+    private JPanel horizontalARightPanel_;
+    private JPanel horizontalBLeftPanel_;
     private JPanel horizontalBPanel_;
+    private JPanel horizontalFilterLeftPanel_;
     private JPanel horizontalFilterPanel_;
+    private JPanel horizontalFilterRightPanel_;
+    private JPanel horizontalMathLeftPanel_;
     private JPanel horizontalMathPanel_;
-    private JSpinner horizontalOffsetASpinner;
-    private JSpinner horizontalOffsetBSpinner;
+    private JTabbedPane channelTabbedPane;
+    private JLabel horizontalOffsetALabel1_;
+    private JLabel horizontalOffsetALabel2_;
+    protected JSpinner horizontalOffsetASpinner;
+    private JLabel horizontalOffsetBLabel1_;
+    private JLabel horizontalOffsetBLabel2_;
+    protected JSpinner horizontalOffsetBSpinner;
+    private JLabel horizontalOffsetFilterLabel1_;
+    private JLabel horizontalOffsetFilterLabel2_;
     private JSpinner horizontalOffsetFilterSpinner;
-    private JSpinner horizontalOffsetMathSpinner;
-    private JComboBox horizontalRangeAComboBox;
-    private JComboBox horizontalRangeBComboBox;
-    private JComboBox horizontalRangeFilterComboBox;
-    private JLabel horizontalRangeLabel_1;
-    private JLabel horizontalRangeLabel_2;
-    private JLabel horizontalRangeLabel_20;
-    private JLabel horizontalRangeLabel_29;
-    private JLabel horizontalRangeLabel_3;
-    private JLabel horizontalRangeLabel_30;
-    private JLabel horizontalRangeLabel_31;
-    private JLabel horizontalRangeLabel_32;
-    private JLabel horizontalRangeLabel_33;
-    private JLabel horizontalRangeLabel_34;
-    private JLabel horizontalRangeLabel_35;
-    private JLabel horizontalRangeLabel_36;
-    private JLabel horizontalRangeLabel_37;
-    private JLabel horizontalRangeLabel_38;
-    private JLabel horizontalRangeLabel_39;
-    private JLabel horizontalRangeLabel_40;
-    private JLabel horizontalRangeLabel_41;
-    private JLabel horizontalRangeLabel_42;
-    private JLabel horizontalRangeLabel_43;
-    private JLabel horizontalRangeLabel_44;
-    private JLabel horizontalRangeLabel_45;
-    private JLabel horizontalRangeLabel_46;
-    private JLabel horizontalRangeLabel_47;
-    private JLabel horizontalRangeLabel_48;
-    private JLabel horizontalRangeLabel_49;
-    private JLabel horizontalRangeLabel_50;
-    private JLabel horizontalRangeLabel_51;
-    private JLabel horizontalRangeLabel_52;
-    private JLabel horizontalRangeLabel_53;
+    private JLabel horizontalOffsetMathLabel1_;
+    private JLabel horizontalOffsetMathLabel2_;
+    protected JSpinner horizontalOffsetMathSpinner;
+    protected JComboBox<String> horizontalRangeAComboBox;
+    private JLabel horizontalRangeALabel1_;
+    private JLabel horizontalRangeALabel2_;
+    protected JComboBox<String> horizontalRangeBComboBox;
+    private JLabel horizontalRangeBLabel1_;
+    private JLabel horizontalRangeBLabel2_;
+    private JComboBox<String> horizontalRangeFilterComboBox;
+    private JLabel horizontalRangeFilterLabel1_;
+    private JLabel horizontalRangeFilterLabel2_;
     private JLabel horizontalRangeLabel_54;
-    private JLabel horizontalRangeLabel_55;
-    private JLabel horizontalRangeLabel_56;
-    private JLabel horizontalRangeLabel_57;
-    private JLabel horizontalRangeLabel_58;
-    private JComboBox horizontalRangeMathComboBox;
-    private JComboBox inputChannelComboBox;
+    protected JComboBox<String> horizontalRangeMathComboBox;
+    private JLabel horizontalRangeMathLabel1_;
+    private JLabel horizontalRangeMathLabel2_;
+    private JPanel inputBottomPanel_;
+    protected JComboBox<String> inputChannelComboBox;
     private JPanel inputPanel_;
-    private JLabel jLabel1;
-    private JLabel jLabel10;
-    private JLabel jLabel11;
-    private JLabel jLabel12;
-    private JLabel jLabel13;
-    private JLabel jLabel14;
-    private JLabel jLabel16;
-    private JLabel jLabel18;
-    private JLabel jLabel2;
-    private JLabel jLabel20;
-    private JLabel jLabel3;
+    private JPanel inputTopPanel_;
     private JLabel jLabel4;
-    private JLabel jLabel5;
-    private JLabel jLabel7;
-    private JPanel jPanel14;
-    private JPanel jPanel15;
-    private JPanel jPanel16;
-    private JPanel jPanel17;
-    private JPanel jPanel18;
-    private JPanel jPanel19;
-    private JPanel jPanel20;
-    private JPanel jPanel21;
-    private JPanel jPanel22;
-    private JPanel jPanel23;
-    private JPanel jPanel24;
-    private JPanel jPanel25;
-    private JPanel jPanel26;
-    private JPanel jPanel27;
-    private JPanel jPanel28;
-    private JPanel jPanel29;
-    private JPanel jPanel30;
-    private JPanel jPanel31;
-    private JPanel jPanel32;
-    private JPanel jPanel33;
-    private JPanel jPanel34;
-    private JPanel jPanel35;
-    private JPanel jPanel36;
-    private JPanel jPanel37;
-    private JPanel jPanel38;
-    private JPanel jPanel4;
-    private JPanel jPanel40;
-    private JPanel jPanel41;
-    private JPanel jPanel42;
-    private JPanel jPanel43;
-    private JPanel jPanel44;
-    private JPanel jPanel45;
-    private JPanel jPanel46;
-    private JPanel jPanel47;
-    private JPanel jPanel5;
-    private JPanel jPanel6;
+    private JPanel horizontalBRightPanel_;
+    private JPanel horizontalMathRightPanel_;
     private JPanel leftPanel_;
-    private JButton leftParatheseButton;
+    protected JButton leftParatheseButton;
     private JPanel mathChannelPanel_;
     protected JLabel maxP2pVoltageLabel;
+    private JLabel maxP2pVoltageLabel_;
     protected JLabel maxVoltageLabel;
+    private JLabel maxVoltageLabel_;
+    private JPanel measurementBottomLeftPanel_;
+    private JPanel measurementBottomRightPanel_;
+    private JPanel measurementMiddleLeftPanel_;
+    private JPanel measurementMiddleRightPanel_;
+    private JPanel measurementTopLeftPanel_;
+    private JPanel measurementTopRightPanel_;
     private JPanel measurementsPanel_;
     protected JLabel minVoltageLabel;
-    private JButton minusButton;
-    private JButton multiplyButton;
-    private JToggleButton outputToggleButton;
-    private JTextField p2pVoltageTextField;
-    private JButton piButton;
-    private JButton plusButton;
-    private JButton powerButton;
-    private JButton rearmTriggerButton;
+    private JLabel minVoltageLabel_;
+    protected JButton minusButton;
+    protected JButton multiplyButton;
+    private JLabel outputLabel_;
+    protected JToggleButton outputToggleButton;
+    private JLabel p2pVoltageLabel_;
+    protected JTextField p2pVoltageTextField;
+    protected JButton piButton;
+    protected JButton plusButton;
+    protected JButton powerButton;
+    protected JButton rearmTriggerButton;
     private JPanel rightPanel_;
-    private JButton rightParatheseButton;
+    protected JButton rightParatheseButton;
     protected JLabel standardDeviationVoltageLabel;
+    private JLabel standardDeviationVoltageLabel_;
     private JToolBar toolBar_;
-    private JComboBox triggerModeComboBox;
+    private JPanel triggerBottomPanel;
+    private JPanel triggerMiddleLeftPanel1_;
+    private JPanel triggerMiddleLeftPanel2_;
+    private JPanel triggerMiddleRightPanel1_;
+    private JPanel triggerMiddleRightPanel2_;
+    protected JComboBox<String> triggerModeComboBox;
+    private JLabel triggerModeLabel_;
     private JPanel triggerPanel_;
-    private JLabel triggerStateLabel;
-    private JSpinner triggerThresholdSpinner;
-    private JComboBox triggerTypeComboBox;
+    protected JLabel triggerStateLabel;
+    private JLabel triggerStateLabel_;
+    private JLabel triggerThresholdLabel_;
+    protected JSpinner triggerThresholdSpinner;
+    private JPanel triggerTopPanel_;
+    protected JComboBox<String> triggerTypeComboBox;
+    private JLabel triggerTypeLabel_;
+    private JPanel verticalALeftPanel_;
     private JPanel verticalAPannel_;
+    private JPanel verticalARightPanel_;
+    private JPanel verticalBLeftPanel_;
     private JPanel verticalBPanel_;
+    private JPanel verticalBRightPanel_;
+    private JPanel verticalFilterLeftPanel_;
     private JPanel verticalFilterPanel_;
+    private JPanel verticalFilterRightPanel_;
+    private JPanel verticalMathLeftPanel_;
     private JPanel verticalMathPanel_;
-    private JSpinner verticalOffsetASpinner;
-    private JSpinner verticalOffsetBSpinner;
+    private JPanel verticalMathRightPanel_;
+    private JLabel verticalOffsetALabel1_;
+    private JLabel verticalOffsetALabel2_;
+    protected JSpinner verticalOffsetASpinner;
+    private JLabel verticalOffsetBLabel1_;
+    private JLabel verticalOffsetBLabel2_;
+    protected JSpinner verticalOffsetBSpinner;
+    private JLabel verticalOffsetFilterLabel1_;
+    private JLabel verticalOffsetFilterLabel2_;
     private JSpinner verticalOffsetFilterSpinner;
-    private JSpinner verticalOffsetMathSpinner;
-    private JComboBox verticalRangeAComboBox;
-    private JComboBox verticalRangeBComboBox;
-    private JComboBox verticalRangeFilterComboBox;
-    private JComboBox verticalRangeMathComboBox;
-    private JComboBox waveTypeComboBox;
+    private JLabel verticalOffsetMathLabel1_;
+    private JLabel verticalOffsetMathLabel2_;
+    protected JSpinner verticalOffsetMathSpinner;
+    protected JComboBox<String> verticalRangeAComboBox;
+    private JLabel verticalRangeALabel1_;
+    private JLabel verticalRangeALabel2_;
+    protected JComboBox<String> verticalRangeBComboBox;
+    private JLabel verticalRangeBLabel1_;
+    private JLabel verticalRangeBLabel2_;
+    private JComboBox<String> verticalRangeFilterComboBox;
+    private JLabel verticalRangeFilterLabel1_;
+    private JLabel verticalRangeFilterLabel2_;
+    protected JComboBox<String> verticalRangeMathComboBox;
+    private JLabel verticalRangeMathLabel1_;
+    private JLabel verticalRangeMathLabel2_;
+    protected JComboBox<String> waveTypeComboBox;
+    private JLabel waveTypeLabel_;
+
     /**
      * Creates new form MainWindowUI
      */
     public MainWindowUI() {
         initializeComponents();
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        System.out.println(dim.width + " x " + dim.height);
+        validate();
+        //Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        //System.out.println(dim.width + " x " + dim.height);
     }
 
     /**
@@ -201,48 +206,48 @@ public class MainWindowUI extends JFrame {
         channelTabbedPane = new JTabbedPane();
         channelAPanel_ = new JPanel();
         horizontalAPanel_ = new JPanel();
-        jPanel5 = new JPanel();
-        horizontalRangeLabel_3 = new JLabel();
-        horizontalRangeAComboBox = new JComboBox();
-        horizontalRangeLabel_1 = new JLabel();
-        jPanel6 = new JPanel();
-        horizontalRangeLabel_2 = new JLabel();
+        horizontalALeftPanel_ = new JPanel();
+        horizontalRangeALabel1_ = new JLabel();
+        horizontalRangeAComboBox = new JComboBox<String>();
+        horizontalRangeALabel2_ = new JLabel();
+        horizontalARightPanel_ = new JPanel();
+        horizontalOffsetALabel1_ = new JLabel();
         horizontalOffsetASpinner = new JSpinner();
-        horizontalRangeLabel_20 = new JLabel();
+        horizontalOffsetALabel2_ = new JLabel();
         verticalAPannel_ = new JPanel();
-        jPanel36 = new JPanel();
-        horizontalRangeLabel_55 = new JLabel();
-        verticalRangeAComboBox = new JComboBox();
-        horizontalRangeLabel_56 = new JLabel();
-        jPanel37 = new JPanel();
-        horizontalRangeLabel_57 = new JLabel();
+        verticalALeftPanel_ = new JPanel();
+        verticalRangeALabel1_ = new JLabel();
+        verticalRangeAComboBox = new JComboBox<String>();
+        verticalRangeALabel2_ = new JLabel();
+        verticalARightPanel_ = new JPanel();
+        verticalOffsetALabel1_ = new JLabel();
         verticalOffsetASpinner = new JSpinner();
-        horizontalRangeLabel_58 = new JLabel();
+        verticalOffsetALabel2_ = new JLabel();
         channelBPanel_ = new JPanel();
         horizontalBPanel_ = new JPanel();
-        jPanel14 = new JPanel();
-        horizontalRangeLabel_29 = new JLabel();
-        horizontalRangeBComboBox = new JComboBox();
-        horizontalRangeLabel_30 = new JLabel();
-        jPanel15 = new JPanel();
-        horizontalRangeLabel_31 = new JLabel();
+        horizontalBLeftPanel_ = new JPanel();
+        horizontalRangeBLabel1_ = new JLabel();
+        horizontalRangeBComboBox = new JComboBox<String>();
+        horizontalRangeBLabel2_ = new JLabel();
+        horizontalBRightPanel_ = new JPanel();
+        horizontalOffsetBLabel1_ = new JLabel();
         horizontalOffsetBSpinner = new JSpinner();
-        horizontalRangeLabel_32 = new JLabel();
+        horizontalOffsetBLabel2_ = new JLabel();
         verticalBPanel_ = new JPanel();
-        jPanel16 = new JPanel();
-        horizontalRangeLabel_33 = new JLabel();
-        verticalRangeBComboBox = new JComboBox();
-        horizontalRangeLabel_34 = new JLabel();
-        jPanel17 = new JPanel();
-        horizontalRangeLabel_35 = new JLabel();
+        verticalBLeftPanel_ = new JPanel();
+        verticalRangeBLabel1_ = new JLabel();
+        verticalRangeBComboBox = new JComboBox<String>();
+        verticalRangeBLabel2_ = new JLabel();
+        verticalBRightPanel_ = new JPanel();
+        verticalOffsetBLabel1_ = new JLabel();
         verticalOffsetBSpinner = new JSpinner();
-        horizontalRangeLabel_36 = new JLabel();
+        verticalOffsetBLabel2_ = new JLabel();
         mathChannelPanel_ = new JPanel();
         equationPannel_ = new JPanel();
-        jPanel28 = new JPanel();
+        equationTopPanel_ = new JPanel();
         equationTextField = new JTextField();
         enableMathToggleButton = new JToggleButton();
-        jPanel35 = new JPanel();
+        equationBottomPanel_ = new JPanel();
         aButton = new JButton();
         bButton = new JButton();
         fButton = new JButton();
@@ -256,492 +261,492 @@ public class MainWindowUI extends JFrame {
         multiplyButton = new JButton();
         divideButton = new JButton();
         horizontalMathPanel_ = new JPanel();
-        jPanel18 = new JPanel();
-        horizontalRangeLabel_37 = new JLabel();
-        horizontalRangeMathComboBox = new JComboBox();
-        horizontalRangeLabel_38 = new JLabel();
-        jPanel19 = new JPanel();
-        horizontalRangeLabel_39 = new JLabel();
+        horizontalMathLeftPanel_ = new JPanel();
+        horizontalRangeMathLabel1_ = new JLabel();
+        horizontalRangeMathComboBox = new JComboBox<String>();
+        horizontalRangeMathLabel2_ = new JLabel();
+        horizontalMathRightPanel_ = new JPanel();
+        horizontalOffsetMathLabel1_ = new JLabel();
         horizontalOffsetMathSpinner = new JSpinner();
-        horizontalRangeLabel_40 = new JLabel();
+        horizontalOffsetMathLabel2_ = new JLabel();
         verticalMathPanel_ = new JPanel();
-        jPanel20 = new JPanel();
-        horizontalRangeLabel_41 = new JLabel();
-        verticalRangeMathComboBox = new JComboBox();
-        horizontalRangeLabel_42 = new JLabel();
-        jPanel21 = new JPanel();
-        horizontalRangeLabel_43 = new JLabel();
+        verticalMathLeftPanel_ = new JPanel();
+        verticalRangeMathLabel1_ = new JLabel();
+        verticalRangeMathComboBox = new JComboBox<String>();
+        verticalRangeMathLabel2_ = new JLabel();
+        verticalMathRightPanel_ = new JPanel();
+        verticalOffsetMathLabel1_ = new JLabel();
         verticalOffsetMathSpinner = new JSpinner();
-        horizontalRangeLabel_44 = new JLabel();
+        verticalOffsetMathLabel2_ = new JLabel();
         filterChannelPanel_ = new JPanel();
         inputPanel_ = new JPanel();
-        jPanel34 = new JPanel();
+        inputTopPanel_ = new JPanel();
         jLabel4 = new JLabel();
-        inputChannelComboBox = new JComboBox();
+        inputChannelComboBox = new JComboBox<String>();
         enableFilterToggleButton = new JToggleButton();
-        jPanel29 = new JPanel();
+        inputBottomPanel_ = new JPanel();
         csvFilePathTextField = new JTextField();
         browseButton = new JButton();
         horizontalFilterPanel_ = new JPanel();
-        jPanel22 = new JPanel();
-        horizontalRangeLabel_45 = new JLabel();
-        horizontalRangeFilterComboBox = new JComboBox();
-        horizontalRangeLabel_46 = new JLabel();
-        jPanel23 = new JPanel();
-        horizontalRangeLabel_47 = new JLabel();
+        horizontalFilterLeftPanel_ = new JPanel();
+        horizontalRangeFilterLabel1_ = new JLabel();
+        horizontalRangeFilterComboBox = new JComboBox<String>();
+        horizontalRangeFilterLabel2_ = new JLabel();
+        horizontalFilterRightPanel_ = new JPanel();
+        horizontalOffsetFilterLabel1_ = new JLabel();
         horizontalOffsetFilterSpinner = new JSpinner();
-        horizontalRangeLabel_48 = new JLabel();
+        horizontalOffsetFilterLabel2_ = new JLabel();
         verticalFilterPanel_ = new JPanel();
-        jPanel24 = new JPanel();
-        horizontalRangeLabel_49 = new JLabel();
-        verticalRangeFilterComboBox = new JComboBox();
-        horizontalRangeLabel_50 = new JLabel();
-        jPanel25 = new JPanel();
-        horizontalRangeLabel_51 = new JLabel();
+        verticalFilterLeftPanel_ = new JPanel();
+        verticalRangeFilterLabel1_ = new JLabel();
+        verticalRangeFilterComboBox = new JComboBox<String>();
+        verticalRangeFilterLabel2_ = new JLabel();
+        verticalFilterRightPanel_ = new JPanel();
+        verticalOffsetFilterLabel1_ = new JLabel();
         verticalOffsetFilterSpinner = new JSpinner();
-        horizontalRangeLabel_52 = new JLabel();
+        verticalOffsetFilterLabel2_ = new JLabel();
         triggerPanel_ = new JPanel();
-        jPanel26 = new JPanel();
-        jLabel5 = new JLabel();
+        triggerTopPanel_ = new JPanel();
+        triggerStateLabel_ = new JLabel();
         triggerStateLabel = new JLabel();
-        jPanel30 = new JPanel();
-        jLabel1 = new JLabel();
-        triggerModeComboBox = new JComboBox();
-        jPanel31 = new JPanel();
+        triggerMiddleLeftPanel1_ = new JPanel();
+        triggerModeLabel_ = new JLabel();
+        triggerModeComboBox = new JComboBox<String>();
+        triggerMiddleRightPanel1_ = new JPanel();
         forceTriggerButton = new JButton();
-        jPanel32 = new JPanel();
-        jLabel3 = new JLabel();
-        triggerTypeComboBox = new JComboBox();
-        jPanel33 = new JPanel();
+        triggerMiddleLeftPanel2_ = new JPanel();
+        triggerTypeLabel_ = new JLabel();
+        triggerTypeComboBox = new JComboBox<String>();
+        triggerMiddleRightPanel2_ = new JPanel();
         rearmTriggerButton = new JButton();
-        jPanel4 = new JPanel();
-        jLabel2 = new JLabel();
+        triggerBottomPanel = new JPanel();
+        triggerThresholdLabel_ = new JLabel();
         triggerThresholdSpinner = new JSpinner();
         functionGeneratorPanel_ = new JPanel();
-        jPanel27 = new JPanel();
-        jLabel7 = new JLabel();
+        functionGeneratorTopPanel_ = new JPanel();
+        outputLabel_ = new JLabel();
         outputToggleButton = new JToggleButton();
-        jPanel40 = new JPanel();
-        jLabel10 = new JLabel();
-        waveTypeComboBox = new JComboBox();
-        jPanel38 = new JPanel();
-        jLabel11 = new JLabel();
+        functionGeneratorMiddlePanel_ = new JPanel();
+        waveTypeLabel_ = new JLabel();
+        waveTypeComboBox = new JComboBox<String>();
+        functionGeneratorBottomLeftPanel_ = new JPanel();
+        p2pVoltageLabel_ = new JLabel();
         p2pVoltageTextField = new JTextField();
-        jPanel41 = new JPanel();
-        horizontalRangeLabel_53 = new JLabel();
+        functionGeneratorBottomRightPanel_ = new JPanel();
+        functionGeneratorOffsetLabel_ = new JLabel();
         functionGeneratorOffsetSpinner = new JSpinner();
         horizontalRangeLabel_54 = new JLabel();
         measurementsPanel_ = new JPanel();
-        jPanel42 = new JPanel();
-        jLabel12 = new JLabel();
+        measurementTopLeftPanel_ = new JPanel();
+        maxVoltageLabel_ = new JLabel();
         maxVoltageLabel = new JLabel();
-        jPanel43 = new JPanel();
-        jLabel13 = new JLabel();
+        measurementTopRightPanel_ = new JPanel();
+        minVoltageLabel_ = new JLabel();
         minVoltageLabel = new JLabel();
-        jPanel44 = new JPanel();
-        jLabel14 = new JLabel();
+        measurementMiddleLeftPanel_ = new JPanel();
+        maxP2pVoltageLabel_ = new JLabel();
         maxP2pVoltageLabel = new JLabel();
-        jPanel45 = new JPanel();
-        jLabel16 = new JLabel();
+        measurementMiddleRightPanel_ = new JPanel();
+        averageVoltageLabel_ = new JLabel();
         averageVoltageLabel = new JLabel();
-        jPanel46 = new JPanel();
-        jLabel18 = new JLabel();
+        measurementBottomLeftPanel_ = new JPanel();
+        standardDeviationVoltageLabel_ = new JLabel();
         standardDeviationVoltageLabel = new JLabel();
-        jPanel47 = new JPanel();
-        jLabel20 = new JLabel();
+        measurementBottomRightPanel_ = new JPanel();
+        frequencyLabel_ = new JLabel();
         frequencyLabel = new JLabel();
         rightPanel_ = new JPanel();
         cursorPanel_ = new JPanel();
         canvasPanel = new JPanel();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Digiscope");
-        setMinimumSize(new java.awt.Dimension(1165, 735));
+        setTitle(Constant.APPLICATION_TITLE);
+        setMinimumSize(new Dimension(1165, 735));
 
         toolBar_.setRollover(true);
-        toolBar_.setPreferredSize(new java.awt.Dimension(1180, 40));
-        getContentPane().add(toolBar_, java.awt.BorderLayout.NORTH);
+        toolBar_.setPreferredSize(new Dimension(1180, 40));
+        getContentPane().add(toolBar_, BorderLayout.NORTH);
 
         leftPanel_.setBorder(BorderFactory.createTitledBorder(""));
-        leftPanel_.setPreferredSize(new java.awt.Dimension(370, 650));
-        leftPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 2, 5));
+        leftPanel_.setPreferredSize(new Dimension(370, 650));
+        leftPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 2, 5));
 
-        channelTabbedPane.setPreferredSize(new java.awt.Dimension(366, 275));
+        channelTabbedPane.setPreferredSize(new Dimension(366, 275));
 
         horizontalAPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
-        horizontalAPanel_.setPreferredSize(new java.awt.Dimension(360, 55));
-        horizontalAPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
+        horizontalAPanel_.setPreferredSize(new Dimension(360, 55));
+        horizontalAPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-        jPanel5.setPreferredSize(new java.awt.Dimension(190, 30));
+        horizontalALeftPanel_.setPreferredSize(new Dimension(190, 30));
 
-        horizontalRangeLabel_3.setText("Range:");
-        jPanel5.add(horizontalRangeLabel_3);
+        horizontalRangeALabel1_.setText("Range:");
+        horizontalALeftPanel_.add(horizontalRangeALabel1_);
 
-        horizontalRangeAComboBox.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        horizontalRangeAComboBox.setPreferredSize(new java.awt.Dimension(95, 20));
-        jPanel5.add(horizontalRangeAComboBox);
+        horizontalRangeAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_RANGE_VALUES));
+        horizontalRangeAComboBox.setPreferredSize(new Dimension(95, 20));
+        horizontalALeftPanel_.add(horizontalRangeAComboBox);
 
-        horizontalRangeLabel_1.setText("/div");
-        jPanel5.add(horizontalRangeLabel_1);
+        horizontalRangeALabel2_.setText("/div");
+        horizontalALeftPanel_.add(horizontalRangeALabel2_);
 
-        horizontalAPanel_.add(jPanel5);
+        horizontalAPanel_.add(horizontalALeftPanel_);
 
-        jPanel6.setPreferredSize(new java.awt.Dimension(150, 30));
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        horizontalARightPanel_.setPreferredSize(new Dimension(150, 30));
+        horizontalARightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-        horizontalRangeLabel_2.setText("Offset:");
-        jPanel6.add(horizontalRangeLabel_2);
+        horizontalOffsetALabel1_.setText("Offset:");
+        horizontalARightPanel_.add(horizontalOffsetALabel1_);
 
-        horizontalOffsetASpinner.setPreferredSize(new java.awt.Dimension(60, 20));
-        jPanel6.add(horizontalOffsetASpinner);
+        horizontalOffsetASpinner.setPreferredSize(new Dimension(60, 20));
+        horizontalARightPanel_.add(horizontalOffsetASpinner);
 
-        horizontalRangeLabel_20.setText("s");
-        jPanel6.add(horizontalRangeLabel_20);
+        horizontalOffsetALabel2_.setText("s");
+        horizontalARightPanel_.add(horizontalOffsetALabel2_);
 
-        horizontalAPanel_.add(jPanel6);
+        horizontalAPanel_.add(horizontalARightPanel_);
 
         channelAPanel_.add(horizontalAPanel_);
 
         verticalAPannel_.setBorder(BorderFactory.createTitledBorder("Vertical"));
-        verticalAPannel_.setPreferredSize(new java.awt.Dimension(360, 55));
-        verticalAPannel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
+        verticalAPannel_.setPreferredSize(new Dimension(360, 55));
+        verticalAPannel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-        jPanel36.setPreferredSize(new java.awt.Dimension(190, 30));
+        verticalALeftPanel_.setPreferredSize(new Dimension(190, 30));
 
-        horizontalRangeLabel_55.setText("Range:");
-        jPanel36.add(horizontalRangeLabel_55);
+        verticalRangeALabel1_.setText("Range:");
+        verticalALeftPanel_.add(verticalRangeALabel1_);
 
-        verticalRangeAComboBox.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        verticalRangeAComboBox.setPreferredSize(new java.awt.Dimension(95, 20));
-        jPanel36.add(verticalRangeAComboBox);
+        verticalRangeAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_RANGE_VALUES));
+        verticalRangeAComboBox.setPreferredSize(new Dimension(95, 20));
+        verticalALeftPanel_.add(verticalRangeAComboBox);
 
-        horizontalRangeLabel_56.setText("/div");
-        jPanel36.add(horizontalRangeLabel_56);
+        verticalRangeALabel2_.setText("/div");
+        verticalALeftPanel_.add(verticalRangeALabel2_);
 
-        verticalAPannel_.add(jPanel36);
+        verticalAPannel_.add(verticalALeftPanel_);
 
-        jPanel37.setPreferredSize(new java.awt.Dimension(150, 30));
-        jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        verticalARightPanel_.setPreferredSize(new Dimension(150, 30));
+        verticalARightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-        horizontalRangeLabel_57.setText("Offset:");
-        jPanel37.add(horizontalRangeLabel_57);
+        verticalOffsetALabel1_.setText("Offset:");
+        verticalARightPanel_.add(verticalOffsetALabel1_);
 
-        verticalOffsetASpinner.setPreferredSize(new java.awt.Dimension(60, 20));
-        jPanel37.add(verticalOffsetASpinner);
+        verticalOffsetASpinner.setPreferredSize(new Dimension(60, 20));
+        verticalARightPanel_.add(verticalOffsetASpinner);
 
-        horizontalRangeLabel_58.setText("volts");
-        jPanel37.add(horizontalRangeLabel_58);
+        verticalOffsetALabel2_.setText("volts");
+        verticalARightPanel_.add(verticalOffsetALabel2_);
 
-        verticalAPannel_.add(jPanel37);
+        verticalAPannel_.add(verticalARightPanel_);
 
         channelAPanel_.add(verticalAPannel_);
 
         channelTabbedPane.addTab("Channel A", channelAPanel_);
 
         horizontalBPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
-        horizontalBPanel_.setPreferredSize(new java.awt.Dimension(360, 55));
-        horizontalBPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
+        horizontalBPanel_.setPreferredSize(new Dimension(360, 55));
+        horizontalBPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-        jPanel14.setPreferredSize(new java.awt.Dimension(190, 30));
+        horizontalBLeftPanel_.setPreferredSize(new Dimension(190, 30));
 
-        horizontalRangeLabel_29.setText("Range:");
-        jPanel14.add(horizontalRangeLabel_29);
+        horizontalRangeBLabel1_.setText("Range:");
+        horizontalBLeftPanel_.add(horizontalRangeBLabel1_);
 
-        horizontalRangeBComboBox.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        horizontalRangeBComboBox.setPreferredSize(new java.awt.Dimension(95, 20));
-        jPanel14.add(horizontalRangeBComboBox);
+        horizontalRangeBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_RANGE_VALUES));
+        horizontalRangeBComboBox.setPreferredSize(new Dimension(95, 20));
+        horizontalBLeftPanel_.add(horizontalRangeBComboBox);
 
-        horizontalRangeLabel_30.setText("/div");
-        jPanel14.add(horizontalRangeLabel_30);
+        horizontalRangeBLabel2_.setText("/div");
+        horizontalBLeftPanel_.add(horizontalRangeBLabel2_);
 
-        horizontalBPanel_.add(jPanel14);
+        horizontalBPanel_.add(horizontalBLeftPanel_);
 
-        jPanel15.setPreferredSize(new java.awt.Dimension(150, 30));
-        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        horizontalBRightPanel_.setPreferredSize(new Dimension(150, 30));
+        horizontalBRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-        horizontalRangeLabel_31.setText("Offset:");
-        jPanel15.add(horizontalRangeLabel_31);
+        horizontalOffsetBLabel1_.setText("Offset:");
+        horizontalBRightPanel_.add(horizontalOffsetBLabel1_);
 
-        horizontalOffsetBSpinner.setPreferredSize(new java.awt.Dimension(60, 20));
-        jPanel15.add(horizontalOffsetBSpinner);
+        horizontalOffsetBSpinner.setPreferredSize(new Dimension(60, 20));
+        horizontalBRightPanel_.add(horizontalOffsetBSpinner);
 
-        horizontalRangeLabel_32.setText("s");
-        jPanel15.add(horizontalRangeLabel_32);
+        horizontalOffsetBLabel2_.setText("s");
+        horizontalBRightPanel_.add(horizontalOffsetBLabel2_);
 
-        horizontalBPanel_.add(jPanel15);
+        horizontalBPanel_.add(horizontalBRightPanel_);
 
         channelBPanel_.add(horizontalBPanel_);
 
         verticalBPanel_.setBorder(BorderFactory.createTitledBorder("Vertical"));
-        verticalBPanel_.setPreferredSize(new java.awt.Dimension(360, 55));
-        verticalBPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
+        verticalBPanel_.setPreferredSize(new Dimension(360, 55));
+        verticalBPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-        jPanel16.setPreferredSize(new java.awt.Dimension(190, 30));
+        verticalBLeftPanel_.setPreferredSize(new Dimension(190, 30));
 
-        horizontalRangeLabel_33.setText("Range:");
-        jPanel16.add(horizontalRangeLabel_33);
+        verticalRangeBLabel1_.setText("Range:");
+        verticalBLeftPanel_.add(verticalRangeBLabel1_);
 
-        verticalRangeBComboBox.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        verticalRangeBComboBox.setPreferredSize(new java.awt.Dimension(95, 20));
-        jPanel16.add(verticalRangeBComboBox);
+        verticalRangeBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_RANGE_VALUES));
+        verticalRangeBComboBox.setPreferredSize(new Dimension(95, 20));
+        verticalBLeftPanel_.add(verticalRangeBComboBox);
 
-        horizontalRangeLabel_34.setText("/div");
-        jPanel16.add(horizontalRangeLabel_34);
+        verticalRangeBLabel2_.setText("/div");
+        verticalBLeftPanel_.add(verticalRangeBLabel2_);
 
-        verticalBPanel_.add(jPanel16);
+        verticalBPanel_.add(verticalBLeftPanel_);
 
-        jPanel17.setPreferredSize(new java.awt.Dimension(150, 30));
-        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        verticalBRightPanel_.setPreferredSize(new Dimension(150, 30));
+        verticalBRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-        horizontalRangeLabel_35.setText("Offset:");
-        jPanel17.add(horizontalRangeLabel_35);
+        verticalOffsetBLabel1_.setText("Offset:");
+        verticalBRightPanel_.add(verticalOffsetBLabel1_);
 
-        verticalOffsetBSpinner.setPreferredSize(new java.awt.Dimension(60, 20));
-        jPanel17.add(verticalOffsetBSpinner);
+        verticalOffsetBSpinner.setPreferredSize(new Dimension(60, 20));
+        verticalBRightPanel_.add(verticalOffsetBSpinner);
 
-        horizontalRangeLabel_36.setText("volts");
-        jPanel17.add(horizontalRangeLabel_36);
+        verticalOffsetBLabel2_.setText("volts");
+        verticalBRightPanel_.add(verticalOffsetBLabel2_);
 
-        verticalBPanel_.add(jPanel17);
+        verticalBPanel_.add(verticalBRightPanel_);
 
         channelBPanel_.add(verticalBPanel_);
 
         channelTabbedPane.addTab("Channel B", channelBPanel_);
 
         equationPannel_.setBorder(BorderFactory.createTitledBorder("Equation"));
-        equationPannel_.setPreferredSize(new java.awt.Dimension(360, 120));
-        equationPannel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 0));
+        equationPannel_.setPreferredSize(new Dimension(360, 120));
+        equationPannel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
 
-        jPanel28.setPreferredSize(new java.awt.Dimension(340, 35));
+        equationTopPanel_.setPreferredSize(new Dimension(340, 35));
 
-        equationTextField.setPreferredSize(new java.awt.Dimension(260, 23));
-        jPanel28.add(equationTextField);
+        equationTextField.setPreferredSize(new Dimension(260, 23));
+        equationTopPanel_.add(equationTextField);
 
         enableMathToggleButton.setText("Enable");
-        jPanel28.add(enableMathToggleButton);
+        equationTopPanel_.add(enableMathToggleButton);
 
-        equationPannel_.add(jPanel28);
+        equationPannel_.add(equationTopPanel_);
 
-        jPanel35.setPreferredSize(new java.awt.Dimension(300, 62));
+        equationBottomPanel_.setPreferredSize(new Dimension(300, 62));
 
         aButton.setText("A");
-        aButton.setPreferredSize(new java.awt.Dimension(41, 23));
-        jPanel35.add(aButton);
+        aButton.setPreferredSize(new Dimension(41, 23));
+        equationBottomPanel_.add(aButton);
 
         bButton.setText("B");
-        bButton.setPreferredSize(new java.awt.Dimension(41, 23));
-        jPanel35.add(bButton);
+        bButton.setPreferredSize(new Dimension(41, 23));
+        equationBottomPanel_.add(bButton);
 
         fButton.setText("F");
-        fButton.setPreferredSize(new java.awt.Dimension(41, 23));
-        jPanel35.add(fButton);
+        fButton.setPreferredSize(new Dimension(41, 23));
+        equationBottomPanel_.add(fButton);
 
         powerButton.setText("^");
-        jPanel35.add(powerButton);
+        equationBottomPanel_.add(powerButton);
 
         plusButton.setText("+");
-        jPanel35.add(plusButton);
+        equationBottomPanel_.add(plusButton);
 
         minusButton.setText("-");
-        minusButton.setPreferredSize(new java.awt.Dimension(41, 23));
-        jPanel35.add(minusButton);
+        minusButton.setPreferredSize(new Dimension(41, 23));
+        equationBottomPanel_.add(minusButton);
 
         piButton.setText("Pi");
-        jPanel35.add(piButton);
+        equationBottomPanel_.add(piButton);
 
         eButton.setText("e");
-        eButton.setPreferredSize(new java.awt.Dimension(41, 23));
-        jPanel35.add(eButton);
+        eButton.setPreferredSize(new Dimension(41, 23));
+        equationBottomPanel_.add(eButton);
 
         leftParatheseButton.setText("(");
-        leftParatheseButton.setPreferredSize(new java.awt.Dimension(41, 23));
-        jPanel35.add(leftParatheseButton);
+        leftParatheseButton.setPreferredSize(new Dimension(41, 23));
+        equationBottomPanel_.add(leftParatheseButton);
 
         rightParatheseButton.setText(")");
-        rightParatheseButton.setPreferredSize(new java.awt.Dimension(41, 23));
-        jPanel35.add(rightParatheseButton);
+        rightParatheseButton.setPreferredSize(new Dimension(41, 23));
+        equationBottomPanel_.add(rightParatheseButton);
 
         multiplyButton.setText("*");
-        multiplyButton.setPreferredSize(new java.awt.Dimension(41, 23));
-        jPanel35.add(multiplyButton);
+        multiplyButton.setPreferredSize(new Dimension(41, 23));
+        equationBottomPanel_.add(multiplyButton);
 
         divideButton.setText("/");
-        divideButton.setPreferredSize(new java.awt.Dimension(41, 23));
-        jPanel35.add(divideButton);
+        divideButton.setPreferredSize(new Dimension(41, 23));
+        equationBottomPanel_.add(divideButton);
 
-        equationPannel_.add(jPanel35);
+        equationPannel_.add(equationBottomPanel_);
 
         mathChannelPanel_.add(equationPannel_);
 
         horizontalMathPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
-        horizontalMathPanel_.setPreferredSize(new java.awt.Dimension(360, 55));
-        horizontalMathPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
+        horizontalMathPanel_.setPreferredSize(new Dimension(360, 55));
+        horizontalMathPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-        jPanel18.setPreferredSize(new java.awt.Dimension(190, 30));
+        horizontalMathLeftPanel_.setPreferredSize(new Dimension(190, 30));
 
-        horizontalRangeLabel_37.setText("Range:");
-        jPanel18.add(horizontalRangeLabel_37);
+        horizontalRangeMathLabel1_.setText("Range:");
+        horizontalMathLeftPanel_.add(horizontalRangeMathLabel1_);
 
-        horizontalRangeMathComboBox.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        horizontalRangeMathComboBox.setPreferredSize(new java.awt.Dimension(95, 20));
-        jPanel18.add(horizontalRangeMathComboBox);
+        horizontalRangeMathComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_RANGE_VALUES));
+        horizontalRangeMathComboBox.setPreferredSize(new Dimension(95, 20));
+        horizontalMathLeftPanel_.add(horizontalRangeMathComboBox);
 
-        horizontalRangeLabel_38.setText("/div");
-        jPanel18.add(horizontalRangeLabel_38);
+        horizontalRangeMathLabel2_.setText("/div");
+        horizontalMathLeftPanel_.add(horizontalRangeMathLabel2_);
 
-        horizontalMathPanel_.add(jPanel18);
+        horizontalMathPanel_.add(horizontalMathLeftPanel_);
 
-        jPanel19.setPreferredSize(new java.awt.Dimension(150, 30));
-        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        horizontalMathRightPanel_.setPreferredSize(new Dimension(150, 30));
+        horizontalMathRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-        horizontalRangeLabel_39.setText("Offset:");
-        jPanel19.add(horizontalRangeLabel_39);
+        horizontalOffsetMathLabel1_.setText("Offset:");
+        horizontalMathRightPanel_.add(horizontalOffsetMathLabel1_);
 
-        horizontalOffsetMathSpinner.setPreferredSize(new java.awt.Dimension(60, 20));
-        jPanel19.add(horizontalOffsetMathSpinner);
+        horizontalOffsetMathSpinner.setPreferredSize(new Dimension(60, 20));
+        horizontalMathRightPanel_.add(horizontalOffsetMathSpinner);
 
-        horizontalRangeLabel_40.setText("s");
-        jPanel19.add(horizontalRangeLabel_40);
+        horizontalOffsetMathLabel2_.setText("s");
+        horizontalMathRightPanel_.add(horizontalOffsetMathLabel2_);
 
-        horizontalMathPanel_.add(jPanel19);
+        horizontalMathPanel_.add(horizontalMathRightPanel_);
 
         mathChannelPanel_.add(horizontalMathPanel_);
 
         verticalMathPanel_.setBorder(BorderFactory.createTitledBorder("Vertical"));
-        verticalMathPanel_.setPreferredSize(new java.awt.Dimension(360, 55));
-        verticalMathPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
+        verticalMathPanel_.setPreferredSize(new Dimension(360, 55));
+        verticalMathPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-        jPanel20.setPreferredSize(new java.awt.Dimension(190, 30));
+        verticalMathLeftPanel_.setPreferredSize(new Dimension(190, 30));
 
-        horizontalRangeLabel_41.setText("Range:");
-        jPanel20.add(horizontalRangeLabel_41);
+        verticalRangeMathLabel1_.setText("Range:");
+        verticalMathLeftPanel_.add(verticalRangeMathLabel1_);
 
-        verticalRangeMathComboBox.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        verticalRangeMathComboBox.setPreferredSize(new java.awt.Dimension(95, 20));
-        jPanel20.add(verticalRangeMathComboBox);
+        verticalRangeMathComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_RANGE_VALUES));
+        verticalRangeMathComboBox.setPreferredSize(new Dimension(95, 20));
+        verticalMathLeftPanel_.add(verticalRangeMathComboBox);
 
-        horizontalRangeLabel_42.setText("/div");
-        jPanel20.add(horizontalRangeLabel_42);
+        verticalRangeMathLabel2_.setText("/div");
+        verticalMathLeftPanel_.add(verticalRangeMathLabel2_);
 
-        verticalMathPanel_.add(jPanel20);
+        verticalMathPanel_.add(verticalMathLeftPanel_);
 
-        jPanel21.setPreferredSize(new java.awt.Dimension(150, 30));
-        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        verticalMathRightPanel_.setPreferredSize(new Dimension(150, 30));
+        verticalMathRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-        horizontalRangeLabel_43.setText("Offset:");
-        jPanel21.add(horizontalRangeLabel_43);
+        verticalOffsetMathLabel1_.setText("Offset:");
+        verticalMathRightPanel_.add(verticalOffsetMathLabel1_);
 
-        verticalOffsetMathSpinner.setPreferredSize(new java.awt.Dimension(60, 20));
-        jPanel21.add(verticalOffsetMathSpinner);
+        verticalOffsetMathSpinner.setPreferredSize(new Dimension(60, 20));
+        verticalMathRightPanel_.add(verticalOffsetMathSpinner);
 
-        horizontalRangeLabel_44.setText("volts");
-        jPanel21.add(horizontalRangeLabel_44);
+        verticalOffsetMathLabel2_.setText("volts");
+        verticalMathRightPanel_.add(verticalOffsetMathLabel2_);
 
-        verticalMathPanel_.add(jPanel21);
+        verticalMathPanel_.add(verticalMathRightPanel_);
 
         mathChannelPanel_.add(verticalMathPanel_);
 
         channelTabbedPane.addTab("Math Channel", mathChannelPanel_);
 
         inputPanel_.setBorder(BorderFactory.createTitledBorder("Input"));
-        inputPanel_.setPreferredSize(new java.awt.Dimension(360, 95));
-        inputPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+        inputPanel_.setPreferredSize(new Dimension(360, 95));
+        inputPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 0));
 
-        jPanel34.setPreferredSize(new java.awt.Dimension(340, 35));
+        inputTopPanel_.setPreferredSize(new Dimension(340, 35));
 
         jLabel4.setText("Input:");
-        jPanel34.add(jLabel4);
+        inputTopPanel_.add(jLabel4);
 
-        inputChannelComboBox.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        inputChannelComboBox.setPreferredSize(new java.awt.Dimension(222, 20));
-        jPanel34.add(inputChannelComboBox);
+        inputChannelComboBox.setModel(new DefaultComboBoxModel<String>(Constant.INPUT_CHANNELS));
+        inputChannelComboBox.setPreferredSize(new Dimension(222, 20));
+        inputTopPanel_.add(inputChannelComboBox);
 
         enableFilterToggleButton.setText("Enable");
-        enableFilterToggleButton.setPreferredSize(new java.awt.Dimension(67, 23));
-        jPanel34.add(enableFilterToggleButton);
+        enableFilterToggleButton.setPreferredSize(new Dimension(67, 23));
+        inputTopPanel_.add(enableFilterToggleButton);
 
-        inputPanel_.add(jPanel34);
+        inputPanel_.add(inputTopPanel_);
 
-        jPanel29.setPreferredSize(new java.awt.Dimension(340, 35));
+        inputBottomPanel_.setPreferredSize(new Dimension(340, 35));
 
         csvFilePathTextField.setEditable(false);
         csvFilePathTextField.setText("Choose CSV file");
         csvFilePathTextField.setToolTipText("");
-        csvFilePathTextField.setPreferredSize(new java.awt.Dimension(260, 23));
-        jPanel29.add(csvFilePathTextField);
+        csvFilePathTextField.setPreferredSize(new Dimension(260, 23));
+        inputBottomPanel_.add(csvFilePathTextField);
 
         browseButton.setText("Browse");
-        jPanel29.add(browseButton);
+        inputBottomPanel_.add(browseButton);
 
-        inputPanel_.add(jPanel29);
+        inputPanel_.add(inputBottomPanel_);
 
         filterChannelPanel_.add(inputPanel_);
 
         horizontalFilterPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
-        horizontalFilterPanel_.setPreferredSize(new java.awt.Dimension(360, 55));
-        horizontalFilterPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
+        horizontalFilterPanel_.setPreferredSize(new Dimension(360, 55));
+        horizontalFilterPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-        jPanel22.setPreferredSize(new java.awt.Dimension(190, 30));
+        horizontalFilterLeftPanel_.setPreferredSize(new Dimension(190, 30));
 
-        horizontalRangeLabel_45.setText("Range:");
-        jPanel22.add(horizontalRangeLabel_45);
+        horizontalRangeFilterLabel1_.setText("Range:");
+        horizontalFilterLeftPanel_.add(horizontalRangeFilterLabel1_);
 
-        horizontalRangeFilterComboBox.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        horizontalRangeFilterComboBox.setPreferredSize(new java.awt.Dimension(95, 20));
-        jPanel22.add(horizontalRangeFilterComboBox);
+        horizontalRangeFilterComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_RANGE_VALUES));
+        horizontalRangeFilterComboBox.setPreferredSize(new Dimension(95, 20));
+        horizontalFilterLeftPanel_.add(horizontalRangeFilterComboBox);
 
-        horizontalRangeLabel_46.setText("/div");
-        jPanel22.add(horizontalRangeLabel_46);
+        horizontalRangeFilterLabel2_.setText("/div");
+        horizontalFilterLeftPanel_.add(horizontalRangeFilterLabel2_);
 
-        horizontalFilterPanel_.add(jPanel22);
+        horizontalFilterPanel_.add(horizontalFilterLeftPanel_);
 
-        jPanel23.setPreferredSize(new java.awt.Dimension(150, 30));
-        jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        horizontalFilterRightPanel_.setPreferredSize(new Dimension(150, 30));
+        horizontalFilterRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-        horizontalRangeLabel_47.setText("Offset:");
-        jPanel23.add(horizontalRangeLabel_47);
+        horizontalOffsetFilterLabel1_.setText("Offset:");
+        horizontalFilterRightPanel_.add(horizontalOffsetFilterLabel1_);
 
-        horizontalOffsetFilterSpinner.setPreferredSize(new java.awt.Dimension(60, 20));
-        jPanel23.add(horizontalOffsetFilterSpinner);
+        horizontalOffsetFilterSpinner.setPreferredSize(new Dimension(60, 20));
+        horizontalFilterRightPanel_.add(horizontalOffsetFilterSpinner);
 
-        horizontalRangeLabel_48.setText("s");
-        jPanel23.add(horizontalRangeLabel_48);
+        horizontalOffsetFilterLabel2_.setText("s");
+        horizontalFilterRightPanel_.add(horizontalOffsetFilterLabel2_);
 
-        horizontalFilterPanel_.add(jPanel23);
+        horizontalFilterPanel_.add(horizontalFilterRightPanel_);
 
         filterChannelPanel_.add(horizontalFilterPanel_);
 
         verticalFilterPanel_.setBorder(BorderFactory.createTitledBorder("Vertical"));
-        verticalFilterPanel_.setPreferredSize(new java.awt.Dimension(360, 55));
-        verticalFilterPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
+        verticalFilterPanel_.setPreferredSize(new Dimension(360, 55));
+        verticalFilterPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-        jPanel24.setPreferredSize(new java.awt.Dimension(190, 30));
+        verticalFilterLeftPanel_.setPreferredSize(new Dimension(190, 30));
 
-        horizontalRangeLabel_49.setText("Range:");
-        jPanel24.add(horizontalRangeLabel_49);
+        verticalRangeFilterLabel1_.setText("Range:");
+        verticalFilterLeftPanel_.add(verticalRangeFilterLabel1_);
 
-        verticalRangeFilterComboBox.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        verticalRangeFilterComboBox.setPreferredSize(new java.awt.Dimension(95, 20));
-        jPanel24.add(verticalRangeFilterComboBox);
+        verticalRangeFilterComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_RANGE_VALUES));
+        verticalRangeFilterComboBox.setPreferredSize(new Dimension(95, 20));
+        verticalFilterLeftPanel_.add(verticalRangeFilterComboBox);
 
-        horizontalRangeLabel_50.setText("/div");
-        jPanel24.add(horizontalRangeLabel_50);
+        verticalRangeFilterLabel2_.setText("/div");
+        verticalFilterLeftPanel_.add(verticalRangeFilterLabel2_);
 
-        verticalFilterPanel_.add(jPanel24);
+        verticalFilterPanel_.add(verticalFilterLeftPanel_);
 
-        jPanel25.setPreferredSize(new java.awt.Dimension(150, 30));
-        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        verticalFilterRightPanel_.setPreferredSize(new Dimension(150, 30));
+        verticalFilterRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-        horizontalRangeLabel_51.setText("Offset:");
-        jPanel25.add(horizontalRangeLabel_51);
+        verticalOffsetFilterLabel1_.setText("Offset:");
+        verticalFilterRightPanel_.add(verticalOffsetFilterLabel1_);
 
-        verticalOffsetFilterSpinner.setPreferredSize(new java.awt.Dimension(60, 20));
-        jPanel25.add(verticalOffsetFilterSpinner);
+        verticalOffsetFilterSpinner.setPreferredSize(new Dimension(60, 20));
+        verticalFilterRightPanel_.add(verticalOffsetFilterSpinner);
 
-        horizontalRangeLabel_52.setText("volts");
-        jPanel25.add(horizontalRangeLabel_52);
+        verticalOffsetFilterLabel2_.setText("volts");
+        verticalFilterRightPanel_.add(verticalOffsetFilterLabel2_);
 
-        verticalFilterPanel_.add(jPanel25);
+        verticalFilterPanel_.add(verticalFilterRightPanel_);
 
         filterChannelPanel_.add(verticalFilterPanel_);
 
@@ -750,229 +755,229 @@ public class MainWindowUI extends JFrame {
         leftPanel_.add(channelTabbedPane);
 
         triggerPanel_.setBorder(BorderFactory.createTitledBorder("Trigger"));
-        triggerPanel_.setPreferredSize(new java.awt.Dimension(366, 145));
-        triggerPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 0, 0));
+        triggerPanel_.setPreferredSize(new Dimension(366, 145));
+        triggerPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
-        jPanel26.setPreferredSize(new java.awt.Dimension(350, 30));
+        triggerTopPanel_.setPreferredSize(new Dimension(350, 30));
 
-        jLabel5.setText("State:");
-        jPanel26.add(jLabel5);
+        triggerStateLabel_.setText("State:");
+        triggerTopPanel_.add(triggerStateLabel_);
 
-        triggerStateLabel.setForeground(java.awt.Color.blue);
-        //triggeretHorizontalAlignment(SwingConstants.CENTER);
-        
+        triggerStateLabel.setForeground(Color.blue);
+        triggerStateLabel.setHorizontalAlignment(SwingConstants.CENTER);
         triggerStateLabel.setText("Stop");
         triggerStateLabel.setBorder(BorderFactory.createTitledBorder(""));
-        triggerStateLabel.setPreferredSize(new java.awt.Dimension(80, 19));
-        jPanel26.add(triggerStateLabel);
+        triggerStateLabel.setPreferredSize(new Dimension(80, 19));
+        triggerTopPanel_.add(triggerStateLabel);
 
-        triggerPanel_.add(jPanel26);
+        triggerPanel_.add(triggerTopPanel_);
 
-        jPanel30.setPreferredSize(new java.awt.Dimension(190, 30));
+        triggerMiddleLeftPanel1_.setPreferredSize(new Dimension(190, 30));
 
-        jLabel1.setText("Mode:");
-        jPanel30.add(jLabel1);
+        triggerModeLabel_.setText("Mode:");
+        triggerMiddleLeftPanel1_.add(triggerModeLabel_);
 
-        triggerModeComboBox.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        triggerModeComboBox.setPreferredSize(new java.awt.Dimension(110, 20));
-        jPanel30.add(triggerModeComboBox);
+        triggerModeComboBox.setModel(new DefaultComboBoxModel<String>(Constant.TRIGGER_MODES));
+        triggerModeComboBox.setPreferredSize(new Dimension(110, 20));
+        triggerMiddleLeftPanel1_.add(triggerModeComboBox);
 
-        triggerPanel_.add(jPanel30);
+        triggerPanel_.add(triggerMiddleLeftPanel1_);
 
-        jPanel31.setPreferredSize(new java.awt.Dimension(150, 30));
-        jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 3));
+        triggerMiddleRightPanel1_.setPreferredSize(new Dimension(150, 30));
+        triggerMiddleRightPanel1_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
 
         forceTriggerButton.setText("Force Trigger");
-        forceTriggerButton.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel31.add(forceTriggerButton);
+        forceTriggerButton.setPreferredSize(new Dimension(120, 23));
+        triggerMiddleRightPanel1_.add(forceTriggerButton);
 
-        triggerPanel_.add(jPanel31);
+        triggerPanel_.add(triggerMiddleRightPanel1_);
 
-        jPanel32.setPreferredSize(new java.awt.Dimension(190, 30));
+        triggerMiddleLeftPanel2_.setPreferredSize(new Dimension(190, 30));
 
-        jLabel3.setText("Type:");
-        jLabel3.setPreferredSize(new java.awt.Dimension(30, 14));
-        jPanel32.add(jLabel3);
+        triggerTypeLabel_.setText("Type:");
+        triggerTypeLabel_.setPreferredSize(new Dimension(30, 14));
+        triggerMiddleLeftPanel2_.add(triggerTypeLabel_);
 
-        triggerTypeComboBox.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        triggerTypeComboBox.setPreferredSize(new java.awt.Dimension(110, 20));
-        jPanel32.add(triggerTypeComboBox);
+        triggerTypeComboBox.setModel(new DefaultComboBoxModel<String>(Constant.TRIGGER_TYPES));
+        triggerTypeComboBox.setPreferredSize(new Dimension(110, 20));
+        triggerMiddleLeftPanel2_.add(triggerTypeComboBox);
 
-        triggerPanel_.add(jPanel32);
+        triggerPanel_.add(triggerMiddleLeftPanel2_);
 
-        jPanel33.setPreferredSize(new java.awt.Dimension(150, 30));
-        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 3));
+        triggerMiddleRightPanel2_.setPreferredSize(new Dimension(150, 30));
+        triggerMiddleRightPanel2_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
 
         rearmTriggerButton.setText("Re-arm Trigger");
-        rearmTriggerButton.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel33.add(rearmTriggerButton);
+        rearmTriggerButton.setPreferredSize(new Dimension(120, 23));
+        triggerMiddleRightPanel2_.add(rearmTriggerButton);
 
-        triggerPanel_.add(jPanel33);
+        triggerPanel_.add(triggerMiddleRightPanel2_);
 
-        jPanel4.setPreferredSize(new java.awt.Dimension(350, 30));
+        triggerBottomPanel.setPreferredSize(new Dimension(350, 30));
 
-        jLabel2.setText("Trigger Threshold:");
-        jPanel4.add(jLabel2);
+        triggerThresholdLabel_.setText("Trigger Threshold:");
+        triggerBottomPanel.add(triggerThresholdLabel_);
 
-        triggerThresholdSpinner.setPreferredSize(new java.awt.Dimension(50, 20));
-        jPanel4.add(triggerThresholdSpinner);
+        triggerThresholdSpinner.setPreferredSize(new Dimension(50, 20));
+        triggerBottomPanel.add(triggerThresholdSpinner);
 
-        triggerPanel_.add(jPanel4);
+        triggerPanel_.add(triggerBottomPanel);
 
         leftPanel_.add(triggerPanel_);
 
         functionGeneratorPanel_.setBorder(BorderFactory.createTitledBorder("Function Generator"));
-        functionGeneratorPanel_.setPreferredSize(new java.awt.Dimension(366, 115));
-        functionGeneratorPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 0, 0));
+        functionGeneratorPanel_.setPreferredSize(new Dimension(366, 115));
+        functionGeneratorPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
-        jPanel27.setPreferredSize(new java.awt.Dimension(350, 30));
-        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 3));
+        functionGeneratorTopPanel_.setPreferredSize(new Dimension(350, 30));
+        functionGeneratorTopPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
 
-        jLabel7.setText("Output");
-        jPanel27.add(jLabel7);
+        outputLabel_.setText("Output");
+        functionGeneratorTopPanel_.add(outputLabel_);
 
         outputToggleButton.setText("On");
-        outputToggleButton.setPreferredSize(new java.awt.Dimension(65, 23));
-        jPanel27.add(outputToggleButton);
+        outputToggleButton.setPreferredSize(new Dimension(65, 23));
+        functionGeneratorTopPanel_.add(outputToggleButton);
 
-        functionGeneratorPanel_.add(jPanel27);
+        functionGeneratorPanel_.add(functionGeneratorTopPanel_);
 
-        jPanel40.setPreferredSize(new java.awt.Dimension(350, 30));
+        functionGeneratorMiddlePanel_.setPreferredSize(new Dimension(350, 30));
 
-        jLabel10.setText("Wave Type:");
-        jLabel10.setPreferredSize(new java.awt.Dimension(60, 14));
-        jPanel40.add(jLabel10);
+        waveTypeLabel_.setText("Wave Type:");
+        waveTypeLabel_.setPreferredSize(new Dimension(60, 14));
+        functionGeneratorMiddlePanel_.add(waveTypeLabel_);
 
-        waveTypeComboBox.setModel(new DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        waveTypeComboBox.setPreferredSize(new java.awt.Dimension(235, 20));
-        jPanel40.add(waveTypeComboBox);
+        waveTypeComboBox.setModel(new DefaultComboBoxModel<String>(Constant.WAVE_TYPES));
+        waveTypeComboBox.setPreferredSize(new Dimension(235, 20));
+        functionGeneratorMiddlePanel_.add(waveTypeComboBox);
 
-        functionGeneratorPanel_.add(jPanel40);
+        functionGeneratorPanel_.add(functionGeneratorMiddlePanel_);
 
-        jPanel38.setPreferredSize(new java.awt.Dimension(190, 30));
+        functionGeneratorBottomLeftPanel_.setPreferredSize(new Dimension(190, 30));
 
-        jLabel11.setText("P2P Voltage:");
-        jPanel38.add(jLabel11);
+        p2pVoltageLabel_.setText("P2P Voltage:");
+        functionGeneratorBottomLeftPanel_.add(p2pVoltageLabel_);
 
-        p2pVoltageTextField.setPreferredSize(new java.awt.Dimension(75, 20));
-        jPanel38.add(p2pVoltageTextField);
+        p2pVoltageTextField.setPreferredSize(new Dimension(75, 20));
+        functionGeneratorBottomLeftPanel_.add(p2pVoltageTextField);
 
-        functionGeneratorPanel_.add(jPanel38);
+        functionGeneratorPanel_.add(functionGeneratorBottomLeftPanel_);
 
-        jPanel41.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        functionGeneratorBottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-        horizontalRangeLabel_53.setText("Offset:");
-        jPanel41.add(horizontalRangeLabel_53);
+        functionGeneratorOffsetLabel_.setText("Offset:");
+        functionGeneratorBottomRightPanel_.add(functionGeneratorOffsetLabel_);
 
-        functionGeneratorOffsetSpinner.setPreferredSize(new java.awt.Dimension(60, 20));
-        jPanel41.add(functionGeneratorOffsetSpinner);
+        functionGeneratorOffsetSpinner.setPreferredSize(new Dimension(60, 20));
+        functionGeneratorBottomRightPanel_.add(functionGeneratorOffsetSpinner);
 
         horizontalRangeLabel_54.setText("volts");
-        jPanel41.add(horizontalRangeLabel_54);
+        functionGeneratorBottomRightPanel_.add(horizontalRangeLabel_54);
 
-        functionGeneratorPanel_.add(jPanel41);
+        functionGeneratorPanel_.add(functionGeneratorBottomRightPanel_);
 
         leftPanel_.add(functionGeneratorPanel_);
 
         measurementsPanel_.setBorder(BorderFactory.createTitledBorder("Measurements"));
-        measurementsPanel_.setPreferredSize(new java.awt.Dimension(366, 97));
-        measurementsPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 15, 0));
+        measurementsPanel_.setPreferredSize(new Dimension(366, 97));
+        measurementsPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 15, 0));
 
-        jPanel42.setPreferredSize(new java.awt.Dimension(150, 25));
-        jPanel42.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 8, 3));
+        measurementTopLeftPanel_.setPreferredSize(new Dimension(150, 25));
+        measurementTopLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 3));
 
-        jLabel12.setText("Max Voltage:");
-        jPanel42.add(jLabel12);
+        maxVoltageLabel_.setText("Max Voltage:");
+        measurementTopLeftPanel_.add(maxVoltageLabel_);
 
         maxVoltageLabel.setText("00.00");
         maxVoltageLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxVoltageLabel.setPreferredSize(new java.awt.Dimension(35, 19));
-        jPanel42.add(maxVoltageLabel);
+        maxVoltageLabel.setPreferredSize(new Dimension(35, 19));
+        measurementTopLeftPanel_.add(maxVoltageLabel);
 
-        measurementsPanel_.add(jPanel42);
+        measurementsPanel_.add(measurementTopLeftPanel_);
 
-        jPanel43.setPreferredSize(new java.awt.Dimension(150, 25));
-        jPanel43.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 3));
+        measurementTopRightPanel_.setPreferredSize(new Dimension(150, 25));
+        measurementTopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 3));
 
-        jLabel13.setText("Min Voltage:");
-        jPanel43.add(jLabel13);
+        minVoltageLabel_.setText("Min Voltage:");
+        measurementTopRightPanel_.add(minVoltageLabel_);
 
         minVoltageLabel.setText("00.00");
         minVoltageLabel.setBorder(BorderFactory.createTitledBorder(""));
-        minVoltageLabel.setPreferredSize(new java.awt.Dimension(35, 19));
-        jPanel43.add(minVoltageLabel);
+        minVoltageLabel.setPreferredSize(new Dimension(35, 19));
+        measurementTopRightPanel_.add(minVoltageLabel);
 
-        measurementsPanel_.add(jPanel43);
+        measurementsPanel_.add(measurementTopRightPanel_);
 
-        jPanel44.setPreferredSize(new java.awt.Dimension(150, 25));
-        jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 8, 3));
+        measurementMiddleLeftPanel_.setPreferredSize(new Dimension(150, 25));
+        measurementMiddleLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 3));
 
-        jLabel14.setText("Max P2P Voltage:");
-        jPanel44.add(jLabel14);
+        maxP2pVoltageLabel_.setText("Max P2P Voltage:");
+        measurementMiddleLeftPanel_.add(maxP2pVoltageLabel_);
 
         maxP2pVoltageLabel.setText("00.00");
         maxP2pVoltageLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxP2pVoltageLabel.setPreferredSize(new java.awt.Dimension(35, 19));
-        jPanel44.add(maxP2pVoltageLabel);
+        maxP2pVoltageLabel.setPreferredSize(new Dimension(35, 19));
+        measurementMiddleLeftPanel_.add(maxP2pVoltageLabel);
 
-        measurementsPanel_.add(jPanel44);
+        measurementsPanel_.add(measurementMiddleLeftPanel_);
 
-        jPanel45.setPreferredSize(new java.awt.Dimension(150, 25));
-        jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 3));
+        measurementMiddleRightPanel_.setPreferredSize(new Dimension(150, 25));
+        measurementMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 3));
 
-        jLabel16.setText("Average Voltage:");
-        jPanel45.add(jLabel16);
+        averageVoltageLabel_.setText("Average Voltage:");
+        measurementMiddleRightPanel_.add(averageVoltageLabel_);
 
         averageVoltageLabel.setText("00.00");
         averageVoltageLabel.setBorder(BorderFactory.createTitledBorder(""));
-        averageVoltageLabel.setPreferredSize(new java.awt.Dimension(35, 19));
-        jPanel45.add(averageVoltageLabel);
+        averageVoltageLabel.setPreferredSize(new Dimension(35, 19));
+        measurementMiddleRightPanel_.add(averageVoltageLabel);
 
-        measurementsPanel_.add(jPanel45);
+        measurementsPanel_.add(measurementMiddleRightPanel_);
 
-        jPanel46.setPreferredSize(new java.awt.Dimension(150, 25));
-        jPanel46.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 8, 3));
+        measurementBottomLeftPanel_.setPreferredSize(new Dimension(150, 25));
+        measurementBottomLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 3));
 
-        jLabel18.setText("SD of Voltage:");
-        jPanel46.add(jLabel18);
+        standardDeviationVoltageLabel_.setText("SD of Voltage:");
+        measurementBottomLeftPanel_.add(standardDeviationVoltageLabel_);
 
         standardDeviationVoltageLabel.setText("00.00");
         standardDeviationVoltageLabel.setBorder(BorderFactory.createTitledBorder(""));
-        standardDeviationVoltageLabel.setPreferredSize(new java.awt.Dimension(35, 19));
-        jPanel46.add(standardDeviationVoltageLabel);
+        standardDeviationVoltageLabel.setPreferredSize(new Dimension(35, 19));
+        measurementBottomLeftPanel_.add(standardDeviationVoltageLabel);
 
-        measurementsPanel_.add(jPanel46);
+        measurementsPanel_.add(measurementBottomLeftPanel_);
 
-        jPanel47.setPreferredSize(new java.awt.Dimension(150, 25));
-        jPanel47.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 3));
+        measurementBottomRightPanel_.setPreferredSize(new Dimension(150, 25));
+        measurementBottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 3));
 
-        jLabel20.setText("Frequency:");
-        jPanel47.add(jLabel20);
+        frequencyLabel_.setText("Frequency:");
+        measurementBottomRightPanel_.add(frequencyLabel_);
 
         frequencyLabel.setText("00.00");
         frequencyLabel.setBorder(BorderFactory.createTitledBorder(""));
-        frequencyLabel.setPreferredSize(new java.awt.Dimension(35, 19));
-        jPanel47.add(frequencyLabel);
+        frequencyLabel.setPreferredSize(new Dimension(35, 19));
+        measurementBottomRightPanel_.add(frequencyLabel);
 
-        measurementsPanel_.add(jPanel47);
+        measurementsPanel_.add(measurementBottomRightPanel_);
 
         leftPanel_.add(measurementsPanel_);
 
-        getContentPane().add(leftPanel_, java.awt.BorderLayout.WEST);
+        getContentPane().add(leftPanel_, BorderLayout.WEST);
 
         rightPanel_.setBorder(BorderFactory.createTitledBorder(""));
-        rightPanel_.setMinimumSize(new java.awt.Dimension(780, 650));
-        rightPanel_.setPreferredSize(new java.awt.Dimension(780, 650));
-        rightPanel_.setLayout(new java.awt.BorderLayout());
+        rightPanel_.setMinimumSize(new Dimension(780, 650));
+        rightPanel_.setPreferredSize(new Dimension(780, 650));
+        rightPanel_.setLayout(new BorderLayout());
 
-        cursorPanel_.setPreferredSize(new java.awt.Dimension(776, 40));
-        cursorPanel_.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 4));
-        rightPanel_.add(cursorPanel_, java.awt.BorderLayout.SOUTH);
-        rightPanel_.add(canvasPanel, java.awt.BorderLayout.CENTER);
+        cursorPanel_.setPreferredSize(new Dimension(776, 40));
+        cursorPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 4));
+        rightPanel_.add(cursorPanel_, BorderLayout.SOUTH);
+        rightPanel_.add(canvasPanel, BorderLayout.CENTER);
 
-        getContentPane().add(rightPanel_, java.awt.BorderLayout.CENTER);
+        getContentPane().add(rightPanel_, BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(1166, 735));
+        setSize(new Dimension(1166, 735));
         setLocationRelativeTo(null);
     }
+
 }

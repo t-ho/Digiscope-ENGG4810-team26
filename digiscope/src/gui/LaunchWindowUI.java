@@ -13,6 +13,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
+import data.Constant;
+
 /**
  *
  * @author ToanHo
@@ -43,7 +45,7 @@ public class LaunchWindowUI extends JFrame {
 		connectButton = new JButton("Connect");
 		
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setTitle("Digiscope");
+		setTitle(Constant.APPLICATION_TITLE);
 		setResizable(false);
 		setSize(new Dimension(480, 205));
 		setLocationRelativeTo(null);
