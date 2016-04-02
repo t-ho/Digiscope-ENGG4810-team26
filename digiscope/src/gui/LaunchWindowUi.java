@@ -23,6 +23,7 @@ import data.Constant;
  */
 public class LaunchWindowUi extends JFrame {
 
+	private static final long serialVersionUID = 1L;
 	private JPanel mainPanel_;
 	private JPanel firstRowPanel_;
 	private JLabel statusLabel_;
@@ -61,7 +62,7 @@ public class LaunchWindowUi extends JFrame {
 		
 		// firstRowPanel_ contains ipAddressLabel_, ipAddressTextField
 		firstRowPanel_.setPreferredSize(new Dimension(460, 50));
-		firstRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 22));
+		firstRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 15));
 
 		ipAddressLabel_.setText("IP Address: ");
 		ipAddressLabel_.setFont(new Font("Lucida Grande", 1, 16));

@@ -11,6 +11,7 @@ import gui.MainWindowUi;
  */
 public class MainWindow extends MainWindowUi {
 
+	private static final long serialVersionUID = 1L;
 	private LaunchWindow launchWindow_;
 
 	public MainWindow(LaunchWindow launchWindow) {

@@ -11,6 +11,7 @@ import gui.LaunchWindowUi;
  * @author ToanHo
  */
 public class LaunchWindow extends LaunchWindowUi {
+	private static final long serialVersionUID = 1L;
 	private MainWindow mainWindow_;
 
 	public LaunchWindow() {
