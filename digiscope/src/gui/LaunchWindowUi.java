@@ -25,7 +25,7 @@ public class LaunchWindowUi extends JFrame {
 
 	private JPanel mainPanel_;
 	private JPanel firstRowPanel_;
-	protected JLabel statusLabel;
+	private JLabel statusLabel_;
 	private JPanel secondRowPanel_;
 	private JLabel ipAddressLabel_;
 	protected JTextField ipAddressTextField;
@@ -40,7 +40,7 @@ public class LaunchWindowUi extends JFrame {
 		
 		mainPanel_ = new JPanel();
 		firstRowPanel_ = new JPanel();
-		statusLabel = new JLabel();
+		statusLabel_ = new JLabel();
 		secondRowPanel_ = new JPanel();
 		ipAddressLabel_ = new JLabel();
 		ipAddressTextField = new JTextField();
@@ -49,19 +49,19 @@ public class LaunchWindowUi extends JFrame {
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setTitle(Constant.APPLICATION_TITLE);
 		setResizable(false);
-		setSize(new Dimension(480, 205));
+		setSize(new Dimension(480, 200));
 		setLocationRelativeTo(null);
 		
 		getContentPane().setLayout(new BorderLayout());
 		
 		// mainPanel_ contains firstRowPanel_, statusLabel, secondRowPanel
 		mainPanel_.setPreferredSize(new Dimension(470, 170));
-		mainPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		mainPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 10));
 		mainPanel_.setBorder(BorderFactory.createTitledBorder(""));
 		
 		// firstRowPanel_ contains ipAddressLabel_, ipAddressTextField
-		firstRowPanel_.setPreferredSize(new Dimension(460, 55));
-		firstRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 20));
+		firstRowPanel_.setPreferredSize(new Dimension(460, 50));
+		firstRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 22));
 
 		ipAddressLabel_.setText("IP Address: ");
 		ipAddressLabel_.setFont(new Font("Lucida Grande", 1, 16));
@@ -72,21 +72,35 @@ public class LaunchWindowUi extends JFrame {
 		firstRowPanel_.add(ipAddressTextField);
 		mainPanel_.add(firstRowPanel_);
 
-		statusLabel.setForeground(Color.RED);
-		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		statusLabel.setPreferredSize(new Dimension(460, 20));
-		mainPanel_.add(statusLabel);
+		statusLabel_.setForeground(Color.RED);
+		statusLabel_.setFont(new Font("Lucida Grande", 0, 14));
+		statusLabel_.setHorizontalAlignment(SwingConstants.CENTER);
+		statusLabel_.setPreferredSize(new Dimension(460, 20));
+		mainPanel_.add(statusLabel_);
 		
 		// secondRowPanel contains connectButton
 		secondRowPanel_.setPreferredSize(new Dimension(460, 75));
-		secondRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 15));
+		secondRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
 
 		connectButton.setPreferredSize(new Dimension(140, 40));
-		connectButton.setFont(new Font("Lucida Grande", 1, 16));
+		connectButton.setFont(new Font("Lucida Grande", 1, 18));
 		secondRowPanel_.add(connectButton);
 		mainPanel_.add(secondRowPanel_);
 		
 		getContentPane().add(mainPanel_,BorderLayout.CENTER);
-
+	}
+	
+	/**
+	 * Set application status.
+	 * @param message
+	 * @param statusType There are 2 types: Constant.ERROR or Constant.NORMAL
+	 */
+	public void setStatus(String message, int statusType) {
+		if(statusType == Constant.ERROR) {
+			statusLabel_.setForeground(Color.RED);
+		} else if(statusType == Constant.NORMAL){
+			statusLabel_.setForeground(Color.BLUE);
+		}
+		statusLabel_.setText(message);
 	}
 }

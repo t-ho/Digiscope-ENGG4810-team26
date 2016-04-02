@@ -1,5 +1,6 @@
 package data;
 
+import javax.swing.JDialog;
 import javax.swing.UIManager;
 
 /**
@@ -23,6 +24,8 @@ public class Constant {
 		"Auto", "Normal", "Single" };
 	public static final  String [] TRIGGER_TYPES = new String[] { 
 		"Rising edge", "Falling edge", "Level" };
+	public static final int ERROR = 1;
+	public static final int NORMAL = 0;
 	
 	/**
 	 * Set application's LookAndFeel based on operating system type.

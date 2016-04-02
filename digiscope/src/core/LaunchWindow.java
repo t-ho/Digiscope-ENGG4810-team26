@@ -3,6 +3,7 @@ package core;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import data.Constant;
 import gui.LaunchWindowUi;
 
 /**
@@ -15,6 +16,7 @@ public class LaunchWindow extends LaunchWindowUi {
 	public LaunchWindow() {
 		super();
 		initialize();
+		setStatus("Please enter the IP Address!", Constant.NORMAL);
 	}
 
 	private void initialize() {
@@ -27,7 +29,6 @@ public class LaunchWindow extends LaunchWindowUi {
 	}
 
 	private void connectButtonActionPerformed(ActionEvent event) {
-		statusLabel.setText("Not implement yet!");
 		setMainWindow(new MainWindow(this));
 		setVisible(false);
 		getMainWindow().setVisible(true);
