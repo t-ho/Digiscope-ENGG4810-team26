@@ -1,10 +1,12 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -49,12 +51,13 @@ public class LaunchWindowUi extends JFrame {
 		setResizable(false);
 		setSize(new Dimension(480, 205));
 		setLocationRelativeTo(null);
-		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
+		
+		getContentPane().setLayout(new BorderLayout());
 		
 		// mainPanel_ contains firstRowPanel_, statusLabel, secondRowPanel
 		mainPanel_.setPreferredSize(new Dimension(470, 170));
 		mainPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		//mainPanel_.setBorder(BorderFactory.createTitledBorder(""));
+		mainPanel_.setBorder(BorderFactory.createTitledBorder(""));
 		
 		// firstRowPanel_ contains ipAddressLabel_, ipAddressTextField
 		firstRowPanel_.setPreferredSize(new Dimension(460, 55));
@@ -83,7 +86,7 @@ public class LaunchWindowUi extends JFrame {
 		secondRowPanel_.add(connectButton);
 		mainPanel_.add(secondRowPanel_);
 		
-		getContentPane().add(mainPanel_);
+		getContentPane().add(mainPanel_,BorderLayout.CENTER);
 
 	}
 }
