@@ -9,6 +9,7 @@ import javax.swing.UIManager;
 public class Constant {
 
 	public static final String APPLICATION_TITLE = "Digiscope - Team 26";
+	public static enum LookAndFeel {System, Metal};
 	public static final String[] VERTICAL_RANGE_VALUES = new String[] {
 		"1 us", "2 us", "5 us", "10 us", "20 us", "50 us", "100 us", "200 us",
 		"500 us", "1ms", "2 ms", "5 ms", "10 ms", "20 ms", "50 ms", "100 ms",
@@ -24,9 +25,15 @@ public class Constant {
 	public static final  String [] TRIGGER_TYPES = new String[] { 
 		"Rising edge", "Falling edge", "Level" };
 	
-	public static void setLookAndFeel() {
+	public static void setLookAndFeel(LookAndFeel lookAndFeel) {
 		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			if(lookAndFeel == LookAndFeel.System) {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} else if(lookAndFeel == LookAndFeel.Metal){
+				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+				/* Turn off metal's use bold fonts */
+				UIManager.put("swing.boldMetal", Boolean.FALSE);
+			}
 		}
 		catch (Exception exception) {
 			exception.printStackTrace();

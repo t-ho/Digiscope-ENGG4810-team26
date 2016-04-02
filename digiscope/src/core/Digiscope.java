@@ -4,6 +4,7 @@ import javax.swing.SwingUtilities;
 
 import core.LaunchWindow;
 import data.Constant;
+import data.Constant.LookAndFeel;
 
 /**
  *
@@ -19,7 +20,7 @@ public class Digiscope {
 	}
 
 	public static void main(String[] args) {
-		Constant.setLookAndFeel();
+		Constant.setLookAndFeel(LookAndFeel.Metal);
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
