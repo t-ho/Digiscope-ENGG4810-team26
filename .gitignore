@@ -29,3 +29,10 @@ bin/*
 *.bbl
 *.blg
 *.out
+
+Debug/
+.settings/
+.launches/
+
+*.obj
+*.aem4f
