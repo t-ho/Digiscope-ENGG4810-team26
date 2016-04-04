@@ -2,6 +2,10 @@ package core;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.SwingWorker;
 
 import data.Constant;
 import gui.LaunchWindowUi;
@@ -17,7 +21,7 @@ public class LaunchWindow extends LaunchWindowUi {
 	public LaunchWindow() {
 		super();
 		initialize();
-		setStatus("Please enter the IP Address!", Constant.NORMAL);
+		setStatus("To connect, please enter the IP address!", Constant.NORMAL);
 	}
 
 	private void initialize() {
@@ -30,9 +34,35 @@ public class LaunchWindow extends LaunchWindowUi {
 	}
 
 	private void connectButtonActionPerformed(ActionEvent event) {
-		setMainWindow(new MainWindow(this));
-		setVisible(false);
-		getMainWindow().setVisible(true);
+		String ipAddress = ipAddressTextField.getText().trim();
+		setEnabled(false);
+		if(ipAddress.equals("")) {
+			setStatus("Please enter the IP address!", Constant.ERROR);
+			setEnabled(true);
+		} else {
+			if(validateIpAddress(ipAddress)) {
+				this.setStatus("Connecting to the device...", Constant.NORMAL);
+				LaunchWindow that = this;
+				SwingWorker<String, Void> swingWorker = new SwingWorker<String, Void>() {
+					@Override
+					protected String doInBackground() throws Exception {
+						setMainWindow(new MainWindow(that));
+						getMainWindow().setVisible(true);
+						return null;
+					}
+					
+					@Override
+					protected void done() {
+						setEnabled(true);
+						setVisible(false);
+					}
+				};
+				swingWorker.execute();
+			} else {
+				setStatus("The IP address is invalid!", Constant.ERROR);
+				setEnabled(true);
+			}
+		}
 	}
 
 	public MainWindow getMainWindow() {
@@ -41,5 +71,11 @@ public class LaunchWindow extends LaunchWindowUi {
 
 	public void setMainWindow(MainWindow mainWindow) {
 		this.mainWindow_ = mainWindow;
+	}
+	
+	private boolean validateIpAddress(String ipAddress) {
+		Pattern pattern = Pattern.compile(Constant.IP_ADDRESS_PATTERN);
+		Matcher matcher = pattern.matcher(ipAddress);
+		return matcher.matches();
 	}
 }

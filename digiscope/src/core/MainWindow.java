@@ -3,6 +3,7 @@ package core;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import data.Constant;
 import gui.MainWindowUi;
 
 /**
@@ -30,6 +31,7 @@ public class MainWindow extends MainWindowUi {
 	}
 
 	private void mainWindowClosed(WindowEvent event) {
+		getLaunchWindow().setStatus("To connect, please enter the IP address!", Constant.NORMAL);
 		getLaunchWindow().setVisible(true);
 	}
 
