@@ -89,6 +89,7 @@ public class LaunchWindowUi extends JFrame {
 		mainPanel_.add(secondRowPanel_);
 		
 		getContentPane().add(mainPanel_,BorderLayout.CENTER);
+		Constant.setApplicationIcon(this);
 	}
 	
 	/**

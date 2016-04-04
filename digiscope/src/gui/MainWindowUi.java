@@ -997,6 +997,7 @@ public class MainWindowUi extends JFrame {
 
         setSize(new Dimension(1166, 735));
         setLocationRelativeTo(null);
+        Constant.setApplicationIcon(this);
     }
 
 }

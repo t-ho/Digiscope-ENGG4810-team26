@@ -1,5 +1,10 @@
 package data;
 
+import java.awt.Image;
+import java.lang.reflect.Method;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.UIManager;
 
 /**
@@ -61,4 +66,25 @@ public class Constant {
 		}
 	}
 	
+	/** Set an icon for application
+	 * @return */
+	public static void setApplicationIcon(JFrame frame) {
+		ImageIcon imageIcon = new ImageIcon(frame.getClass().getResource("/icons/oscilloscope_48x48.png")); 
+		Image image = imageIcon.getImage();
+		String os = System.getProperty("os.name");
+		if (os.contains("Mac")) {
+			try {
+				Class<?> applicationClass = Class.forName("com.apple.eawt.Application");
+				Method getAppMethod = applicationClass.getMethod("getApplication");
+				Method setDockIconMethod = applicationClass.getMethod("setDockIconImage", Image.class);
+				Object app = getAppMethod.invoke(applicationClass);
+				setDockIconMethod.invoke(app, image);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			frame.setIconImage(image);
+		}
+
+	}
 }
