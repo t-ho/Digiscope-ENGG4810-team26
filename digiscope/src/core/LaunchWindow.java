@@ -2,6 +2,10 @@ package core;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,9 +35,34 @@ public class LaunchWindow extends LaunchWindowUi {
 				connectButtonActionPerformed(event);
 			}
 		});
+		
+		ipAddressTextField.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent keyEvent) {
+				ipAddressTextFieldKeyTyped(keyEvent);
+			}
+		});
 	}
 
+
 	private void connectButtonActionPerformed(ActionEvent event) {
+		//TODO
+		connect();
+	}
+
+	private void ipAddressTextFieldKeyTyped(KeyEvent keyEvent) {
+		//TODO
+		char keyChar = keyEvent.getKeyChar();
+		if(keyChar == KeyEvent.VK_ENTER) {
+			connect();
+		} else if((keyChar < '0' || keyChar > '9') && (keyChar != '.') &&
+				(keyChar != KeyEvent.VK_BACK_SPACE)) {
+			keyEvent.consume();
+		} else {
+			setStatus("", Constant.NORMAL);
+		}
+	}
+
+	private void connect() {
 		String ipAddress = ipAddressTextField.getText().trim();
 		setEnabled(false);
 		if(ipAddress.equals("")) {
@@ -64,7 +93,7 @@ public class LaunchWindow extends LaunchWindowUi {
 			}
 		}
 	}
-
+	
 	public MainWindow getMainWindow() {
 		return mainWindow_;
 	}
