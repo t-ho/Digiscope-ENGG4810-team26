@@ -45,6 +45,8 @@ public class Constant {
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
+	public static enum TAB {CHANNEL_A, CHANNEL_B, MATH_CHANNEL, FILTER_CHANNEL};
+
 	/**
 	 * Set application's LookAndFeel based on operating system type.
 	 * Use default system look and feel when in Microsoft Windows.

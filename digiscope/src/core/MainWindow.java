@@ -31,25 +31,61 @@ public class MainWindow extends MainWindowUi {
 			}
 		});
 		
-		mathChannelCheckbox.addItemListener(new ItemListener() {
+		channelACheckBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				channelACheckboxItemStateChanged(event);
+			}
+		});
+
+		channelBCheckBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				channelBCheckboxItemStateChanged(event);
+			}
+		});
+		
+		mathChannelCheckBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
 				mathChannelCheckboxItemStateChanged(event);
 			}
 		});
 		
-		filterChannelCheckbox.addItemListener(new ItemListener() {
+		filterChannelCheckBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
 				filterChannelCheckboxItemStateChanged(event);
 			}
 		});
+
+	}
+
+	private void channelACheckboxItemStateChanged(ItemEvent event) {
+		// TODO
+		if(channelACheckBox.isSelected()) {
+			setEnabledChannelA(true);
+			showTab(Constant.TAB.CHANNEL_A);
+		} else {
+			setEnabledChannelA(false);
+		}
+	}
+
+	private void channelBCheckboxItemStateChanged(ItemEvent event) {
+		// TODO
+		if(channelBCheckBox.isSelected()) {
+			setEnabledChannelB(true);
+			showTab(Constant.TAB.CHANNEL_B);
+		} else {
+			setEnabledChannelB(false);
+		}
 	}
 
 	private void mathChannelCheckboxItemStateChanged(ItemEvent event) {
 		// TODO
-		if(mathChannelCheckbox.isSelected()) {
+		if(mathChannelCheckBox.isSelected()) {
 			setEnabledMathChannel(true);
+			showTab(Constant.TAB.MATH_CHANNEL);
 		} else {
 			setEnabledMathChannel(false);
 		}
@@ -57,41 +93,14 @@ public class MainWindow extends MainWindowUi {
 
 	private void filterChannelCheckboxItemStateChanged(ItemEvent event) {
 		// TODO
-		if(filterChannelCheckbox.isSelected()) {
+		if(filterChannelCheckBox.isSelected()) {
 			setEnabledFilterChannel(true);
+			showTab(Constant.TAB.FILTER_CHANNEL);
 		} else {
 			setEnabledFilterChannel(false);
 		}
 	}
 
-	private void setEnabledMathChannel(boolean enabled) {
-		equationTextField.setEnabled(enabled);
-		aButton.setEnabled(enabled);
-		bButton.setEnabled(enabled);
-		fButton.setEnabled(enabled);
-		powerButton.setEnabled(enabled);
-		plusButton.setEnabled(enabled);
-		minusButton.setEnabled(enabled);
-		piButton.setEnabled(enabled);
-		eButton.setEnabled(enabled);
-		leftParatheseButton.setEnabled(enabled);
-		rightParatheseButton.setEnabled(enabled);
-		multiplyButton.setEnabled(enabled);
-		divideButton.setEnabled(enabled);
-		horizontalOffsetMathSpinner.setEnabled(enabled);
-		horizontalRangeMathComboBox.setEnabled(enabled);
-		verticalOffsetMathSpinner.setEnabled(enabled);
-		verticalRangeMathComboBox.setEnabled(enabled);
-	}
-
-	private void setEnabledFilterChannel(boolean enabled){
-		inputChannelComboBox.setEnabled(enabled);
-		browseButton.setEnabled(enabled);
-		horizontalOffsetFilterSpinner.setEnabled(enabled);
-		horizontalRangeFilterComboBox.setEnabled(enabled);
-		verticalOffsetFilterSpinner.setEnabled(enabled);
-		verticalRangeFilterComboBox.setEnabled(enabled);
-	}
 
 	private void mainWindowClosed(WindowEvent event) {
 		getLaunchWindow().setStatus("To connect, please enter the IP address!", Constant.NORMAL);
