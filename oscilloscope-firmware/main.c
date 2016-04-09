@@ -93,33 +93,21 @@ void gpio_out_data(uint16_t c)
 void Write_Command(uint16_t c)
 {
 	GPIO_write(LCD_CS, 0);
-	SysCtlDelay(3);
 	GPIO_write(LCD_RS,0);
-	SysCtlDelay(3);
 	gpio_out_data(c);
-	SysCtlDelay(3);
 	GPIO_write(LCD_WR,0);
-	SysCtlDelay(3);
 	GPIO_write(LCD_WR,1);
-	SysCtlDelay(3);
 	GPIO_write(LCD_CS,1);
-	SysCtlDelay(3);
 }
 
 void Write_Data(uint16_t c)
 {
 	GPIO_write(LCD_CS, 0);
-	SysCtlDelay(3);
 	GPIO_write(LCD_RS,1);
-	SysCtlDelay(3);
 	gpio_out_data(c);
-	SysCtlDelay(3);
 	GPIO_write(LCD_WR,0);
-	SysCtlDelay(3);
 	GPIO_write(LCD_WR,1);
-	SysCtlDelay(3);
 	GPIO_write(LCD_CS,1);
-	SysCtlDelay(3);
 }
 
 void Write_Command_Data(uint16_t cmd, uint16_t dat)
@@ -210,14 +198,13 @@ void Pant(uint16_t color)
 	int i,j;
 	SetXY(0,0,239,319);
 
-    for(i=0;i<320;i++)
-	 {
-	  for (j=0;j<240;j++)
-	   	{
-         Write_Data(color);
-	    }
-
-	  }
+	for(i=0;i<320;i++)
+	{
+		for (j=0;j<240;j++)
+		{
+			Write_Data(color);
+		}
+	}
 }
 
 /*
