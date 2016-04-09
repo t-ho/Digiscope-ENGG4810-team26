@@ -35,11 +35,11 @@ public class MainWindowUi extends JFrame {
     protected JButton bButton;
     protected JButton browseButton;
     private JPanel canvasPanel;
-    protected JCheckBox channelACheckbox;
+    protected JCheckBox channelACheckBox;
     private JPanel channelAPanel_;
-    protected JCheckBox channelBCheckbox;
+    protected JCheckBox channelBCheckBox;
     private JPanel channelBPanel_;
-    private JTabbedPane channelTabbedPane;
+    private JTabbedPane channelTabbedPane_;
     private JPanel channelVisibilityPanel_;
     protected JTextField csvFilePathTextField;
     private JPanel cursorPanel_;
@@ -50,7 +50,7 @@ public class MainWindowUi extends JFrame {
     protected JTextField equationTextField;
     private JPanel equationTopPanel_;
     protected JButton fButton;
-    protected JCheckBox filterChannelCheckbox;
+    protected JCheckBox filterChannelCheckBox;
     private JPanel filterChannelPanel_;
     protected JButton forceTriggerButton;
     protected JLabel frequencyLabel;
@@ -107,7 +107,7 @@ public class MainWindowUi extends JFrame {
     private JToolBar toolBar_;
     private JPanel leftPanel_;
     protected JButton leftParatheseButton;
-    protected JCheckBox mathChannelCheckbox;
+    protected JCheckBox mathChannelCheckBox;
     private JPanel mathChannelPanel_;
     protected JLabel maxP2pVoltageLabel;
     private JLabel maxP2pVoltageLabel_;
@@ -204,11 +204,11 @@ public class MainWindowUi extends JFrame {
 
         leftPanel_ = new JPanel();
         channelVisibilityPanel_ = new JPanel();
-        channelACheckbox = new JCheckBox();
-        channelBCheckbox = new JCheckBox();
-        mathChannelCheckbox = new JCheckBox();
-        filterChannelCheckbox = new JCheckBox();
-        channelTabbedPane = new JTabbedPane();
+        channelACheckBox = new JCheckBox();
+        channelBCheckBox = new JCheckBox();
+        mathChannelCheckBox = new JCheckBox();
+        filterChannelCheckBox = new JCheckBox();
+        channelTabbedPane_ = new JTabbedPane();
         channelAPanel_ = new JPanel();
         horizontalAPanel_ = new JPanel();
         horizontalALeftPanel_ = new JPanel();
@@ -375,26 +375,27 @@ public class MainWindowUi extends JFrame {
         channelVisibilityPanel_.setPreferredSize(new Dimension(366, 45));
         channelVisibilityPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 0));
 
-        channelACheckbox.setText("A");
-        channelACheckbox.setPreferredSize(new Dimension(75, 20));
-        channelVisibilityPanel_.add(channelACheckbox);
+        channelACheckBox.setSelected(true);
+        channelACheckBox.setText("A");
+        channelACheckBox.setPreferredSize(new Dimension(75, 20));
+        channelVisibilityPanel_.add(channelACheckBox);
 
-        channelBCheckbox.setText("B");
-        channelBCheckbox.setPreferredSize(new Dimension(75, 20));
-        channelVisibilityPanel_.add(channelBCheckbox);
+        channelBCheckBox.setText("B");
+        channelBCheckBox.setPreferredSize(new Dimension(75, 20));
+        channelVisibilityPanel_.add(channelBCheckBox);
 
-        mathChannelCheckbox.setText("Math");
-        mathChannelCheckbox.setPreferredSize(new Dimension(75, 20));
-        channelVisibilityPanel_.add(mathChannelCheckbox);
+        mathChannelCheckBox.setText("Math");
+        mathChannelCheckBox.setPreferredSize(new Dimension(75, 20));
+        channelVisibilityPanel_.add(mathChannelCheckBox);
 
-        filterChannelCheckbox.setText("Filter");
-        filterChannelCheckbox.setPreferredSize(new Dimension(75, 20));
-        channelVisibilityPanel_.add(filterChannelCheckbox);
+        filterChannelCheckBox.setText("Filter");
+        filterChannelCheckBox.setPreferredSize(new Dimension(75, 20));
+        channelVisibilityPanel_.add(filterChannelCheckBox);
 
         leftPanel_.add(channelVisibilityPanel_);
 
-        channelTabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        channelTabbedPane.setPreferredSize(new Dimension(366, 275));
+        channelTabbedPane_.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        channelTabbedPane_.setPreferredSize(new Dimension(366, 275));
 
         horizontalAPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
         horizontalAPanel_.setPreferredSize(new Dimension(360, 55));
@@ -466,7 +467,7 @@ public class MainWindowUi extends JFrame {
 
         channelAPanel_.add(verticalAPannel_);
 
-        channelTabbedPane.addTab("Channel A", channelAPanel_);
+        channelTabbedPane_.addTab("Channel A", channelAPanel_);
 
         horizontalBPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
         horizontalBPanel_.setPreferredSize(new Dimension(360, 55));
@@ -479,6 +480,7 @@ public class MainWindowUi extends JFrame {
         horizontalBLeftPanel_.add(horizontalRangeBLabel1_);
 
         horizontalRangeBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_RANGE_VALUES));
+        horizontalRangeBComboBox.setEnabled(false);
         horizontalRangeBComboBox.setPreferredSize(new Dimension(95, 20));
         horizontalBLeftPanel_.add(horizontalRangeBComboBox);
 
@@ -493,6 +495,7 @@ public class MainWindowUi extends JFrame {
         horizontalOffsetBLabel1_.setText("Offset:");
         horizontalBRightPanel_.add(horizontalOffsetBLabel1_);
 
+        horizontalOffsetBSpinner.setEnabled(false);
         horizontalOffsetBSpinner.setPreferredSize(new Dimension(60, 20));
         horizontalBRightPanel_.add(horizontalOffsetBSpinner);
 
@@ -514,6 +517,7 @@ public class MainWindowUi extends JFrame {
         verticalBLeftPanel_.add(verticalRangeBLabel1_);
 
         verticalRangeBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_RANGE_VALUES));
+        verticalRangeBComboBox.setEnabled(false);
         verticalRangeBComboBox.setPreferredSize(new Dimension(95, 20));
         verticalBLeftPanel_.add(verticalRangeBComboBox);
 
@@ -528,6 +532,7 @@ public class MainWindowUi extends JFrame {
         verticalOffsetBLabel1_.setText("Offset:");
         verticalBRightPanel_.add(verticalOffsetBLabel1_);
 
+        verticalOffsetBSpinner.setEnabled(false);
         verticalOffsetBSpinner.setPreferredSize(new Dimension(60, 20));
         verticalBRightPanel_.add(verticalOffsetBSpinner);
 
@@ -538,7 +543,7 @@ public class MainWindowUi extends JFrame {
 
         channelBPanel_.add(verticalBPanel_);
 
-        channelTabbedPane.addTab("Channel B", channelBPanel_);
+        channelTabbedPane_.addTab("Channel B", channelBPanel_);
 
         equationPannel_.setBorder(BorderFactory.createTitledBorder("Equation"));
         equationPannel_.setPreferredSize(new Dimension(360, 115));
@@ -693,7 +698,7 @@ public class MainWindowUi extends JFrame {
 
         mathChannelPanel_.add(verticalMathPanel_);
 
-        channelTabbedPane.addTab("Math Channel", mathChannelPanel_);
+        channelTabbedPane_.addTab("Math Channel", mathChannelPanel_);
 
         inputPanel_.setBorder(BorderFactory.createTitledBorder("Input"));
         inputPanel_.setPreferredSize(new Dimension(360, 95));
@@ -804,9 +809,9 @@ public class MainWindowUi extends JFrame {
 
         filterChannelPanel_.add(verticalFilterPanel_);
 
-        channelTabbedPane.addTab("Filter Channel", filterChannelPanel_);
+        channelTabbedPane_.addTab("Filter Channel", filterChannelPanel_);
 
-        leftPanel_.add(channelTabbedPane);
+        leftPanel_.add(channelTabbedPane_);
 
         triggerPanel_.setBorder(BorderFactory.createTitledBorder("Trigger"));
         triggerPanel_.setPreferredSize(new Dimension(366, 140));
@@ -1043,4 +1048,86 @@ public class MainWindowUi extends JFrame {
         setLocationRelativeTo(null);
         Constant.setApplicationIcon(this);
     }
+    
+    /**
+     * Show tab on channel tabbedpane
+     * @param tab Constant.TAB
+     */
+    protected void showTab(Constant.TAB tab) {
+    	switch(tab) {
+    		case CHANNEL_A:
+    			channelTabbedPane_.setSelectedComponent(channelAPanel_);
+    			break;
+    		case CHANNEL_B:
+    			channelTabbedPane_.setSelectedComponent(channelBPanel_);
+    			break;
+    		case MATH_CHANNEL:
+    			channelTabbedPane_.setSelectedComponent(mathChannelPanel_);
+    			break;
+    		case FILTER_CHANNEL:
+    			channelTabbedPane_.setSelectedComponent(filterChannelPanel_);
+    			break;
+    		default:
+    			channelTabbedPane_.setSelectedComponent(channelAPanel_);
+    	}
+    }
+
+    /**
+     * Enable or disable all the components on the Math channel panel 
+     * @param enabled boolean
+     */
+	protected void setEnabledMathChannel(boolean enabled) {
+		equationTextField.setEnabled(enabled);
+		aButton.setEnabled(enabled);
+		bButton.setEnabled(enabled);
+		fButton.setEnabled(enabled);
+		powerButton.setEnabled(enabled);
+		plusButton.setEnabled(enabled);
+		minusButton.setEnabled(enabled);
+		piButton.setEnabled(enabled);
+		eButton.setEnabled(enabled);
+		leftParatheseButton.setEnabled(enabled);
+		rightParatheseButton.setEnabled(enabled);
+		multiplyButton.setEnabled(enabled);
+		divideButton.setEnabled(enabled);
+		horizontalOffsetMathSpinner.setEnabled(enabled);
+		horizontalRangeMathComboBox.setEnabled(enabled);
+		verticalOffsetMathSpinner.setEnabled(enabled);
+		verticalRangeMathComboBox.setEnabled(enabled);
+	}
+
+	/**
+	 * Enable or disable all the components on the Filter channel panel
+	 * @param enabled boolean
+	 */
+	protected void setEnabledFilterChannel(boolean enabled){
+		inputChannelComboBox.setEnabled(enabled);
+		browseButton.setEnabled(enabled);
+		horizontalOffsetFilterSpinner.setEnabled(enabled);
+		horizontalRangeFilterComboBox.setEnabled(enabled);
+		verticalOffsetFilterSpinner.setEnabled(enabled);
+		verticalRangeFilterComboBox.setEnabled(enabled);
+	}
+	
+	/**
+	 * Enable or disable all the components on the channel A panel
+	 * @param enabled boolean
+	 */
+	protected void setEnabledChannelA(boolean enabled) {
+		horizontalOffsetASpinner.setEnabled(enabled);
+		horizontalRangeAComboBox.setEnabled(enabled);
+		verticalOffsetASpinner.setEnabled(enabled);
+		verticalRangeAComboBox.setEnabled(enabled);
+	}
+ 
+	/**
+	 * Enable or disable all the components on the channel B panel
+	 * @param enabled boolean
+	 */
+	protected void setEnabledChannelB(boolean enabled) {
+		horizontalOffsetBSpinner.setEnabled(enabled);
+		horizontalRangeBComboBox.setEnabled(enabled);
+		verticalOffsetBSpinner.setEnabled(enabled);
+		verticalRangeBComboBox.setEnabled(enabled);
+	}
 }
