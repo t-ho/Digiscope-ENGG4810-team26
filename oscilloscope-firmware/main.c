@@ -66,6 +66,159 @@
 
 Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
+Task_Struct task1Struct;
+Char task1Stack[TASKSTACKSIZE];
+
+
+void gpio_out_data(uint16_t c)
+{
+	GPIO_write(LCD_DATA_0, (c >> 0) & 1);
+	GPIO_write(LCD_DATA_1, (c >> 1) & 1);
+	GPIO_write(LCD_DATA_2, (c >> 2) & 1);
+	GPIO_write(LCD_DATA_3, (c >> 3) & 1);
+	GPIO_write(LCD_DATA_4, (c >> 4) & 1);
+	GPIO_write(LCD_DATA_5, (c >> 5) & 1);
+	GPIO_write(LCD_DATA_6, (c >> 6) & 1);
+	GPIO_write(LCD_DATA_7, (c >> 7) & 1);
+	GPIO_write(LCD_DATA_8, (c >> 8) & 1);
+	GPIO_write(LCD_DATA_9, (c >> 9) & 1);
+	GPIO_write(LCD_DATA_10, (c >> 10) & 1);
+	GPIO_write(LCD_DATA_11, (c >> 11) & 1);
+	GPIO_write(LCD_DATA_12, (c >> 12) & 1);
+	GPIO_write(LCD_DATA_13, (c >> 13) & 1);
+	GPIO_write(LCD_DATA_14, (c >> 14) & 1);
+	GPIO_write(LCD_DATA_15, (c >> 15) & 1);
+}
+
+void Write_Command(uint16_t c)
+{
+	GPIO_write(LCD_CS, 0);
+	SysCtlDelay(3);
+	GPIO_write(LCD_RS,0);
+	SysCtlDelay(3);
+	gpio_out_data(c);
+	SysCtlDelay(3);
+	GPIO_write(LCD_WR,0);
+	SysCtlDelay(3);
+	GPIO_write(LCD_WR,1);
+	SysCtlDelay(3);
+	GPIO_write(LCD_CS,1);
+	SysCtlDelay(3);
+}
+
+void Write_Data(uint16_t c)
+{
+	GPIO_write(LCD_CS, 0);
+	SysCtlDelay(3);
+	GPIO_write(LCD_RS,1);
+	SysCtlDelay(3);
+	gpio_out_data(c);
+	SysCtlDelay(3);
+	GPIO_write(LCD_WR,0);
+	SysCtlDelay(3);
+	GPIO_write(LCD_WR,1);
+	SysCtlDelay(3);
+	GPIO_write(LCD_CS,1);
+	SysCtlDelay(3);
+}
+
+void Write_Command_Data(uint16_t cmd, uint16_t dat)
+{
+	Write_Command(cmd);
+	Write_Data(dat);
+}
+
+
+void Lcd_Init()
+{
+	GPIO_write(LCD_LED,1);
+
+
+
+//	GPIO_write(LCD_RST,1);
+//	GPIO_write(LCD_RST,0);
+//    GPIO_write(LCD_RST,1);
+//    GPIO_write(LCD_CS,1);
+//    GPIO_write(LCD_WR,1);
+
+	GPIO_write(LCD_RST,0);
+	GPIO_write(LCD_CS,1);
+	GPIO_write(LCD_RS,1);
+	GPIO_write(LCD_WR,1);
+	GPIO_write(LCD_RD,1);
+
+	GPIO_write(LCD_RST,1);
+
+	SysCtlDelay(100);
+
+	Write_Command_Data(0x0000,0x0001);
+	Write_Command_Data(0x0003,0xA8A4);
+	Write_Command_Data(0x000C,0x0000);
+	Write_Command_Data(0x000D,0x080C);
+	Write_Command_Data(0x000E,0x2B00);
+	Write_Command_Data(0x001E,0x00B7);
+	Write_Command_Data(0x0001,0x2B3F);
+	Write_Command_Data(0x0002,0x0600);
+	Write_Command_Data(0x0010,0x0000);
+	Write_Command_Data(0x0011,0x6070);
+	Write_Command_Data(0x0005,0x0000);
+	Write_Command_Data(0x0006,0x0000);
+	Write_Command_Data(0x0016,0xEF1C);
+	Write_Command_Data(0x0017,0x0003);
+	Write_Command_Data(0x0007,0x0233);
+	Write_Command_Data(0x000B,0x0000);
+	Write_Command_Data(0x000F,0x0000);
+	Write_Command_Data(0x0041,0x0000);
+	Write_Command_Data(0x0042,0x0000);
+	Write_Command_Data(0x0048,0x0000);
+	Write_Command_Data(0x0049,0x013F);
+	Write_Command_Data(0x004A,0x0000);
+	Write_Command_Data(0x004B,0x0000);
+	Write_Command_Data(0x0044,0xEF00);
+	Write_Command_Data(0x0045,0x0000);
+	Write_Command_Data(0x0046,0x013F);
+	Write_Command_Data(0x0030,0x0707);
+	Write_Command_Data(0x0031,0x0204);
+	Write_Command_Data(0x0032,0x0204);
+	Write_Command_Data(0x0033,0x0502);
+	Write_Command_Data(0x0034,0x0507);
+	Write_Command_Data(0x0035,0x0204);
+	Write_Command_Data(0x0036,0x0204);
+	Write_Command_Data(0x0037,0x0502);
+	Write_Command_Data(0x003A,0x0302);
+	Write_Command_Data(0x003B,0x0302);
+	Write_Command_Data(0x0023,0x0000);
+	Write_Command_Data(0x0024,0x0000);
+	Write_Command_Data(0x0025,0x8000);
+	Write_Command_Data(0x004f,0x0000);
+	Write_Command_Data(0x004e,0x0000);
+	Write_Command(0x0022);
+}
+
+void SetXY(unsigned int x0,unsigned int y0,unsigned int x1,unsigned int y1)
+{
+	Write_Command_Data(0x0044,(x1<<8)+x0);
+	Write_Command_Data(0x0045,y0);
+	Write_Command_Data(0x0046,y1);
+	Write_Command_Data(0x004e,x0);
+	Write_Command_Data(0x004f,y0);
+	Write_Command (0x0022);//LCD_WriteCMD(GRAMWR);
+}
+
+void Pant(uint16_t color)
+{
+	int i,j;
+	SetXY(0,0,239,319);
+
+    for(i=0;i<320;i++)
+	 {
+	  for (j=0;j<240;j++)
+	   	{
+         Write_Data(color);
+	    }
+
+	  }
+}
 
 /*
  *  ======== heartBeatFxn ========
@@ -84,6 +237,18 @@ void heartBeatFxn(UArg arg0, UArg arg1)
         ADCSequenceDataGet(ADC0_BASE, 0, &result);
         System_printf("%04lu\r", result);
         System_flush();
+    }
+}
+
+void screenDemo(UArg arg0, UArg arg1)
+{
+    while (1) {
+        Task_sleep(2000);
+    	Pant(0xF800);
+        Task_sleep(2000);
+    	Pant(0x001F);
+        Task_sleep(2000);
+    	Pant(0xFFE0);
     }
 }
 
@@ -106,6 +271,9 @@ int main(void)
     // Board_initWatchdog();
     // Board_initWiFi();
 
+
+    Lcd_Init();
+
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC0));
@@ -117,10 +285,14 @@ int main(void)
 
     /* Construct heartBeat Task  thread */
     Task_Params_init(&taskParams);
-    taskParams.arg0 = 10;
+    taskParams.arg0 = 1000;
     taskParams.stackSize = TASKSTACKSIZE;
     taskParams.stack = &task0Stack;
     Task_construct(&task0Struct, (Task_FuncPtr)heartBeatFxn, &taskParams, NULL);
+
+    taskParams.stack = &task1Stack;
+    Task_construct(&task1Struct, (Task_FuncPtr)screenDemo, &taskParams, NULL);
+
 
      /* Turn on user LED */
     GPIO_write(Board_LED0, Board_LED_ON);
