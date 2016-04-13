@@ -2,8 +2,6 @@ package core;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputMethodEvent;
-import java.awt.event.InputMethodListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
@@ -26,6 +24,7 @@ public class LaunchWindow extends LaunchWindowUi {
 		super();
 		initialize();
 		setStatus("To connect, please enter the IP address!", Constant.NORMAL);
+		ipAddressTextField.setText("192.168.1.2");
 	}
 
 	private void initialize() {
