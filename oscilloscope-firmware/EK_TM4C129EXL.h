@@ -93,7 +93,6 @@ typedef enum EK_TM4C129EXL_GPIOName {
 	LCD_RS,
 	LCD_WR,
 	LCD_RD,
-	LCD_D_IRQ,
 	LCD_CS,
 	LCD_RST,
 	LCD_LED,
@@ -101,6 +100,7 @@ typedef enum EK_TM4C129EXL_GPIOName {
 	T_CS,
 	T_DIN,
 	T_BUSY,
+	T_IRQ,
 	T_DOUT,
 
     EK_TM4C129EXL_GPIOCOUNT

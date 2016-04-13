@@ -40,6 +40,7 @@
 /* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Task.h>
+#include <ti/sysbios/knl/Clock.h>
 
 /* TI-RTOS Header files */
 // #include <ti/drivers/EMAC.h>
@@ -64,10 +65,22 @@
 
 #define TASKSTACKSIZE   512
 
+/* Touch screen calibration */
+#define PixSizeX	13.78f
+#define PixOffsX	411
+#define PixSizeY	11.01f
+#define PixOffsY	378
+#define PREC_TOUCH_CONST 10
+
 Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
 Task_Struct task1Struct;
 Char task1Stack[TASKSTACKSIZE];
+
+Clock_Struct TouchClkStruct;
+Clock_Handle TouchClkHandle;
+
+uint16_t x, y;
 
 
 void gpio_out_data(uint16_t c)
@@ -120,14 +133,6 @@ void Write_Command_Data(uint16_t cmd, uint16_t dat)
 void Lcd_Init()
 {
 	GPIO_write(LCD_LED,1);
-
-
-
-//	GPIO_write(LCD_RST,1);
-//	GPIO_write(LCD_RST,0);
-//    GPIO_write(LCD_RST,1);
-//    GPIO_write(LCD_CS,1);
-//    GPIO_write(LCD_WR,1);
 
 	GPIO_write(LCD_RST,0);
 	GPIO_write(LCD_CS,1);
@@ -204,8 +209,126 @@ void Pant(uint16_t color)
 		{
 			Write_Data(color);
 		}
+        Task_sleep(1);
 	}
 }
+
+void Touch_Init(void)
+{
+	GPIO_write(T_CS,  1);
+	SysCtlDelay(3);
+	GPIO_write(T_CLK, 1);
+	SysCtlDelay(3);
+	GPIO_write(T_DIN, 1);
+	SysCtlDelay(3);
+	GPIO_write(T_CLK, 1);
+	SysCtlDelay(3);
+
+	GPIO_write(T_CLK, 0);
+	SysCtlDelay(3);
+}
+
+
+void Touch_WriteData(uint8_t data)
+{
+	uint8_t temp;
+	uint8_t count;
+
+	temp=data;
+	GPIO_write(T_CLK,0);
+	SysCtlDelay(3);
+
+	for(count=0; count<8; count++)
+	{
+		if(temp & 0x80)
+			GPIO_write(T_DIN, 1);
+		else
+			GPIO_write(T_DIN, 0);
+		temp = temp << 1;
+		SysCtlDelay(3);
+		GPIO_write(T_CLK, 0);
+		SysCtlDelay(3);
+		GPIO_write(T_CLK, 1);
+//		SysCtlDelay(3);
+	}
+}
+
+uint16_t Touch_ReadData()
+{
+	uint16_t data = 0;
+	uint8_t count;
+
+	for(count=0; count<12; count++)
+	{
+		data <<= 1;
+		GPIO_write(T_CLK, 1);
+		SysCtlDelay(3);
+		if (GPIO_read(T_DOUT))
+		{
+			data++;
+		}
+		SysCtlDelay(3);
+		GPIO_write(T_CLK, 0);
+		SysCtlDelay(3);
+	}
+	return(data);
+}
+
+void Touch_Read(uint16_t *x_out, uint16_t *y_out)
+{
+	uint32_t tx=0;
+	uint32_t ty=0;
+
+	GPIO_write(T_CS,0);
+	SysCtlDelay(3);
+
+	int i;
+	for (i = 0; i < PREC_TOUCH_CONST; i++)
+	{
+		Touch_WriteData(0x90);
+		GPIO_write(T_CLK,1);
+		SysCtlDelay(3);
+		GPIO_write(T_CLK,0);
+		SysCtlDelay(3);
+		ty += Touch_ReadData();
+
+		Touch_WriteData(0xD0);
+		GPIO_write(T_CLK,1);
+		SysCtlDelay(3);
+		GPIO_write(T_CLK,0);
+		SysCtlDelay(3);
+		tx += Touch_ReadData();
+
+	}
+
+	GPIO_write(T_CS,1);
+
+	int16_t x_temp = ((tx / PREC_TOUCH_CONST) - PixOffsX) / PixSizeX;
+	int16_t y_temp = ((ty / PREC_TOUCH_CONST) - PixOffsY) / PixSizeY;
+
+	if (x_temp > 0) *x_out = x_temp;
+	else *x_out = 0;
+	if (y_temp > 0) *y_out = y_temp;
+	else *y_out = 0;
+}
+
+void touchCallback(unsigned int index)
+{
+	GPIO_disableInt(T_IRQ);
+
+	Touch_Read(&x, &y);
+    System_printf("x: %d, y: %d\r", x, y);
+
+    Clock_start(TouchClkHandle);
+
+}
+
+void clk0Fxn(UArg arg0)
+{
+    GPIO_clearInt(T_IRQ);
+    GPIO_enableInt(T_IRQ);
+}
+
 
 /*
  *  ======== heartBeatFxn ========
@@ -244,6 +367,11 @@ void screenDemo(UArg arg0, UArg arg1)
  */
 int main(void)
 {
+
+    SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ |
+                    SYSCTL_OSC_MAIN | SYSCTL_USE_PLL |
+                    SYSCTL_CFG_VCO_480), 120000000);
+
     Task_Params taskParams;
     /* Call board init functions */
     Board_initGeneral();
@@ -258,8 +386,19 @@ int main(void)
     // Board_initWatchdog();
     // Board_initWiFi();
 
+    Clock_Params clkParams;
+    Clock_Params_init(&clkParams);
+    clkParams.period = 0;
+    clkParams.startFlag = FALSE;
+    Clock_construct(&TouchClkStruct, (Clock_FuncPtr)clk0Fxn, 200, &clkParams);
+    TouchClkHandle = Clock_handle(&TouchClkStruct);
 
     Lcd_Init();
+    Touch_Init();
+
+    GPIO_setCallback(T_IRQ, touchCallback);
+    GPIO_enableInt(T_IRQ);
+
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 
@@ -272,7 +411,7 @@ int main(void)
 
     /* Construct heartBeat Task  thread */
     Task_Params_init(&taskParams);
-    taskParams.arg0 = 1000;
+    taskParams.arg0 = 250;
     taskParams.stackSize = TASKSTACKSIZE;
     taskParams.stack = &task0Stack;
     Task_construct(&task0Struct, (Task_FuncPtr)heartBeatFxn, &taskParams, NULL);
