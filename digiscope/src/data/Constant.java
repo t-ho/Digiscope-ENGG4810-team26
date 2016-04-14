@@ -47,6 +47,8 @@ public class Constant {
 
 	public static enum TAB {CHANNEL_A, CHANNEL_B, MATH_CHANNEL, FILTER_CHANNEL};
 	
+	public static int VERTICAL_GRID_SPACINGS = 10;
+	
 	
 	public static final int NUMBER_OF_CHANNELS = 4;
 	public static final int A_INDEX = 0;

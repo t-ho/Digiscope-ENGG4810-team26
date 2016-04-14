@@ -30,12 +30,11 @@ public class MainWindow extends MainWindowUi {
 		// Test
 		XYSeries aSeries = new XYSeries("Channel A");
 		for(double i = -20; i <= 20; i = i + 0.1) {
-			aSeries.add(i, 3*Math.sin(i));
+			aSeries.add(i, 10 * (3*Math.sin(i)));
 		}
 		visualizer = new Visualizer(Constant.A_INDEX, aSeries);
 		chartPanel = new ChartPanel(visualizer.getChart());
 		addComponentToCanvasPanel(chartPanel);
-		visualizer.setAutoRange(false);
 		// endTest
 	}
 
