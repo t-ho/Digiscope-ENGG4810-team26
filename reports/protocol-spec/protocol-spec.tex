@@ -1,0 +1,96 @@
+\documentclass[]{article}
+
+\usepackage{bytefield}
+\usepackage{float}
+
+%opening
+\title{ENGG4810 Oscilloscope Communication Protocol Specification}
+\author{
+	Ryan Fitzimon\\
+	43214907\\
+	\texttt{ryan.fitzsimon@uq.net.au}
+	\and
+	Minh Toan Ho\\
+	43129560\\
+	\texttt{minh.ho2@uq.net.au}
+}
+
+\begin{document}
+
+\maketitle
+
+\section{Packet Types}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|}
+		\hline
+		\textbf{Identifier} & \textbf{Type} \\ \hline
+		0xD1 & 8 bit sample packet, channel 1 \\ \hline
+		0xD2 & 8 bit sample packet, channel 2 \\ \hline
+		0xE1 & 12 bit sample packet, channel 1 \\ \hline
+		0xE2 & 12 bit sample packet, channel 2 \\ \hline
+	\end{tabular}
+	\caption{Packet type identifiers}
+\end{table}
+
+\section{General Structure}
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}[bitwidth=2em]{16}
+		\bitheader{0-15} \\
+		\bitbox{8}{Packet Type} & \bitbox[ltr]{8}{} \\
+		\wordbox[lr]{1}{\dots} \\
+		\wordbox[lr]{1}{Data} \\
+		\wordbox[blr]{1}{\dots}
+	\end{bytefield}
+	\caption{Generic packet structure}
+\end{figure}
+
+\section{Command Packet}
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}[bitwidth=2em]{16}
+		\bitheader{0-15} \\
+		\bitbox{8}{Packet Type} & \bitbox{8}{Command Argument}
+	\end{bytefield}
+	\caption{Command packet structure}
+\end{figure}
+
+\section{Data Packet}
+\subsection{8 bit mode}
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}[bitwidth=2em]{16}
+		\bitheader{0-15} \\
+		\bitbox{8}{Packet Type} & \bitbox{8}{Sequence Number} \\
+		\begin{rightwordgroup}{Payload}
+			\bitbox{8}{Sample 0} & \bitbox{8}{Sample 1} \\
+			\bitbox{8}{Sample 2} & \bitbox{8}{Sample 3}\\
+			\wordbox[tlr]{1}{\dots} \\
+			\wordbox[lr]{1}{Samples} \\
+			\wordbox[lr]{1}{\dots} \\
+			\bitbox[blr]{8}{} & \bitbox{8}{Sample n}
+		\end{rightwordgroup}
+	\end{bytefield}
+	\caption{8 bit mode data packet structure}
+\end{figure}
+
+\subsection{12 bit mode}
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}[bitwidth=2em]{16}
+		\bitheader{0-15} \\
+		\bitbox{8}{Packet Type} & \bitbox{8}{Sequence Number} \\
+		\begin{rightwordgroup}{Payload}
+			\bitbox{12}{Sample 0} & \bitbox{4}{Sample 1\dots} \\
+			\bitbox{4}{\dots Sample 1} & \bitbox{12}{Sample 2}\\
+			\wordbox[tlr]{1}{\dots} \\
+			\wordbox[lr]{1}{Samples} \\
+			\wordbox[lr]{1}{\dots} \\
+			\bitbox[blr]{4}{} & \bitbox{12}{Sample n}
+		\end{rightwordgroup}
+	\end{bytefield}
+	\caption{12 bit mode data packet structure}
+\end{figure}
+
+\end{document}
