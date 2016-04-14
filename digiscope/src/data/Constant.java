@@ -46,6 +46,13 @@ public class Constant {
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
 	public static enum TAB {CHANNEL_A, CHANNEL_B, MATH_CHANNEL, FILTER_CHANNEL};
+	
+	
+	public static final int NUMBER_OF_CHANNELS = 4;
+	public static final int A_INDEX = 0;
+	public static final int B_INDEX = 1;
+	public static final int MATH_INDEX = 2;
+	public static final int FILTER_INDEX = 3;
 
 	/**
 	 * Set application's LookAndFeel based on operating system type.

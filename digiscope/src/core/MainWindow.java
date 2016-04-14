@@ -5,6 +5,9 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import org.jfree.chart.ChartPanel;
+import org.jfree.data.xy.XYSeries;
+
 import data.Constant;
 import gui.MainWindowUi;
 
@@ -16,11 +19,23 @@ public class MainWindow extends MainWindowUi {
 
 	private static final long serialVersionUID = 1L;
 	private LaunchWindow launchWindow_;
+	private Visualizer visualizer;
+	private ChartPanel chartPanel;
 
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
 		initialize();
 		setLaunchWindow(launchWindow);
+		
+		// Test
+		XYSeries aSeries = new XYSeries("Channel A");
+		for(double i = -20; i <= 20; i = i + 0.1) {
+			aSeries.add(i, 3*Math.sin(i));
+		}
+		visualizer = new Visualizer(Constant.A_INDEX, aSeries);
+		chartPanel = new ChartPanel(visualizer.getChart());
+		addComponentToCanvasPanel(chartPanel);
+		// endTest
 	}
 
 	private void initialize() {
