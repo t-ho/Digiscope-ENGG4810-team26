@@ -35,6 +35,7 @@ public class MainWindow extends MainWindowUi {
 		visualizer = new Visualizer(Constant.A_INDEX, aSeries);
 		chartPanel = new ChartPanel(visualizer.getChart());
 		addComponentToCanvasPanel(chartPanel);
+		visualizer.setAutoRange(false);
 		// endTest
 	}
 
@@ -81,8 +82,14 @@ public class MainWindow extends MainWindowUi {
 		if(channelACheckBox.isSelected()) {
 			setEnabledChannelA(true);
 			showTab(Constant.TAB.CHANNEL_A);
+			XYSeries aSeries = new XYSeries("Channel A");
+			for(double i = -20; i <= 20; i = i + 0.1) {
+				aSeries.add(i, 3*Math.sin(i));
+			}
+			visualizer.addSeriesToDataset(Constant.A_INDEX, aSeries);
 		} else {
 			setEnabledChannelA(false);
+			visualizer.removeAllSeriesFromDataset(Constant.A_INDEX);
 		}
 	}
 
@@ -90,9 +97,15 @@ public class MainWindow extends MainWindowUi {
 		// TODO
 		if(channelBCheckBox.isSelected()) {
 			setEnabledChannelB(true);
+			XYSeries aSeries = new XYSeries("Channel B");
+			for(double i = -20; i <= 20; i = i + 0.1) {
+				aSeries.add(i, 2*Math.sin(i));
+			}
+			visualizer.addSeriesToDataset(Constant.B_INDEX, aSeries);
 			showTab(Constant.TAB.CHANNEL_B);
 		} else {
 			setEnabledChannelB(false);
+			visualizer.removeAllSeriesFromDataset(Constant.B_INDEX);
 		}
 	}
 

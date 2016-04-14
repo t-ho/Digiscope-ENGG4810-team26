@@ -1,6 +1,5 @@
 package core;
 
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartTheme;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
@@ -24,29 +23,19 @@ public class Visualizer {
 	private XYSeriesCollection[] datasets;
 	private NumberAxis[] horizontalAxes;
 	private NumberAxis[] verticalAxes;
-	private XYItemRenderer[] renderers;
 
 	public Visualizer() {
+		chart = createDefaultChart();
+		xYPlot = chart.getXYPlot();
 		datasets = new XYSeriesCollection[Constant.NUMBER_OF_CHANNELS];
 		horizontalAxes = new NumberAxis[Constant.NUMBER_OF_CHANNELS];
 		verticalAxes = new NumberAxis[Constant.NUMBER_OF_CHANNELS];
-		renderers = new XYItemRenderer[Constant.NUMBER_OF_CHANNELS];
 		for(int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
-			datasets[i] = new XYSeriesCollection();
-			horizontalAxes[i] = new NumberAxis();
-			verticalAxes[i] = new NumberAxis();
-			renderers[i] = new XYLineAndShapeRenderer(true, false);
+			datasets[i] = (XYSeriesCollection) xYPlot.getDataset(i);
+			horizontalAxes[i] = (NumberAxis) xYPlot.getDomainAxis(i);
+			verticalAxes[i] = (NumberAxis) xYPlot.getRangeAxis(i);
 		}
-		horizontalAxes[Constant.A_INDEX].setLabel("X");
-		verticalAxes[Constant.A_INDEX].setLabel("Y");
-		xYPlot = new XYPlot();
 		xYPlot.setOrientation(PlotOrientation.VERTICAL);
-		xYPlot.setDomainAxes(horizontalAxes);
-		xYPlot.setRangeAxes(verticalAxes);
-		for(int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
-			xYPlot.setDataset(i, datasets[i]);
-		}
-		chart = new JFreeChart("", JFreeChart.DEFAULT_TITLE_FONT, xYPlot, true);
 		currentTheme.apply(chart);
 	}
 
@@ -66,4 +55,50 @@ public class Visualizer {
 	public JFreeChart getChart() {
 		return chart;
 	}
+	
+	private JFreeChart createDefaultChart() {
+		XYSeriesCollection[] datasets = new XYSeriesCollection[Constant.NUMBER_OF_CHANNELS];
+		NumberAxis[] horizontalAxes = new NumberAxis[Constant.NUMBER_OF_CHANNELS];
+		NumberAxis[] verticalAxes = new NumberAxis[Constant.NUMBER_OF_CHANNELS];
+		XYItemRenderer[] renderers = new XYItemRenderer[Constant.NUMBER_OF_CHANNELS];
+		for(int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
+			datasets[i] = new XYSeriesCollection();
+			horizontalAxes[i] = new NumberAxis();
+			verticalAxes[i] = new NumberAxis();
+			renderers[i] = new XYLineAndShapeRenderer(true, false);
+		}
+		horizontalAxes[Constant.A_INDEX].setLabel("X");
+		verticalAxes[Constant.A_INDEX].setLabel("Y");
+		XYPlot xYPlot = new XYPlot();
+		xYPlot.setOrientation(PlotOrientation.VERTICAL);
+		xYPlot.setDomainAxes(horizontalAxes);
+		xYPlot.setRangeAxes(verticalAxes);
+		for(int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
+			xYPlot.setDataset(i, datasets[i]);
+			xYPlot.setRenderer(i, renderers[i]);
+			xYPlot.mapDatasetToDomainAxis(i, i);
+			xYPlot.mapDatasetToRangeAxis(i, i);
+		}
+		//test
+			xYPlot.mapDatasetToRangeAxis(1, 0);
+		//endTest
+			
+		for(int i = 1; i < Constant.NUMBER_OF_CHANNELS; i++) {
+			horizontalAxes[i].setTickLabelsVisible(false);
+			horizontalAxes[i].setAxisLineVisible(false);
+			horizontalAxes[i].setTickMarksVisible(false);
+			verticalAxes[i].setTickLabelsVisible(false);
+			verticalAxes[i].setAxisLineVisible(false);
+			verticalAxes[i].setTickMarksVisible(false);
+		}
+		JFreeChart chart = new JFreeChart("", JFreeChart.DEFAULT_TITLE_FONT, xYPlot, true);
+		return chart;
+	}
+	
+	// test
+	public void setAutoRange(boolean auto) {
+		horizontalAxes[Constant.A_INDEX].setAutoRange(auto);
+		verticalAxes[Constant.A_INDEX].setAutoRange(auto); 
+	}
+	//endTest
 }
