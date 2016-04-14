@@ -63,6 +63,7 @@
 	\begin{bytefield}[bitwidth=2em]{16}
 		\bitheader{0-15} \\
 		\bitbox{8}{Packet Type} & \bitbox{8}{Sequence Number} \\
+		\bitbox{16}{Number of Samples}  \\
 		\begin{rightwordgroup}{Payload}
 			\bitbox{8}{Sample 0} & \bitbox{8}{Sample 1} \\
 			\bitbox{8}{Sample 2} & \bitbox{8}{Sample 3}\\
@@ -81,6 +82,7 @@
 	\begin{bytefield}[bitwidth=2em]{16}
 		\bitheader{0-15} \\
 		\bitbox{8}{Packet Type} & \bitbox{8}{Sequence Number} \\
+		\bitbox{16}{Number of Samples}  \\
 		\begin{rightwordgroup}{Payload}
 			\bitbox{12}{Sample 0} & \bitbox{4}{Sample 1\dots} \\
 			\bitbox{4}{\dots Sample 1} & \bitbox{12}{Sample 2}\\
