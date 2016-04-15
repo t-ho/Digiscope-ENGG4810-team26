@@ -30,7 +30,7 @@ public class MainWindow extends MainWindowUi {
 		// Test
 		XYSeries aSeries = new XYSeries("Channel A");
 		for(double i = -20; i <= 20; i = i + 0.1) {
-			aSeries.add(i, 10 * (3*Math.sin(i)));
+			aSeries.add(i, 30 * (3*Math.sin(i)));
 		}
 		visualizer = new Visualizer(Constant.A_INDEX, aSeries);
 		chartPanel = new ChartPanel(visualizer.getChart());
@@ -74,6 +74,117 @@ public class MainWindow extends MainWindowUi {
 			}
 		});
 
+		horizontalRangeAComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				horizontalRangeAComboBoxItemStateChanged(event);
+			}
+		});
+
+		horizontalRangeBComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				horizontalRangeBComboBoxItemStateChanged(event);
+			}
+		});
+
+		horizontalRangeMathComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				horizontalRangeMathComboBoxItemStateChanged(event);
+			}
+		});
+
+		horizontalRangeFilterComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				horizontalRangeFilterComboBoxItemStateChanged(event);
+			}
+		});
+		
+		verticalRangeAComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				verticalRangeAComboBoxItemStateChanged(event);
+			}
+		});
+
+		verticalRangeBComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				verticalRangeBComboBoxItemStateChanged(event);
+			}
+		});
+
+		verticalRangeMathComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				verticalRangeMathComboBoxItemStateChanged(event);
+			}
+		});
+
+		verticalRangeFilterComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				verticalRangeFilterComboBoxItemStateChanged(event);
+			}
+		});
+	}
+
+	private void horizontalRangeFilterComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		String selectedItem = (String) horizontalRangeFilterComboBox.getSelectedItem();
+		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		visualizer.setValuePerHorizontalGridSpacing(horizontalRange);
+	}
+
+	private void horizontalRangeMathComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		String selectedItem = (String) horizontalRangeMathComboBox.getSelectedItem();
+		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		visualizer.setValuePerHorizontalGridSpacing(horizontalRange);
+	}
+
+	private void horizontalRangeBComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		String selectedItem = (String) horizontalRangeBComboBox.getSelectedItem();
+		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		visualizer.setValuePerHorizontalGridSpacing(horizontalRange);
+	}
+
+	private void horizontalRangeAComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		String selectedItem = (String) horizontalRangeAComboBox.getSelectedItem();
+		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		visualizer.setValuePerHorizontalGridSpacing(horizontalRange);
+	}
+
+	private void verticalRangeFilterComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		String selectedItem = (String) verticalRangeFilterComboBox.getSelectedItem();
+		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		visualizer.setValuePerVerticalGridSpacing(Constant.FILTER_INDEX, verticalRange);
+	}
+
+	private void verticalRangeMathComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();
+		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		visualizer.setValuePerVerticalGridSpacing(Constant.MATH_INDEX, verticalRange);
+	}
+
+	private void verticalRangeBComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		String selectedItem = (String) verticalRangeBComboBox.getSelectedItem();
+		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		visualizer.setValuePerVerticalGridSpacing(Constant.B_INDEX, verticalRange);
+	}
+
+	private void verticalRangeAComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
+		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		visualizer.setValuePerVerticalGridSpacing(Constant.A_INDEX, verticalRange);
 	}
 
 	private void channelACheckboxItemStateChanged(ItemEvent event) {
@@ -128,7 +239,103 @@ public class MainWindow extends MainWindowUi {
 		}
 	}
 
-
+	private int changeVoltStringToMiliVolts(String voltString) {
+		int value = 0;
+		switch(voltString) {
+			case "20 mV":
+				value = 20;
+				break;
+			case "50 mV":
+				value = 50;
+				break;
+			case "100 mV":
+				value = 100;
+				break;
+			case "200 mV":
+				value = 200;
+				break;
+			case "500 mV":
+				value = 500;
+				break;
+			case "1 V":
+				value = 1000;
+				break;
+			case "2 V":
+				value = 2000;
+				break;
+			default:
+				// Cannot reach here
+				value = 20;
+		}
+		return value;
+	}
+	
+	private int changeTimeStringToMicroSeconds(String voltString) {
+		int value = 0;
+		switch(voltString) {
+			case "1 us":
+				value = 1;
+				break;
+			case "2 us":
+				value = 2;
+				break;
+			case "5 us":
+				value = 5;
+				break;
+			case "10 us":
+				value = 10;
+				break;
+			case "20 us":
+				value = 20;
+				break;
+			case "50 us":
+				value = 50;
+				break;
+			case "100 us":
+				value = 100;
+				break;
+			case "200 us":
+				value = 200;
+				break;
+			case "500 us":
+				value = 500;
+				break;
+			case "1 ms":
+				value = 1000;
+				break;
+			case "2 ms":
+				value = 2000;
+				break;
+			case "5 ms":
+				value = 5000;
+				break;
+			case "10 ms":
+				value = 10000;
+				break;
+			case "20 ms":
+				value = 20000;
+				break;
+			case "50 ms":
+				value = 50000;
+				break;
+			case "100 ms":
+				value = 100000;
+				break;
+			case "200 ms":
+				value = 200000;
+				break;
+			case "500 ms":
+				value = 500000;
+				break;
+			case "1 s":
+				value = 1000000;
+				break;
+			default:
+				// Cannot reach here
+				value = 1;
+		}
+		return value;
+	}
 	private void mainWindowClosed(WindowEvent event) {
 		getLaunchWindow().setStatus("To connect, please enter the IP address!", Constant.NORMAL);
 		getLaunchWindow().setVisible(true);

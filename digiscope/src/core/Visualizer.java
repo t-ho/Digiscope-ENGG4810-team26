@@ -22,18 +22,19 @@ public class Visualizer {
 	private JFreeChart chart;
 	private XYPlot xYPlot;
 	private XYSeriesCollection[] datasets;
-	private NumberAxis[] horizontalAxes;
+	private NumberAxis commonHorizontalAxis;
+	private NumberAxis commonVerticalAxis;
 	private NumberAxis[] verticalAxes;
 
 	public Visualizer() {
 		chart = createDefaultChart();
 		xYPlot = chart.getXYPlot();
+		commonHorizontalAxis = (NumberAxis) xYPlot.getDomainAxis();
+		commonVerticalAxis = (NumberAxis) xYPlot.getRangeAxis(4);
 		datasets = new XYSeriesCollection[Constant.NUMBER_OF_CHANNELS];
-		horizontalAxes = new NumberAxis[Constant.NUMBER_OF_CHANNELS];
 		verticalAxes = new NumberAxis[Constant.NUMBER_OF_CHANNELS];
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			datasets[i] = (XYSeriesCollection) xYPlot.getDataset(i);
-			horizontalAxes[i] = (NumberAxis) xYPlot.getDomainAxis(i);
 			verticalAxes[i] = (NumberAxis) xYPlot.getRangeAxis(i);
 		}
 		currentTheme.apply(chart);
@@ -42,8 +43,6 @@ public class Visualizer {
 	public Visualizer(int channelIndex, XYSeries xYSeries) {
 		this();
 		addSeriesToDataset(channelIndex, xYSeries);
-		setValuePerHorizontalGridSpacing(channelIndex, 1);
-		setValuePerVerticalGridSpacing(channelIndex, 20);
 	}
 
 	public void addSeriesToDataset(int channelIndex, XYSeries xYSeries) {
@@ -58,40 +57,47 @@ public class Visualizer {
 		return chart;
 	}
 
+	/**
+	 * Create a default chart which has:
+	 *  - One common horizontal axis(visible) which has 16 grid spacings for four channels
+	 *  - One common vertical axis(visible) which has 10 grid spacings
+	 *  - Four vertical axes(invisible) for four channels
+	 * @return JFreeChart
+	 */
 	private JFreeChart createDefaultChart() {
 		XYSeriesCollection[] datasets = new XYSeriesCollection[Constant.NUMBER_OF_CHANNELS];
-		NumberAxis[] horizontalAxes = new NumberAxis[Constant.NUMBER_OF_CHANNELS];
+		NumberAxis commonHorizontalAxis = new NumberAxis("X");
+		NumberAxis commonVerticalAxis = new NumberAxis("Y");
 		NumberAxis[] verticalAxes = new NumberAxis[Constant.NUMBER_OF_CHANNELS];
 		XYItemRenderer[] renderers = new XYItemRenderer[Constant.NUMBER_OF_CHANNELS];
+		commonHorizontalAxis.setPositiveArrowVisible(true);
+		commonVerticalAxis.setPositiveArrowVisible(true);
+		// Set commonVerticalAxis = 10 grid spacings
+		commonVerticalAxis.setTickUnit(new NumberTickUnit(20));
+		commonVerticalAxis.setRange(-100, 100);
+		// Set commonHorizontalAxis = 16 grid spacigns
+		commonHorizontalAxis.setTickUnit(new NumberTickUnit(1));
+		commonHorizontalAxis.setRange(0, 16);
+		System.out.println("Created chart");
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			datasets[i] = new XYSeriesCollection();
-			horizontalAxes[i] = new NumberAxis();
 			verticalAxes[i] = new NumberAxis();
 			renderers[i] = new XYLineAndShapeRenderer(true, false);
 		}
 		XYPlot xYPlot = new XYPlot();
 		xYPlot.setOrientation(PlotOrientation.VERTICAL);
-		xYPlot.setDomainAxes(horizontalAxes);
+		xYPlot.setDomainAxis(0, commonHorizontalAxis); // commonHorizontalAxis's index = 0
 		xYPlot.setRangeAxes(verticalAxes);
+		xYPlot.setRangeAxis(4, commonVerticalAxis); // commonVerticalAxis's index = 4
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			xYPlot.setDataset(i, datasets[i]);
 			xYPlot.setRenderer(i, renderers[i]);
-			xYPlot.mapDatasetToDomainAxis(i, i);
-			xYPlot.mapDatasetToRangeAxis(i, i);
+			xYPlot.mapDatasetToDomainAxis(i, 0); // map dataset to commonHorizontalAxis
+			xYPlot.mapDatasetToRangeAxis(i, i); // map dataset to its verticalAxis
 		}
-		// test
-		xYPlot.mapDatasetToRangeAxis(1, 0);
-		// endTest
 
-		horizontalAxes[Constant.A_INDEX].setLabel("X");
-		horizontalAxes[Constant.A_INDEX].setPositiveArrowVisible(true);
-		verticalAxes[Constant.A_INDEX].setLabel("Y");
-		verticalAxes[Constant.A_INDEX].setPositiveArrowVisible(true);
-		verticalAxes[Constant.A_INDEX].setMinorTickCount(3);
-		for (int i = 1; i < Constant.NUMBER_OF_CHANNELS; i++) {
-			horizontalAxes[i].setTickLabelsVisible(false);
-			horizontalAxes[i].setAxisLineVisible(false);
-			horizontalAxes[i].setTickMarksVisible(false);
+		/* Hide 4 vertical axes of 4 channels */
+		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			verticalAxes[i].setTickLabelsVisible(false);
 			verticalAxes[i].setAxisLineVisible(false);
 			verticalAxes[i].setTickMarksVisible(false);
@@ -100,21 +106,33 @@ public class Visualizer {
 		return chart;
 	}
 
-
-	public void setValuePerHorizontalGridSpacing(int channelIndex, int value) {
+	/**
+	 * Set value for horizontal grid spacings.
+	 * The horizontal axis has Constant.HORIZONTAL_GRID_SPACINGS.
+	 * @param value The value in microseconds
+	 */
+	public void setValuePerHorizontalGridSpacing(int value) {
 		NumberTickUnit tickUnit = new NumberTickUnit(value);
-		double lower = -((16 / 2) * value);
-		double upper = ((16 / 2) * value);
-		horizontalAxes[channelIndex].setTickUnit(tickUnit);
-		horizontalAxes[channelIndex].setRange(lower, upper);
+		double lower = 0;
+		double upper = Constant.HORIZONTAL_GRID_SPACINGS * value;
+		commonHorizontalAxis.setTickUnit(tickUnit);
+		commonHorizontalAxis.setRange(lower, upper);
 	}
 
+	/**
+	 * Set value for vertical grid spacings.
+	 * The vertical axis has Constant.VERTICAL_GRID_SPACINGS.
+	 * @param channelIndex The index of channel
+	 * @param value The value in milivolts
+	 */
 	public void setValuePerVerticalGridSpacing(int channelIndex, int value) {
 		NumberTickUnit tickUnit = new NumberTickUnit(value);
 		double lower = -((Constant.VERTICAL_GRID_SPACINGS / 2) * value);
 		double upper = ((Constant.VERTICAL_GRID_SPACINGS / 2) * value);
 		verticalAxes[channelIndex].setTickUnit(tickUnit);
 		verticalAxes[channelIndex].setRange(lower, upper);
+		commonVerticalAxis.setTickUnit(tickUnit);
+		commonVerticalAxis.setRange(lower, upper);
 	}
 
 }
