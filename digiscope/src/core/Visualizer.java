@@ -66,22 +66,17 @@ public class Visualizer {
 	 */
 	private JFreeChart createDefaultChart() {
 		XYSeriesCollection[] datasets = new XYSeriesCollection[Constant.NUMBER_OF_CHANNELS];
-		NumberAxis commonHorizontalAxis = new NumberAxis("X");
-		NumberAxis commonVerticalAxis = new NumberAxis("Y");
+		NumberAxis commonHorizontalAxis = createDefaultHorizontalAxis();
+		NumberAxis commonVerticalAxis = createDefaultVerticalAxis();
 		NumberAxis[] verticalAxes = new NumberAxis[Constant.NUMBER_OF_CHANNELS];
 		XYItemRenderer[] renderers = new XYItemRenderer[Constant.NUMBER_OF_CHANNELS];
+		commonHorizontalAxis.setLabel("X");
 		commonHorizontalAxis.setPositiveArrowVisible(true);
+		commonVerticalAxis.setLabel("Y");
 		commonVerticalAxis.setPositiveArrowVisible(true);
-		// Set commonVerticalAxis = 10 grid spacings
-		commonVerticalAxis.setTickUnit(new NumberTickUnit(20));
-		commonVerticalAxis.setRange(-100, 100);
-		// Set commonHorizontalAxis = 16 grid spacigns
-		commonHorizontalAxis.setTickUnit(new NumberTickUnit(1));
-		commonHorizontalAxis.setRange(0, 16);
-		System.out.println("Created chart");
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			datasets[i] = new XYSeriesCollection();
-			verticalAxes[i] = new NumberAxis();
+			verticalAxes[i] = createDefaultVerticalAxis();
 			renderers[i] = new XYLineAndShapeRenderer(true, false);
 		}
 		XYPlot xYPlot = new XYPlot();
@@ -111,7 +106,7 @@ public class Visualizer {
 	 * The horizontal axis has Constant.HORIZONTAL_GRID_SPACINGS.
 	 * @param value The value in microseconds
 	 */
-	public void setValuePerHorizontalGridSpacing(int value) {
+	public void setValueForHorizontalGridSpacing(int value) {
 		NumberTickUnit tickUnit = new NumberTickUnit(value);
 		double lower = 0;
 		double upper = Constant.HORIZONTAL_GRID_SPACINGS * value;
@@ -125,14 +120,42 @@ public class Visualizer {
 	 * @param channelIndex The index of channel
 	 * @param value The value in milivolts
 	 */
-	public void setValuePerVerticalGridSpacing(int channelIndex, int value) {
-		NumberTickUnit tickUnit = new NumberTickUnit(value);
+	public void setValueForVerticalGridSpacing(int channelIndex, int value) {
 		double lower = -((Constant.VERTICAL_GRID_SPACINGS / 2) * value);
 		double upper = ((Constant.VERTICAL_GRID_SPACINGS / 2) * value);
-		verticalAxes[channelIndex].setTickUnit(tickUnit);
+		verticalAxes[channelIndex].setTickUnit(new NumberTickUnit(value));
 		verticalAxes[channelIndex].setRange(lower, upper);
-		commonVerticalAxis.setTickUnit(tickUnit);
+		commonVerticalAxis.setTickUnit(new NumberTickUnit(value));
 		commonVerticalAxis.setRange(lower, upper);
 	}
 
+	/**
+	 * Create an vertical axis with default settings:
+	 *  - The number of grid spacings = Constant.VERTICAL_GRID_SPACINGS 
+	 *  - Each grid spacing range = Constant.DEFAULT_VERTICAL_RANGE
+	 * @return
+	 */
+	private NumberAxis createDefaultVerticalAxis() {
+		NumberAxis axis = new NumberAxis();
+		double lower = -((Constant.VERTICAL_GRID_SPACINGS / 2) * Constant.DEFAULT_VERTICAL_RANGE);
+		double upper = ((Constant.VERTICAL_GRID_SPACINGS / 2) * Constant.DEFAULT_VERTICAL_RANGE);
+		axis.setTickUnit(new NumberTickUnit(Constant.DEFAULT_VERTICAL_RANGE));
+		axis.setRange(lower, upper);
+		return axis;
+	}
+
+	/**
+	 * Create a horizontal axis with default settings:
+	 *  - The number of grid spacings = Constant.HORIZONTAL_GRID_SPACINGS 
+	 *  - Each grid spacing range = Constant.DEFAULT_HORIZONTAL_RANGE
+	 * @return
+	 */
+	private NumberAxis createDefaultHorizontalAxis() {
+		NumberAxis axis = new NumberAxis();
+		double lower = 0;
+		double upper = Constant.HORIZONTAL_GRID_SPACINGS * Constant.DEFAULT_HORIZONTAL_RANGE;
+		axis.setTickUnit(new NumberTickUnit(Constant.DEFAULT_HORIZONTAL_RANGE));
+		axis.setRange(lower, upper);
+		return axis;
+	}
 }

@@ -1,5 +1,7 @@
 package core;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
@@ -30,16 +32,21 @@ public class MainWindow extends MainWindowUi {
 		// Test
 		XYSeries aSeries = new XYSeries("Channel A");
 		for(double i = -20; i <= 20; i = i + 0.1) {
-			aSeries.add(i, 30 * (3*Math.sin(i)));
+			aSeries.add(i, 80 * (3*Math.sin(i)));
 		}
 		visualizer = new Visualizer(Constant.A_INDEX, aSeries);
+		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
+		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		selectedItem = (String) horizontalRangeAComboBox.getSelectedItem();
+		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
+		visualizer.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
 		chartPanel = new ChartPanel(visualizer.getChart());
 		addComponentToCanvasPanel(chartPanel);
 		// endTest
 	}
 
 	private void initialize() {
-		// TODO
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent event) {
 				mainWindowClosed(event);
@@ -102,6 +109,34 @@ public class MainWindow extends MainWindowUi {
 			}
 		});
 		
+		horizontalRangeAComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				horizontalRangeAComboBoxActionPerformed(event);
+			}
+		});
+		
+		horizontalRangeBComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				horizontalRangeBComboBoxActionPerformed(event);
+			}
+		});
+
+		horizontalRangeMathComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				horizontalRangeMathComboBoxActionPerformed(event);
+			}
+		});
+		
+		horizontalRangeFilterComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				horizontalRangeFilterComboBoxActionPerformed(event);
+			}
+		});
+
 		verticalRangeAComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
@@ -131,60 +166,92 @@ public class MainWindow extends MainWindowUi {
 		});
 	}
 
-	private void horizontalRangeFilterComboBoxItemStateChanged(ItemEvent event) {
-		// TODO
-		String selectedItem = (String) horizontalRangeFilterComboBox.getSelectedItem();
-		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
-		visualizer.setValuePerHorizontalGridSpacing(horizontalRange);
+	private void horizontalRangeAComboBoxActionPerformed(ActionEvent event) {
+		// TODO 
+		int selectedIndex = horizontalRangeAComboBox.getSelectedIndex();
+		horizontalRangeBComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeMathComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeFilterComboBox.setSelectedIndex(selectedIndex);
 	}
 
-	private void horizontalRangeMathComboBoxItemStateChanged(ItemEvent event) {
-		// TODO
-		String selectedItem = (String) horizontalRangeMathComboBox.getSelectedItem();
-		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
-		visualizer.setValuePerHorizontalGridSpacing(horizontalRange);
+	private void horizontalRangeBComboBoxActionPerformed(ActionEvent event) {
+		// TODO 
+		int selectedIndex = horizontalRangeBComboBox.getSelectedIndex();
+		horizontalRangeAComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeMathComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeFilterComboBox.setSelectedIndex(selectedIndex);
 	}
 
-	private void horizontalRangeBComboBoxItemStateChanged(ItemEvent event) {
+	private void horizontalRangeMathComboBoxActionPerformed(ActionEvent event) {
 		// TODO
-		String selectedItem = (String) horizontalRangeBComboBox.getSelectedItem();
-		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
-		visualizer.setValuePerHorizontalGridSpacing(horizontalRange);
+		int selectedIndex = horizontalRangeMathComboBox.getSelectedIndex();
+		horizontalRangeAComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeBComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeFilterComboBox.setSelectedIndex(selectedIndex);
+	}
+
+	private void horizontalRangeFilterComboBoxActionPerformed(ActionEvent event) {
+		// TODO
+		int selectedIndex = horizontalRangeFilterComboBox.getSelectedIndex();
+		horizontalRangeAComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeBComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeMathComboBox.setSelectedIndex(selectedIndex);
 	}
 
 	private void horizontalRangeAComboBoxItemStateChanged(ItemEvent event) {
 		// TODO
 		String selectedItem = (String) horizontalRangeAComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
-		visualizer.setValuePerHorizontalGridSpacing(horizontalRange);
+		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
 	}
 
-	private void verticalRangeFilterComboBoxItemStateChanged(ItemEvent event) {
+	private void horizontalRangeBComboBoxItemStateChanged(ItemEvent event) {
 		// TODO
-		String selectedItem = (String) verticalRangeFilterComboBox.getSelectedItem();
-		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
-		visualizer.setValuePerVerticalGridSpacing(Constant.FILTER_INDEX, verticalRange);
+		String selectedItem = (String) horizontalRangeBComboBox.getSelectedItem();
+		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
 	}
 
-	private void verticalRangeMathComboBoxItemStateChanged(ItemEvent event) {
+	private void horizontalRangeMathComboBoxItemStateChanged(ItemEvent event) {
 		// TODO
-		String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();
-		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
-		visualizer.setValuePerVerticalGridSpacing(Constant.MATH_INDEX, verticalRange);
+		String selectedItem = (String) horizontalRangeMathComboBox.getSelectedItem();
+		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
 	}
 
-	private void verticalRangeBComboBoxItemStateChanged(ItemEvent event) {
+	private void horizontalRangeFilterComboBoxItemStateChanged(ItemEvent event) {
 		// TODO
-		String selectedItem = (String) verticalRangeBComboBox.getSelectedItem();
-		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
-		visualizer.setValuePerVerticalGridSpacing(Constant.B_INDEX, verticalRange);
+		String selectedItem = (String) horizontalRangeFilterComboBox.getSelectedItem();
+		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
 	}
 
 	private void verticalRangeAComboBoxItemStateChanged(ItemEvent event) {
 		// TODO
 		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
-		visualizer.setValuePerVerticalGridSpacing(Constant.A_INDEX, verticalRange);
+		visualizer.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
+	}
+
+	private void verticalRangeBComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		String selectedItem = (String) verticalRangeBComboBox.getSelectedItem();
+		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		visualizer.setValueForVerticalGridSpacing(Constant.B_INDEX, verticalRange);
+	}
+
+	private void verticalRangeMathComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();
+		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		visualizer.setValueForVerticalGridSpacing(Constant.MATH_INDEX, verticalRange);
+	}
+
+	private void verticalRangeFilterComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		String selectedItem = (String) verticalRangeFilterComboBox.getSelectedItem();
+		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		visualizer.setValueForVerticalGridSpacing(Constant.FILTER_INDEX, verticalRange);
 	}
 
 	private void channelACheckboxItemStateChanged(ItemEvent event) {
@@ -194,7 +261,7 @@ public class MainWindow extends MainWindowUi {
 			showTab(Constant.TAB.CHANNEL_A);
 			XYSeries aSeries = new XYSeries("Channel A");
 			for(double i = -20; i <= 20; i = i + 0.1) {
-				aSeries.add(i, 3*Math.sin(i));
+				aSeries.add(i, 80 * Math.sin(i));
 			}
 			visualizer.addSeriesToDataset(Constant.A_INDEX, aSeries);
 		} else {
@@ -209,7 +276,7 @@ public class MainWindow extends MainWindowUi {
 			setEnabledChannelB(true);
 			XYSeries aSeries = new XYSeries("Channel B");
 			for(double i = -20; i <= 20; i = i + 0.1) {
-				aSeries.add(i, 2*Math.sin(i));
+				aSeries.add(i, 70 *Math.cos(i));
 			}
 			visualizer.addSeriesToDataset(Constant.B_INDEX, aSeries);
 			showTab(Constant.TAB.CHANNEL_B);
@@ -239,6 +306,11 @@ public class MainWindow extends MainWindowUi {
 		}
 	}
 
+	/**
+	 * Change the voltage string to milivolts
+	 * @param voltString The voltage string. e.g. 200 mV, 1 V,...
+	 * @return the voltage in milivolts
+	 */
 	private int changeVoltStringToMiliVolts(String voltString) {
 		int value = 0;
 		switch(voltString) {
@@ -270,9 +342,14 @@ public class MainWindow extends MainWindowUi {
 		return value;
 	}
 	
-	private int changeTimeStringToMicroSeconds(String voltString) {
+	/**
+	 * Change time string to micro seconds
+	 * @param timeString The time string. e.g. 1 us, 500 ms
+	 * @return the microseconds
+	 */
+	private int changeTimeStringToMicroSeconds(String timeString) {
 		int value = 0;
-		switch(voltString) {
+		switch(timeString) {
 			case "1 us":
 				value = 1;
 				break;
@@ -336,6 +413,7 @@ public class MainWindow extends MainWindowUi {
 		}
 		return value;
 	}
+
 	private void mainWindowClosed(WindowEvent event) {
 		getLaunchWindow().setStatus("To connect, please enter the IP address!", Constant.NORMAL);
 		getLaunchWindow().setVisible(true);

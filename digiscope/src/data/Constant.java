@@ -50,6 +50,9 @@ public class Constant {
 	public static int VERTICAL_GRID_SPACINGS = 10;
 	public static int HORIZONTAL_GRID_SPACINGS = 16;
 	
+	public static int DEFAULT_VERTICAL_RANGE = 20;
+	public static int DEFAULT_HORIZONTAL_RANGE = 1;
+	
 	public static final int NUMBER_OF_CHANNELS = 4;
 	public static final int A_INDEX = 0;
 	public static final int B_INDEX = 1;
