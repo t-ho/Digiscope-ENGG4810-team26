@@ -8,6 +8,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 
 import data.Constant;
@@ -41,7 +42,7 @@ public class MainWindow extends MainWindowUi {
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
 		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
 		visualizer.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
-		chartPanel = new ChartPanel(visualizer.getChart());
+		chartPanel = createDefaultChartPanel(visualizer.getChart());
 		addComponentToCanvasPanel(chartPanel);
 		// endTest
 	}
@@ -203,6 +204,7 @@ public class MainWindow extends MainWindowUi {
 		String selectedItem = (String) horizontalRangeAComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
 		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
+		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
 	private void horizontalRangeBComboBoxItemStateChanged(ItemEvent event) {
@@ -210,6 +212,7 @@ public class MainWindow extends MainWindowUi {
 		String selectedItem = (String) horizontalRangeBComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
 		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
+		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
 	private void horizontalRangeMathComboBoxItemStateChanged(ItemEvent event) {
@@ -217,6 +220,7 @@ public class MainWindow extends MainWindowUi {
 		String selectedItem = (String) horizontalRangeMathComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
 		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
+		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
 	private void horizontalRangeFilterComboBoxItemStateChanged(ItemEvent event) {
@@ -224,6 +228,7 @@ public class MainWindow extends MainWindowUi {
 		String selectedItem = (String) horizontalRangeFilterComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
 		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
+		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
 	private void verticalRangeAComboBoxItemStateChanged(ItemEvent event) {
@@ -231,6 +236,7 @@ public class MainWindow extends MainWindowUi {
 		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
 		visualizer.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
+		aDivisionInfoLabel.setText("A: " + selectedItem + "/div");
 	}
 
 	private void verticalRangeBComboBoxItemStateChanged(ItemEvent event) {
@@ -238,6 +244,7 @@ public class MainWindow extends MainWindowUi {
 		String selectedItem = (String) verticalRangeBComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
 		visualizer.setValueForVerticalGridSpacing(Constant.B_INDEX, verticalRange);
+		bDivisionInfoLabel.setText("B: " + selectedItem + "/div");
 	}
 
 	private void verticalRangeMathComboBoxItemStateChanged(ItemEvent event) {
@@ -245,6 +252,7 @@ public class MainWindow extends MainWindowUi {
 		String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
 		visualizer.setValueForVerticalGridSpacing(Constant.MATH_INDEX, verticalRange);
+		mathDivisionInfoLabel.setText("Math: " + selectedItem + "/div");
 	}
 
 	private void verticalRangeFilterComboBoxItemStateChanged(ItemEvent event) {
@@ -252,6 +260,7 @@ public class MainWindow extends MainWindowUi {
 		String selectedItem = (String) verticalRangeFilterComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
 		visualizer.setValueForVerticalGridSpacing(Constant.FILTER_INDEX, verticalRange);
+		filterDivisionInfoLabel.setText("Filter: " + selectedItem + "/div");
 	}
 
 	private void channelACheckboxItemStateChanged(ItemEvent event) {
@@ -291,8 +300,14 @@ public class MainWindow extends MainWindowUi {
 		if(mathChannelCheckBox.isSelected()) {
 			setEnabledMathChannel(true);
 			showTab(Constant.TAB.MATH_CHANNEL);
+			XYSeries aSeries = new XYSeries("Math Channel");
+			for(double i = -20; i <= 20; i = i + 0.1) {
+				aSeries.add(i, 100 * Math.sin(i));
+			}
+			visualizer.addSeriesToDataset(Constant.MATH_INDEX, aSeries);
 		} else {
 			setEnabledMathChannel(false);
+			visualizer.removeAllSeriesFromDataset(Constant.MATH_INDEX);
 		}
 	}
 
@@ -301,8 +316,14 @@ public class MainWindow extends MainWindowUi {
 		if(filterChannelCheckBox.isSelected()) {
 			setEnabledFilterChannel(true);
 			showTab(Constant.TAB.FILTER_CHANNEL);
+			XYSeries aSeries = new XYSeries("Filter Channel");
+			for(double i = -20; i <= 20; i = i + 0.1) {
+				aSeries.add(i, 150 * Math.sin(i));
+			}
+			visualizer.addSeriesToDataset(Constant.FILTER_INDEX, aSeries);
 		} else {
 			setEnabledFilterChannel(false);
+			visualizer.removeAllSeriesFromDataset(Constant.FILTER_INDEX);
 		}
 	}
 
@@ -412,6 +433,17 @@ public class MainWindow extends MainWindowUi {
 				value = 1;
 		}
 		return value;
+	}
+	
+	/**
+	 * Create default chart panel
+	 * @param chart 
+	 * @return ChartPanel instance
+	 */
+	private ChartPanel createDefaultChartPanel(JFreeChart chart) {
+		ChartPanel chartPanel = new ChartPanel(chart);
+		chartPanel.setMouseZoomable(false);
+		return chartPanel;
 	}
 
 	private void mainWindowClosed(WindowEvent event) {

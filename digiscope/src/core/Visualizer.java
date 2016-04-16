@@ -29,13 +29,13 @@ public class Visualizer {
 	public Visualizer() {
 		chart = createDefaultChart();
 		xYPlot = chart.getXYPlot();
-		commonHorizontalAxis = (NumberAxis) xYPlot.getDomainAxis();
-		commonVerticalAxis = (NumberAxis) xYPlot.getRangeAxis(4);
+		commonHorizontalAxis = (NumberAxis) xYPlot.getDomainAxis(0);
+		commonVerticalAxis = (NumberAxis) xYPlot.getRangeAxis(0);
 		datasets = new XYSeriesCollection[Constant.NUMBER_OF_CHANNELS];
 		verticalAxes = new NumberAxis[Constant.NUMBER_OF_CHANNELS];
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			datasets[i] = (XYSeriesCollection) xYPlot.getDataset(i);
-			verticalAxes[i] = (NumberAxis) xYPlot.getRangeAxis(i);
+			verticalAxes[i] = (NumberAxis) xYPlot.getRangeAxis(i + 1);
 		}
 		currentTheme.apply(chart);
 	}
@@ -72,31 +72,37 @@ public class Visualizer {
 		XYItemRenderer[] renderers = new XYItemRenderer[Constant.NUMBER_OF_CHANNELS];
 		commonHorizontalAxis.setLabel("X");
 		commonHorizontalAxis.setPositiveArrowVisible(true);
+		commonHorizontalAxis.setTickLabelsVisible(false);
 		commonVerticalAxis.setLabel("Y");
 		commonVerticalAxis.setPositiveArrowVisible(true);
+		commonVerticalAxis.setTickLabelsVisible(false);
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			datasets[i] = new XYSeriesCollection();
 			verticalAxes[i] = createDefaultVerticalAxis();
 			renderers[i] = new XYLineAndShapeRenderer(true, false);
 		}
-		XYPlot xYPlot = new XYPlot();
-		xYPlot.setOrientation(PlotOrientation.VERTICAL);
-		xYPlot.setDomainAxis(0, commonHorizontalAxis); // commonHorizontalAxis's index = 0
-		xYPlot.setRangeAxes(verticalAxes);
-		xYPlot.setRangeAxis(4, commonVerticalAxis); // commonVerticalAxis's index = 4
-		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
-			xYPlot.setDataset(i, datasets[i]);
-			xYPlot.setRenderer(i, renderers[i]);
-			xYPlot.mapDatasetToDomainAxis(i, 0); // map dataset to commonHorizontalAxis
-			xYPlot.mapDatasetToRangeAxis(i, i); // map dataset to its verticalAxis
-		}
-
 		/* Hide 4 vertical axes of 4 channels */
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			verticalAxes[i].setTickLabelsVisible(false);
 			verticalAxes[i].setAxisLineVisible(false);
 			verticalAxes[i].setTickMarksVisible(false);
 		}
+		XYPlot xYPlot = new XYPlot();
+		xYPlot.setOrientation(PlotOrientation.VERTICAL);
+		xYPlot.setDomainAxis(0, commonHorizontalAxis); // commonHorizontalAxis's index = 0
+		xYPlot.setRangeAxis(0, commonVerticalAxis); // commonVerticalAxis's index = 0
+		xYPlot.setDomainZeroBaselineVisible(true);
+		xYPlot.setRangeZeroBaselineVisible(true);
+		//xYPlot.setDomainCrosshairVisible(true);
+		//xYPlot.setRangeCrosshairVisible(true);
+		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
+			xYPlot.setRangeAxis(i + 1, verticalAxes[i]);
+			xYPlot.setDataset(i, datasets[i]);
+			xYPlot.setRenderer(i, renderers[i]);
+			xYPlot.mapDatasetToDomainAxis(i, 0); // map dataset to commonHorizontalAxis
+			xYPlot.mapDatasetToRangeAxis(i, i + 1); // map dataset to its verticalAxis
+		}
+
 		JFreeChart chart = new JFreeChart("", JFreeChart.DEFAULT_TITLE_FONT, xYPlot, true);
 		return chart;
 	}
@@ -139,6 +145,7 @@ public class Visualizer {
 		NumberAxis axis = new NumberAxis();
 		double lower = -((Constant.VERTICAL_GRID_SPACINGS / 2) * Constant.DEFAULT_VERTICAL_RANGE);
 		double upper = ((Constant.VERTICAL_GRID_SPACINGS / 2) * Constant.DEFAULT_VERTICAL_RANGE);
+		axis.setAutoRange(false);
 		axis.setTickUnit(new NumberTickUnit(Constant.DEFAULT_VERTICAL_RANGE));
 		axis.setRange(lower, upper);
 		return axis;
@@ -154,6 +161,7 @@ public class Visualizer {
 		NumberAxis axis = new NumberAxis();
 		double lower = 0;
 		double upper = Constant.HORIZONTAL_GRID_SPACINGS * Constant.DEFAULT_HORIZONTAL_RANGE;
+		axis.setAutoRange(false);
 		axis.setTickUnit(new NumberTickUnit(Constant.DEFAULT_HORIZONTAL_RANGE));
 		axis.setRange(lower, upper);
 		return axis;

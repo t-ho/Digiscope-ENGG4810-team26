@@ -32,6 +32,7 @@ public class MainWindowUi extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	protected JButton aButton;
+	protected JLabel aDivisionInfoLabel;
     protected JLabel averageVoltageALabel;
     private JLabel averageVoltageALabel_;
     protected JLabel averageVoltageBLabel;
@@ -41,6 +42,7 @@ public class MainWindowUi extends JFrame {
     protected JLabel averageVoltageMathLabel;
     private JLabel averageVoltageMathLabel_;
     protected JButton bButton;
+    protected JLabel bDivisionInfoLabel;
     protected JButton browseButton;
     private JPanel canvasPanel_;
     protected JCheckBox channelACheckBox;
@@ -50,7 +52,7 @@ public class MainWindowUi extends JFrame {
     private JTabbedPane channelTabbedPane_;
     private JPanel channelVisibilityPanel_;
     protected JTextField csvFilePathTextField;
-    private JPanel cursorPanel_;
+    private JPanel divisionInfoPanel_;
     protected JButton divideButton;
     protected JButton eButton;
     private JPanel equationBottomPanel_;
@@ -60,6 +62,7 @@ public class MainWindowUi extends JFrame {
     protected JButton fButton;
     protected JCheckBox filterChannelCheckBox;
     private JPanel filterChannelPanel_;
+    protected JLabel filterDivisionInfoLabel;
     protected JButton forceTriggerButton;
     protected JLabel frequencyALabel;
     private JLabel frequencyALabel_;
@@ -82,6 +85,7 @@ public class MainWindowUi extends JFrame {
     private JPanel horizontalBLeftPanel_;
     private JPanel horizontalBPanel_;
     private JPanel horizontalBRightPanel_;
+    protected JLabel horizontalDivisionInfoLabel;
     private JPanel horizontalFilterLeftPanel_;
     private JPanel horizontalFilterPanel_;
     private JPanel horizontalFilterRightPanel_;
@@ -123,6 +127,7 @@ public class MainWindowUi extends JFrame {
     protected JButton leftParatheseButton;
     protected JCheckBox mathChannelCheckBox;
     private JPanel mathChannelPanel_;
+    protected JLabel mathDivisionInfoLabel;
     protected JLabel maxP2pVoltageALabel;
     private JLabel maxP2pVoltageALabel_;
     protected JLabel maxP2pVoltageBLabel;
@@ -477,7 +482,12 @@ public class MainWindowUi extends JFrame {
         functionGeneratorOffsetSpinner = new JSpinner();
         horizontalRangeLabel_54 = new JLabel();
         rightPanel_ = new JPanel();
-        cursorPanel_ = new JPanel();
+        divisionInfoPanel_ = new JPanel();
+        aDivisionInfoLabel = new JLabel();
+        bDivisionInfoLabel = new JLabel();
+        mathDivisionInfoLabel = new JLabel();
+        filterDivisionInfoLabel = new JLabel();
+        horizontalDivisionInfoLabel = new JLabel();
         canvasPanel_ = new JPanel();
         jToolBar1 = new JToolBar();
 
@@ -1407,9 +1417,33 @@ public class MainWindowUi extends JFrame {
         rightPanel_.setPreferredSize(new Dimension(780, 650));
         rightPanel_.setLayout(new BorderLayout());
 
-        cursorPanel_.setPreferredSize(new Dimension(776, 40));
-        cursorPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 4));
-        rightPanel_.add(cursorPanel_, BorderLayout.SOUTH);
+        divisionInfoPanel_.setPreferredSize(new Dimension(776, 30));
+        divisionInfoPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 8));
+        
+        aDivisionInfoLabel.setText("A: 20 mV/div");
+        aDivisionInfoLabel.setBorder(BorderFactory.createTitledBorder(""));
+        divisionInfoPanel_.add(aDivisionInfoLabel);
+        
+        bDivisionInfoLabel.setText("B: 20 mV/div");
+        bDivisionInfoLabel.setBorder(BorderFactory.createTitledBorder(""));
+        bDivisionInfoLabel.setEnabled(false);
+        divisionInfoPanel_.add(bDivisionInfoLabel);
+
+        mathDivisionInfoLabel.setText("Math: 20 mV/div");
+        mathDivisionInfoLabel.setBorder(BorderFactory.createTitledBorder(""));
+        mathDivisionInfoLabel.setEnabled(false);
+        divisionInfoPanel_.add(mathDivisionInfoLabel);
+
+        filterDivisionInfoLabel.setText("Filter: 20 mV/div");
+        filterDivisionInfoLabel.setBorder(BorderFactory.createTitledBorder(""));
+        filterDivisionInfoLabel.setEnabled(false);
+        divisionInfoPanel_.add(filterDivisionInfoLabel);
+
+        horizontalDivisionInfoLabel.setText("Horizontal: 1 us/div");
+        horizontalDivisionInfoLabel.setBorder(BorderFactory.createTitledBorder(""));
+        divisionInfoPanel_.add(horizontalDivisionInfoLabel);
+
+        rightPanel_.add(divisionInfoPanel_, BorderLayout.SOUTH);
 
         canvasPanel_.setLayout(new BorderLayout());
         rightPanel_.add(canvasPanel_, BorderLayout.CENTER);
@@ -1469,6 +1503,7 @@ public class MainWindowUi extends JFrame {
         horizontalRangeMathComboBox.setEnabled(enabled);
         verticalOffsetMathSpinner.setEnabled(enabled);
         verticalRangeMathComboBox.setEnabled(enabled);
+        mathDivisionInfoLabel.setEnabled(enabled);
     }
 
     /**
@@ -1482,6 +1517,7 @@ public class MainWindowUi extends JFrame {
         horizontalRangeFilterComboBox.setEnabled(enabled);
         verticalOffsetFilterSpinner.setEnabled(enabled);
         verticalRangeFilterComboBox.setEnabled(enabled);
+        filterDivisionInfoLabel.setEnabled(enabled);
     }
 
     /**
@@ -1493,6 +1529,7 @@ public class MainWindowUi extends JFrame {
         horizontalRangeAComboBox.setEnabled(enabled);
         verticalOffsetASpinner.setEnabled(enabled);
         verticalRangeAComboBox.setEnabled(enabled);
+        aDivisionInfoLabel.setEnabled(enabled);
     }
 
     /**
@@ -1504,6 +1541,7 @@ public class MainWindowUi extends JFrame {
         horizontalRangeBComboBox.setEnabled(enabled);
         verticalOffsetBSpinner.setEnabled(enabled);
         verticalRangeBComboBox.setEnabled(enabled);
+        bDivisionInfoLabel.setEnabled(enabled);
     }
     
     /**
