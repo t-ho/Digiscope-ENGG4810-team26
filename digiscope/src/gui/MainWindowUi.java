@@ -1423,21 +1423,25 @@ public class MainWindowUi extends JFrame {
         divisionInfoPanel_.setPreferredSize(new Dimension(776, 30));
         divisionInfoPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 8));
         
+        aDivisionInfoLabel.setForeground(Constant.A_COLOR);
         aDivisionInfoLabel.setText("A: 20 mV/div");
         aDivisionInfoLabel.setBorder(BorderFactory.createTitledBorder(""));
         aDivisionInfoLabel.setEnabled(false);
         divisionInfoPanel_.add(aDivisionInfoLabel);
         
+        bDivisionInfoLabel.setForeground(Constant.B_COLOR);
         bDivisionInfoLabel.setText("B: 20 mV/div");
         bDivisionInfoLabel.setBorder(BorderFactory.createTitledBorder(""));
         bDivisionInfoLabel.setEnabled(false);
         divisionInfoPanel_.add(bDivisionInfoLabel);
 
+        mathDivisionInfoLabel.setForeground(Constant.MATH_COLOR);
         mathDivisionInfoLabel.setText("Math: 20 mV/div");
         mathDivisionInfoLabel.setBorder(BorderFactory.createTitledBorder(""));
         mathDivisionInfoLabel.setEnabled(false);
         divisionInfoPanel_.add(mathDivisionInfoLabel);
 
+        filterDivisionInfoLabel.setForeground(Constant.FILTER_COLOR);
         filterDivisionInfoLabel.setText("Filter: 20 mV/div");
         filterDivisionInfoLabel.setBorder(BorderFactory.createTitledBorder(""));
         filterDivisionInfoLabel.setEnabled(false);

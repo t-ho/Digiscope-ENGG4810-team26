@@ -1,5 +1,6 @@
 package data;
 
+import java.awt.Color;
 import java.awt.Image;
 import java.lang.reflect.Method;
 
@@ -58,6 +59,11 @@ public class Constant {
 	public static final int B_INDEX = 1;
 	public static final int MATH_INDEX = 2;
 	public static final int FILTER_INDEX = 3;
+	
+	public static final Color A_COLOR = new Color(255, 0, 0); // red
+	public static final Color B_COLOR = new Color(0, 0, 255); // blue
+	public static final Color MATH_COLOR = new Color(0, 152, 125); // green
+	public static final Color FILTER_COLOR = new Color(177, 75, 255); // purple
 
 	/**
 	 * Set application's LookAndFeel based on operating system type.

@@ -25,6 +25,7 @@ public class Visualizer {
 	private NumberAxis commonHorizontalAxis;
 	private NumberAxis commonVerticalAxis;
 	private NumberAxis[] verticalAxes;
+	private XYItemRenderer[] renderers = new XYItemRenderer[Constant.NUMBER_OF_CHANNELS];
 
 	public Visualizer() {
 		chart = createDefaultChart();
@@ -36,6 +37,7 @@ public class Visualizer {
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			datasets[i] = (XYSeriesCollection) xYPlot.getDataset(i);
 			verticalAxes[i] = (NumberAxis) xYPlot.getRangeAxis(i + 1);
+			renderers[i] = (XYItemRenderer) xYPlot.getRenderer(i);
 		}
 		currentTheme.apply(chart);
 	}
@@ -46,7 +48,17 @@ public class Visualizer {
 	}
 
 	public void addSeriesToDataset(int channelIndex, XYSeries xYSeries) {
+		datasets[channelIndex].removeAllSeries();
 		datasets[channelIndex].addSeries(xYSeries);
+		if(channelIndex == Constant.A_INDEX) {
+			renderers[channelIndex].setSeriesPaint(0, Constant.A_COLOR);
+		} else if(channelIndex == Constant.B_INDEX) {
+			renderers[channelIndex].setSeriesPaint(0, Constant.B_COLOR);
+		} else if(channelIndex == Constant.MATH_INDEX) {
+			renderers[channelIndex].setSeriesPaint(0, Constant.MATH_COLOR);
+		} else if(channelIndex == Constant.FILTER_INDEX) {
+			renderers[channelIndex].setSeriesPaint(0, Constant.FILTER_COLOR);
+		}
 	}
 
 	public void removeAllSeriesFromDataset(int channelIndex) {
@@ -134,7 +146,7 @@ public class Visualizer {
 		commonVerticalAxis.setTickUnit(new NumberTickUnit(value));
 		commonVerticalAxis.setRange(lower, upper);
 	}
-
+	
 	/**
 	 * Create an vertical axis with default settings:
 	 *  - The number of grid spacings = Constant.VERTICAL_GRID_SPACINGS 

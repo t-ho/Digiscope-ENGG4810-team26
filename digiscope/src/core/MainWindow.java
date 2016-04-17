@@ -279,12 +279,12 @@ public class MainWindow extends MainWindowUi {
 		// TODO
 		if(channelBCheckBox.isSelected()) {
 			setEnabledChannelB(true);
+			showTab(Constant.TAB.CHANNEL_B);
 			XYSeries aSeries = new XYSeries("Channel B");
 			for(double i = -20; i <= 20; i = i + 0.1) {
 				aSeries.add(i, 70 *Math.cos(i));
 			}
 			visualizer.addSeriesToDataset(Constant.B_INDEX, aSeries);
-			showTab(Constant.TAB.CHANNEL_B);
 		} else {
 			setEnabledChannelB(false);
 			visualizer.removeAllSeriesFromDataset(Constant.B_INDEX);
