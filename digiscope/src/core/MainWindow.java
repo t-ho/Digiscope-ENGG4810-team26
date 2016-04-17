@@ -31,11 +31,7 @@ public class MainWindow extends MainWindowUi {
 		setLaunchWindow(launchWindow);
 		
 		// Test
-		XYSeries aSeries = new XYSeries("Channel A");
-		for(double i = -20; i <= 20; i = i + 0.1) {
-			aSeries.add(i, 80 * (3*Math.sin(i)));
-		}
-		visualizer = new Visualizer(Constant.A_INDEX, aSeries);
+		visualizer = new Visualizer();
 		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
 		selectedItem = (String) horizontalRangeAComboBox.getSelectedItem();
@@ -270,7 +266,7 @@ public class MainWindow extends MainWindowUi {
 			showTab(Constant.TAB.CHANNEL_A);
 			XYSeries aSeries = new XYSeries("Channel A");
 			for(double i = -20; i <= 20; i = i + 0.1) {
-				aSeries.add(i, 80 * Math.sin(i));
+				aSeries.add(i, 240 * Math.sin(i));
 			}
 			visualizer.addSeriesToDataset(Constant.A_INDEX, aSeries);
 		} else {

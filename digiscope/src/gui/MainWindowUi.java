@@ -503,7 +503,6 @@ public class MainWindowUi extends JFrame {
         channelVisibilityPanel_.setPreferredSize(new Dimension(366, 45));
         channelVisibilityPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 0));
 
-        channelACheckBox.setSelected(true);
         channelACheckBox.setText("A");
         channelACheckBox.setFocusable(false);
         channelACheckBox.setPreferredSize(new Dimension(75, 20));
@@ -540,6 +539,7 @@ public class MainWindowUi extends JFrame {
         horizontalALeftPanel_.add(horizontalRangeALabel1_);
 
         horizontalRangeAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_RANGE_VALUES));
+        horizontalRangeAComboBox.setEnabled(false);
         horizontalRangeAComboBox.setPreferredSize(new Dimension(95, 20));
         horizontalALeftPanel_.add(horizontalRangeAComboBox);
 
@@ -554,6 +554,7 @@ public class MainWindowUi extends JFrame {
         horizontalOffsetALabel1_.setText("Offset:");
         horizontalARightPanel_.add(horizontalOffsetALabel1_);
 
+        horizontalOffsetASpinner.setEnabled(false);
         horizontalOffsetASpinner.setPreferredSize(new Dimension(60, 20));
         horizontalARightPanel_.add(horizontalOffsetASpinner);
 
@@ -575,6 +576,7 @@ public class MainWindowUi extends JFrame {
         verticalALeftPanel_.add(verticalRangeALabel1_);
 
         verticalRangeAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_RANGE_VALUES));
+        verticalRangeAComboBox.setEnabled(false);
         verticalRangeAComboBox.setPreferredSize(new Dimension(95, 20));
         verticalALeftPanel_.add(verticalRangeAComboBox);
 
@@ -589,6 +591,7 @@ public class MainWindowUi extends JFrame {
         verticalOffsetALabel1_.setText("Offset:");
         verticalARightPanel_.add(verticalOffsetALabel1_);
 
+        verticalOffsetASpinner.setEnabled(false);
         verticalOffsetASpinner.setPreferredSize(new Dimension(60, 20));
         verticalARightPanel_.add(verticalOffsetASpinner);
 
@@ -1422,6 +1425,7 @@ public class MainWindowUi extends JFrame {
         
         aDivisionInfoLabel.setText("A: 20 mV/div");
         aDivisionInfoLabel.setBorder(BorderFactory.createTitledBorder(""));
+        aDivisionInfoLabel.setEnabled(false);
         divisionInfoPanel_.add(aDivisionInfoLabel);
         
         bDivisionInfoLabel.setText("B: 20 mV/div");
