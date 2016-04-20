@@ -1,15 +1,26 @@
 package core;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Rectangle2D;
 
+import org.jfree.chart.ChartMouseEvent;
+import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.panel.CrosshairOverlay;
+import org.jfree.chart.plot.Crosshair;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.general.DatasetUtilities;
 import org.jfree.data.xy.XYSeries;
+import org.jfree.ui.RectangleEdge;
 
 import data.Constant;
 import gui.MainWindowUi;
@@ -18,12 +29,15 @@ import gui.MainWindowUi;
  *
  * @author ToanHo
  */
-public class MainWindow extends MainWindowUi {
+public class MainWindow extends MainWindowUi implements ChartMouseListener{
 
 	private static final long serialVersionUID = 1L;
 	private LaunchWindow launchWindow_;
-	private Visualizer visualizer;
-	private ChartPanel chartPanel;
+	private Visualizer visualizer_;
+	private ChartPanel chartPanel_;
+	private Crosshair timeCrosshair_;
+	private Crosshair voltageCrosshair_;
+	private int measuredChannelIndex_;
 
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
@@ -31,15 +45,15 @@ public class MainWindow extends MainWindowUi {
 		setLaunchWindow(launchWindow);
 		
 		// Test
-		visualizer = new Visualizer();
+		visualizer_ = new Visualizer();
 		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
 		selectedItem = (String) horizontalRangeAComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
-		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
-		visualizer.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
-		chartPanel = createDefaultChartPanel(visualizer.getChart());
-		addComponentToCanvasPanel(chartPanel);
+		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
+		visualizer_.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
+		chartPanel_ = createDefaultChartPanel(visualizer_.getChart());
+		addComponentToCanvasPanel(chartPanel_);
 		// endTest
 	}
 
@@ -199,7 +213,7 @@ public class MainWindow extends MainWindowUi {
 		// TODO
 		String selectedItem = (String) horizontalRangeAComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
-		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
+		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
@@ -207,7 +221,7 @@ public class MainWindow extends MainWindowUi {
 		// TODO
 		String selectedItem = (String) horizontalRangeBComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
-		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
+		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
@@ -215,7 +229,7 @@ public class MainWindow extends MainWindowUi {
 		// TODO
 		String selectedItem = (String) horizontalRangeMathComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
-		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
+		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
@@ -223,7 +237,7 @@ public class MainWindow extends MainWindowUi {
 		// TODO
 		String selectedItem = (String) horizontalRangeFilterComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
-		visualizer.setValueForHorizontalGridSpacing(horizontalRange);
+		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
@@ -231,7 +245,10 @@ public class MainWindow extends MainWindowUi {
 		// TODO
 		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
-		visualizer.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
+		visualizer_.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
+		if(measuredChannelIndex_ == Constant.A_INDEX) {
+			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+		}
 		aDivisionInfoLabel.setText("A: " + selectedItem + "/div");
 	}
 
@@ -239,7 +256,10 @@ public class MainWindow extends MainWindowUi {
 		// TODO
 		String selectedItem = (String) verticalRangeBComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
-		visualizer.setValueForVerticalGridSpacing(Constant.B_INDEX, verticalRange);
+		visualizer_.setValueForVerticalGridSpacing(Constant.B_INDEX, verticalRange);
+		if(measuredChannelIndex_ == Constant.B_INDEX) {
+			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+		}
 		bDivisionInfoLabel.setText("B: " + selectedItem + "/div");
 	}
 
@@ -247,7 +267,10 @@ public class MainWindow extends MainWindowUi {
 		// TODO
 		String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
-		visualizer.setValueForVerticalGridSpacing(Constant.MATH_INDEX, verticalRange);
+		visualizer_.setValueForVerticalGridSpacing(Constant.MATH_INDEX, verticalRange);
+		if(measuredChannelIndex_ == Constant.MATH_INDEX) {
+			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+		}
 		mathDivisionInfoLabel.setText("Math: " + selectedItem + "/div");
 	}
 
@@ -255,7 +278,10 @@ public class MainWindow extends MainWindowUi {
 		// TODO
 		String selectedItem = (String) verticalRangeFilterComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
-		visualizer.setValueForVerticalGridSpacing(Constant.FILTER_INDEX, verticalRange);
+		visualizer_.setValueForVerticalGridSpacing(Constant.FILTER_INDEX, verticalRange);
+		if(measuredChannelIndex_ == Constant.FILTER_INDEX) {
+			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+		}
 		filterDivisionInfoLabel.setText("Filter: " + selectedItem + "/div");
 	}
 
@@ -268,10 +294,12 @@ public class MainWindow extends MainWindowUi {
 			for(double i = -20; i <= 20; i = i + 0.1) {
 				aSeries.add(i, 240 * Math.sin(i));
 			}
-			visualizer.addSeriesToDataset(Constant.A_INDEX, aSeries);
+			visualizer_.addSeriesToDataset(Constant.A_INDEX, aSeries);
+			showCursorMeasurement(Constant.A_INDEX);
 		} else {
 			setEnabledChannelA(false);
-			visualizer.removeAllSeriesFromDataset(Constant.A_INDEX);
+			visualizer_.removeAllSeriesFromDataset(Constant.A_INDEX);
+			hideCursorMeasurement();
 		}
 	}
 
@@ -284,10 +312,12 @@ public class MainWindow extends MainWindowUi {
 			for(double i = -20; i <= 20; i = i + 0.1) {
 				aSeries.add(i, 70 *Math.cos(i));
 			}
-			visualizer.addSeriesToDataset(Constant.B_INDEX, aSeries);
+			visualizer_.addSeriesToDataset(Constant.B_INDEX, aSeries);
+			showCursorMeasurement(Constant.B_INDEX);
 		} else {
 			setEnabledChannelB(false);
-			visualizer.removeAllSeriesFromDataset(Constant.B_INDEX);
+			visualizer_.removeAllSeriesFromDataset(Constant.B_INDEX);
+			hideCursorMeasurement();
 		}
 	}
 
@@ -300,10 +330,12 @@ public class MainWindow extends MainWindowUi {
 			for(double i = -20; i <= 20; i = i + 0.1) {
 				aSeries.add(i, 100 * Math.sin(i));
 			}
-			visualizer.addSeriesToDataset(Constant.MATH_INDEX, aSeries);
+			visualizer_.addSeriesToDataset(Constant.MATH_INDEX, aSeries);
+			showCursorMeasurement(Constant.MATH_INDEX);
 		} else {
 			setEnabledMathChannel(false);
-			visualizer.removeAllSeriesFromDataset(Constant.MATH_INDEX);
+			visualizer_.removeAllSeriesFromDataset(Constant.MATH_INDEX);
+			hideCursorMeasurement();
 		}
 	}
 
@@ -316,10 +348,12 @@ public class MainWindow extends MainWindowUi {
 			for(double i = -20; i <= 20; i = i + 0.1) {
 				aSeries.add(i, 150 * Math.sin(i));
 			}
-			visualizer.addSeriesToDataset(Constant.FILTER_INDEX, aSeries);
+			visualizer_.addSeriesToDataset(Constant.FILTER_INDEX, aSeries);
+			showCursorMeasurement(Constant.FILTER_INDEX);
 		} else {
 			setEnabledFilterChannel(false);
-			visualizer.removeAllSeriesFromDataset(Constant.FILTER_INDEX);
+			visualizer_.removeAllSeriesFromDataset(Constant.FILTER_INDEX);
+			hideCursorMeasurement();
 		}
 	}
 
@@ -438,6 +472,16 @@ public class MainWindow extends MainWindowUi {
 	 */
 	private ChartPanel createDefaultChartPanel(JFreeChart chart) {
 		ChartPanel chartPanel = new ChartPanel(chart);
+        CrosshairOverlay crosshairOverlay = new CrosshairOverlay();
+        this.measuredChannelIndex_ = 0;
+        this.timeCrosshair_ = new Crosshair(Double.NaN, Color.GRAY, new BasicStroke(0f));
+        this.timeCrosshair_.setLabelVisible(true);
+        this.timeCrosshair_.setLabelBackgroundPaint(Constant.A_COLOR);
+        this.voltageCrosshair_ = new Crosshair(Double.NaN, Color.GRAY, new BasicStroke(0f));
+        this.voltageCrosshair_.setLabelVisible(true);
+        crosshairOverlay.addDomainCrosshair(timeCrosshair_);
+        crosshairOverlay.addRangeCrosshair(voltageCrosshair_);
+        chartPanel.addOverlay(crosshairOverlay);
 		chartPanel.setMouseZoomable(false);
 		return chartPanel;
 	}
@@ -453,5 +497,67 @@ public class MainWindow extends MainWindowUi {
 
 	public void setLaunchWindow(LaunchWindow launchWindow) {
 		this.launchWindow_ = launchWindow;
+	}
+	
+	/**
+	 * Show cursor measurement and set channel index which will be measured
+	 * @param channelIndex the index of the measured channel
+	 */
+	private void showCursorMeasurement(int channelIndex) {
+		chartPanel_.removeChartMouseListener(this);
+		measuredChannelIndex_ = channelIndex;
+		if(channelIndex == Constant.A_INDEX) {
+			String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
+			int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+			timeCrosshair_.setLabelBackgroundPaint(Constant.A_LIGHT_COLOR);
+			voltageCrosshair_.setLabelBackgroundPaint(Constant.A_LIGHT_COLOR);
+		} else if(channelIndex == Constant.B_INDEX) {
+			String selectedItem = (String) verticalRangeBComboBox.getSelectedItem();
+			int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+			timeCrosshair_.setLabelBackgroundPaint(Constant.B_LIGHT_COLOR);
+			voltageCrosshair_.setLabelBackgroundPaint(Constant.B_LIGHT_COLOR);
+		} else if(channelIndex == Constant.MATH_INDEX) {
+			String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();
+			int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+			timeCrosshair_.setLabelBackgroundPaint(Constant.MATH_LIGHT_COLOR);
+			voltageCrosshair_.setLabelBackgroundPaint(Constant.MATH_LIGHT_COLOR);
+		} else if(channelIndex == Constant.FILTER_INDEX) {
+			String selectedItem = (String) verticalRangeFilterComboBox.getSelectedItem();
+			int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+			timeCrosshair_.setLabelBackgroundPaint(Constant.FILTER_LIGHT_COLOR);
+			voltageCrosshair_.setLabelBackgroundPaint(Constant.FILTER_LIGHT_COLOR);
+		}
+		chartPanel_.addChartMouseListener(this);
+	}
+	
+	/**
+	 * Hide the cursor measurement
+	 */
+	private void hideCursorMeasurement() {
+		this.chartPanel_.removeChartMouseListener(this);
+		timeCrosshair_.setValue(Double.NaN);
+		voltageCrosshair_.setValue(Double.NaN);
+	}
+
+	@Override
+	public void chartMouseClicked(ChartMouseEvent event) {
+		// TODO
+	}
+
+	@Override
+	public void chartMouseMoved(ChartMouseEvent event) {
+		// TODO
+        Rectangle2D dataArea = this.chartPanel_.getScreenDataArea();
+        JFreeChart chart = event.getChart();
+        XYPlot plot = (XYPlot) chart.getPlot();
+        ValueAxis xAxis = plot.getDomainAxis();
+        double x = xAxis.java2DToValue(event.getTrigger().getX(), dataArea, RectangleEdge.BOTTOM);
+        double y = DatasetUtilities.findYValue(plot.getDataset(measuredChannelIndex_), 0, x);
+        this.timeCrosshair_.setValue(x);
+        this.voltageCrosshair_.setValue(y);
 	}
 }

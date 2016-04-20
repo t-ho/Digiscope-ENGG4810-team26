@@ -14,6 +14,10 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import data.Constant;
 
+/**
+ *
+ * @author ToanHo
+ */
 public class Visualizer {
 
 	/** The chart theme. */
@@ -82,10 +86,10 @@ public class Visualizer {
 		NumberAxis commonVerticalAxis = createDefaultVerticalAxis();
 		NumberAxis[] verticalAxes = new NumberAxis[Constant.NUMBER_OF_CHANNELS];
 		XYItemRenderer[] renderers = new XYItemRenderer[Constant.NUMBER_OF_CHANNELS];
-		commonHorizontalAxis.setLabel("X");
+		commonHorizontalAxis.setLabel("Time");
 		commonHorizontalAxis.setPositiveArrowVisible(true);
 		commonHorizontalAxis.setTickLabelsVisible(false);
-		commonVerticalAxis.setLabel("Y");
+		commonVerticalAxis.setLabel("Voltage");
 		commonVerticalAxis.setPositiveArrowVisible(true);
 		commonVerticalAxis.setTickLabelsVisible(false);
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
@@ -106,6 +110,7 @@ public class Visualizer {
 		xYPlot.setDomainZeroBaselineVisible(true);
 		xYPlot.setRangeZeroBaselineVisible(true);
 		//xYPlot.setDomainCrosshairVisible(true);
+		//xYPlot.setRangeCrosshairLockedOnData(false);
 		//xYPlot.setRangeCrosshairVisible(true);
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			xYPlot.setRangeAxis(i + 1, verticalAxes[i]);
@@ -143,6 +148,16 @@ public class Visualizer {
 		double upper = ((Constant.VERTICAL_GRID_SPACINGS / 2) * value);
 		verticalAxes[channelIndex].setTickUnit(new NumberTickUnit(value));
 		verticalAxes[channelIndex].setRange(lower, upper);
+	}
+
+	/**
+	 * Set value for common vertical grid spacings.
+	 * The common vertical axis has Constant.VERTICAL_GRID_SPACINGS.
+	 * @param value The value in milivolts
+	 */
+	public void setValueForCommonVerticalGridSpacing(int value) {
+		double lower = -((Constant.VERTICAL_GRID_SPACINGS / 2) * value);
+		double upper = ((Constant.VERTICAL_GRID_SPACINGS / 2) * value);
 		commonVerticalAxis.setTickUnit(new NumberTickUnit(value));
 		commonVerticalAxis.setRange(lower, upper);
 	}

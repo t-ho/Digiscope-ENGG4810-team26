@@ -64,6 +64,11 @@ public class Constant {
 	public static final Color B_COLOR = new Color(0, 0, 255); // blue
 	public static final Color MATH_COLOR = new Color(0, 152, 125); // green
 	public static final Color FILTER_COLOR = new Color(177, 75, 255); // purple
+	
+	public static final Color A_LIGHT_COLOR = new Color(252, 73, 73); // light red
+	public static final Color B_LIGHT_COLOR = new Color(65, 114, 248); // light blue
+	public static final Color MATH_LIGHT_COLOR = new Color(0, 165, 135); // light green
+	public static final Color FILTER_LIGHT_COLOR = new Color(186, 100, 252); // light purple
 
 	/**
 	 * Set application's LookAndFeel based on operating system type.
