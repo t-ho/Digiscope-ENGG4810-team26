@@ -26,9 +26,14 @@ public class Constant {
 
 	public static final String[] WAVE_TYPES = new String[] {
 		"Sine", "Square", "Triangle", "Ramp", "Random noise" };
+	
+	public static final String CHANNEL_A = "Channel A";
+	public static final String CHANNEL_B = "Channel B";
+	public static final String MATH_CHANNEL = "Math Channel";
+	public static final String FILTER_CHANNEL = "Filter Channel";
 
 	public static final String[] INPUT_CHANNELS = new String[] { 
-		"Channel A", "Channel B", "Math Channel" };
+		CHANNEL_A, CHANNEL_B, MATH_CHANNEL };
 
 	public static final String[] TRIGGER_MODES = new String[] { 
 		"Auto", "Normal", "Single" };

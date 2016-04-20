@@ -175,6 +175,34 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				verticalRangeFilterComboBoxItemStateChanged(event);
 			}
 		});
+
+		cursorComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				cursorComboBoxItemStateChanged(event);
+			}
+		});
+	}
+
+	private void cursorComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		String selectChannel = (String) cursorComboBox.getSelectedItem();
+		if(selectChannel == Constant.CHANNEL_A) {
+			showCursorMeasurement(Constant.A_INDEX);
+			cursorVerticalValueLabel.setForeground(Constant.A_COLOR);
+		} else if(selectChannel == Constant.CHANNEL_B) {
+			showCursorMeasurement(Constant.B_INDEX);
+			cursorVerticalValueLabel.setForeground(Constant.B_COLOR);
+		} else if(selectChannel == Constant.MATH_CHANNEL) {
+			showCursorMeasurement(Constant.MATH_INDEX);
+			cursorVerticalValueLabel.setForeground(Constant.MATH_COLOR);
+		} else if(selectChannel == Constant.FILTER_CHANNEL) {
+			showCursorMeasurement(Constant.FILTER_INDEX);
+			cursorVerticalValueLabel.setForeground(Constant.FILTER_COLOR);
+		} else {
+			hideCursorMeasurement();
+			cursorVerticalValueLabel.setForeground(Color.BLACK);
+		}
 	}
 
 	private void horizontalRangeAComboBoxActionPerformed(ActionEvent event) {
@@ -292,14 +320,14 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 			showTab(Constant.TAB.CHANNEL_A);
 			XYSeries aSeries = new XYSeries("Channel A");
 			for(double i = -20; i <= 20; i = i + 0.1) {
-				aSeries.add(i, 240 * Math.sin(i));
+				aSeries.add(i, 1500 * Math.sin(i));
 			}
 			visualizer_.addSeriesToDataset(Constant.A_INDEX, aSeries);
-			showCursorMeasurement(Constant.A_INDEX);
+			cursorComboBox.addItem(Constant.CHANNEL_A);
 		} else {
 			setEnabledChannelA(false);
 			visualizer_.removeAllSeriesFromDataset(Constant.A_INDEX);
-			hideCursorMeasurement();
+			cursorComboBox.removeItem(Constant.CHANNEL_A);;
 		}
 	}
 
@@ -313,11 +341,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				aSeries.add(i, 70 *Math.cos(i));
 			}
 			visualizer_.addSeriesToDataset(Constant.B_INDEX, aSeries);
-			showCursorMeasurement(Constant.B_INDEX);
+			cursorComboBox.addItem(Constant.CHANNEL_B);
 		} else {
 			setEnabledChannelB(false);
 			visualizer_.removeAllSeriesFromDataset(Constant.B_INDEX);
-			hideCursorMeasurement();
+			cursorComboBox.removeItem(Constant.CHANNEL_B);
 		}
 	}
 
@@ -331,11 +359,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				aSeries.add(i, 100 * Math.sin(i));
 			}
 			visualizer_.addSeriesToDataset(Constant.MATH_INDEX, aSeries);
-			showCursorMeasurement(Constant.MATH_INDEX);
+			cursorComboBox.addItem(Constant.MATH_CHANNEL);
 		} else {
 			setEnabledMathChannel(false);
 			visualizer_.removeAllSeriesFromDataset(Constant.MATH_INDEX);
-			hideCursorMeasurement();
+			cursorComboBox.removeItem(Constant.MATH_CHANNEL);
 		}
 	}
 
@@ -349,11 +377,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				aSeries.add(i, 150 * Math.sin(i));
 			}
 			visualizer_.addSeriesToDataset(Constant.FILTER_INDEX, aSeries);
-			showCursorMeasurement(Constant.FILTER_INDEX);
+			cursorComboBox.addItem(Constant.FILTER_CHANNEL);
 		} else {
 			setEnabledFilterChannel(false);
 			visualizer_.removeAllSeriesFromDataset(Constant.FILTER_INDEX);
-			hideCursorMeasurement();
+			cursorComboBox.removeItem(Constant.FILTER_CHANNEL);
 		}
 	}
 
@@ -542,6 +570,16 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		timeCrosshair_.setValue(Double.NaN);
 		voltageCrosshair_.setValue(Double.NaN);
 	}
+	
+	private String miliVoltsToString(double voltage) {
+		String result = "";
+		if(voltage < 1000) {
+			result = voltage + " mV";
+		} else if(voltage >= 1000) {
+			result = (voltage / 1000) + " V";
+		}
+		return result;
+	}
 
 	@Override
 	public void chartMouseClicked(ChartMouseEvent event) {
@@ -559,5 +597,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
         double y = DatasetUtilities.findYValue(plot.getDataset(measuredChannelIndex_), 0, x);
         this.timeCrosshair_.setValue(x);
         this.voltageCrosshair_.setValue(y);
+        this.cursorVerticalValueLabel.setText(miliVoltsToString(y));
 	}
 }

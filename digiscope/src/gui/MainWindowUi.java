@@ -52,6 +52,9 @@ public class MainWindowUi extends JFrame {
     private JTabbedPane channelTabbedPane_;
     private JPanel channelVisibilityPanel_;
     protected JTextField csvFilePathTextField;
+    protected JComboBox<String> cursorComboBox;
+    private JLabel cursorLabel_;
+    protected JLabel cursorVerticalValueLabel;
     private JPanel divisionInfoPanel_;
     protected JButton divideButton;
     protected JButton eButton;
@@ -122,7 +125,6 @@ public class MainWindowUi extends JFrame {
     private JPanel inputPanel_;
     private JPanel inputTopPanel_;
     private JLabel jLabel4;
-    private JToolBar jToolBar1;
     private JPanel leftPanel_;
     protected JButton leftParatheseButton;
     protected JCheckBox mathChannelCheckBox;
@@ -192,6 +194,7 @@ public class MainWindowUi extends JFrame {
     protected JButton rearmTriggerButton;
     private JPanel rightPanel_;
     protected JButton rightParatheseButton;
+    private JLabel spaceLabel_;
     protected JLabel standardDeviationVoltageALabel;
     private JLabel standardDeviationVoltageALabel_;
     protected JLabel standardDeviationVoltageBLabel;
@@ -200,6 +203,7 @@ public class MainWindowUi extends JFrame {
     private JLabel standardDeviationVoltageFilterLabel_;
     protected JLabel standardDeviationVoltageMathLabel;
     private JLabel standardDeviationVoltageMathLabel_;
+    private JToolBar toolBar_;
     private JPanel triggerBottomPanel;
     private JPanel triggerMiddleLeftPanel1_;
     private JPanel triggerMiddleLeftPanel2_;
@@ -489,7 +493,11 @@ public class MainWindowUi extends JFrame {
         filterDivisionInfoLabel = new JLabel();
         horizontalDivisionInfoLabel = new JLabel();
         canvasPanel_ = new JPanel();
-        jToolBar1 = new JToolBar();
+        toolBar_ = new JToolBar();
+        cursorLabel_ = new JLabel();
+        cursorComboBox = new JComboBox<String>();
+        spaceLabel_ = new JLabel();
+        cursorVerticalValueLabel = new JLabel();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(Constant.APPLICATION_TITLE);
@@ -1456,9 +1464,25 @@ public class MainWindowUi extends JFrame {
         canvasPanel_.setLayout(new BorderLayout());
         rightPanel_.add(canvasPanel_, BorderLayout.CENTER);
 
-        jToolBar1.setRollover(true);
-        jToolBar1.setPreferredSize(new Dimension(100, 40));
-        rightPanel_.add(jToolBar1, BorderLayout.NORTH);
+        toolBar_.setFloatable(false);
+        toolBar_.setRollover(true);
+        toolBar_.setPreferredSize(new Dimension(100, 40));
+        
+        cursorLabel_.setText(" Cursor on: ");
+        toolBar_.add(cursorLabel_);
+        
+        cursorComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "Disabled" }));
+        cursorComboBox.setMaximumSize(new Dimension(120, 20));
+        toolBar_.add(cursorComboBox);
+        
+        spaceLabel_.setText("  ");
+        toolBar_.add(spaceLabel_);
+        
+        cursorVerticalValueLabel.setText("0 mv");
+        cursorVerticalValueLabel.setBorder(BorderFactory.createTitledBorder(""));
+        toolBar_.add(cursorVerticalValueLabel);
+        
+        rightPanel_.add(toolBar_, BorderLayout.NORTH);
 
         getContentPane().add(rightPanel_, BorderLayout.CENTER);
 
