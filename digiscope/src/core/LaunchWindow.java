@@ -22,12 +22,12 @@ public class LaunchWindow extends LaunchWindowUi {
 
 	public LaunchWindow() {
 		super();
-		initialize();
+		addListenersToComponents();
 		setStatus("To connect, please enter the IP address!", Constant.NORMAL);
 		ipAddressTextField.setText("192.168.1.2");
 	}
 
-	private void initialize() {
+	private void addListenersToComponents() {
 		connectButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {

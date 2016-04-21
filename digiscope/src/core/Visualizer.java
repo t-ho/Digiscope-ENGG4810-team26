@@ -11,6 +11,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.RectangleInsets;
 
 import data.Constant;
 
@@ -192,5 +193,11 @@ public class Visualizer {
 		axis.setTickUnit(new NumberTickUnit(Constant.DEFAULT_HORIZONTAL_RANGE));
 		axis.setRange(lower, upper);
 		return axis;
+	}
+
+	public void changeVerticalOffset(int channelIndex, double offset) {
+		System.out.println("\n" + xYPlot.getAxisOffset());
+		xYPlot.setAxisOffset(new RectangleInsets(0, 0, 0, 0));
+		System.out.println(xYPlot.getAxisOffset());
 	}
 }

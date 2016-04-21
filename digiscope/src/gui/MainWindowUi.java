@@ -1517,7 +1517,7 @@ public class MainWindowUi extends JFrame {
      * Enable or disable all the components on the Math channel panel
      * @param enabled boolean
      */
-    protected void setEnabledMathChannel(boolean enabled) {
+    protected void setEnabledMathChannelControls(boolean enabled) {
         equationTextField.setEnabled(enabled);
         aButton.setEnabled(enabled);
         bButton.setEnabled(enabled);
@@ -1542,7 +1542,7 @@ public class MainWindowUi extends JFrame {
      * Enable or disable all the components on the Filter channel panel
      * @param enabled boolean
      */
-    protected void setEnabledFilterChannel(boolean enabled) {
+    protected void setEnabledFilterChannelControls(boolean enabled) {
         inputChannelComboBox.setEnabled(enabled);
         browseButton.setEnabled(enabled);
         horizontalOffsetFilterSpinner.setEnabled(enabled);
@@ -1556,7 +1556,7 @@ public class MainWindowUi extends JFrame {
      * Enable or disable all the components on the channel A panel
      * @param enabled boolean
      */
-    protected void setEnabledChannelA(boolean enabled) {
+    protected void setEnabledChannelAControls(boolean enabled) {
         horizontalOffsetASpinner.setEnabled(enabled);
         horizontalRangeAComboBox.setEnabled(enabled);
         verticalOffsetASpinner.setEnabled(enabled);
@@ -1568,7 +1568,7 @@ public class MainWindowUi extends JFrame {
      * Enable or disable all the components on the channel B panel
      * @param enabled boolean
      */
-    protected void setEnabledChannelB(boolean enabled) {
+    protected void setEnabledChannelBControls(boolean enabled) {
         horizontalOffsetBSpinner.setEnabled(enabled);
         horizontalRangeBComboBox.setEnabled(enabled);
         verticalOffsetBSpinner.setEnabled(enabled);

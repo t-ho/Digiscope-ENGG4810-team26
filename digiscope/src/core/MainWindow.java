@@ -9,6 +9,11 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.jfree.chart.ChartMouseEvent;
 import org.jfree.chart.ChartMouseListener;
@@ -38,26 +43,53 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private Crosshair timeCrosshair_;
 	private Crosshair voltageCrosshair_;
 	private int measuredChannelIndex_;
+	private Map<String, XYSeries> rawXYSeries_;
 
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
 		initialize();
+		addListenersToComponents();
 		setLaunchWindow(launchWindow);
-		
-		// Test
-		visualizer_ = new Visualizer();
-		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
-		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
-		selectedItem = (String) horizontalRangeAComboBox.getSelectedItem();
-		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
-		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
-		visualizer_.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
-		chartPanel_ = createDefaultChartPanel(visualizer_.getChart());
 		addComponentToCanvasPanel(chartPanel_);
+	}
+	
+	private void initialize() {
+		visualizer_ = new Visualizer();
+		chartPanel_ = createDefaultChartPanel(visualizer_.getChart());
+		rawXYSeries_ = new HashMap<String, XYSeries>();
+		
+		// test
+		// Channel A
+		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
+		for(double i = -20; i <= 20; i = i + 0.1) {
+			aSeries.add(i, 1500 * Math.sin(i));
+		}
+		rawXYSeries_.put(Constant.CHANNEL_A, aSeries);
+
+		// Channel B
+		XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
+		for(double i = -20; i <= 20; i = i + 0.1) {
+			bSeries.add(i, 70 * Math.sin(i));
+		}
+		rawXYSeries_.put(Constant.CHANNEL_B, bSeries);
+
+		//Math Channel
+		XYSeries mathSeries = new XYSeries(Constant.MATH_CHANNEL);
+		for(double i = -20; i <= 20; i = i + 0.1) {
+			mathSeries.add(i, 800 * Math.sin(i));
+		}
+		rawXYSeries_.put(Constant.MATH_CHANNEL, mathSeries);
 		// endTest
+
+		// Filter Channel
+		XYSeries filterSeries = new XYSeries(Constant.FILTER_CHANNEL);
+		for(double i = -20; i <= 20; i = i + 0.1) {
+			filterSeries.add(i, 280 * Math.sin(i));
+		}
+		rawXYSeries_.put(Constant.FILTER_CHANNEL, filterSeries);
 	}
 
-	private void initialize() {
+	private void addListenersToComponents() {
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent event) {
 				mainWindowClosed(event);
@@ -182,6 +214,134 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				cursorComboBoxItemStateChanged(event);
 			}
 		});
+		
+		verticalOffsetASpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				verticalOffsetASpinnerStateChanged(event);
+			}
+		});
+
+		verticalOffsetBSpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				verticalOffsetBSpinnerStateChanged(event);
+			}
+		});
+
+		verticalOffsetMathSpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				verticalOffsetMathSpinnerStateChanged(event);
+			}
+		});
+
+		verticalOffsetFilterSpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				verticalOffsetFilterSpinnerStateChanged(event);
+			}
+		});
+
+		horizontalOffsetASpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				horizontalOffsetASpinnerStateChanged(event);
+			}
+		});
+
+		horizontalOffsetBSpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				horizontalOffsetBSpinnerStateChanged(event);
+			}
+		});
+
+		horizontalOffsetMathSpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				horizontalOffsetMathSpinnerStateChanged(event);
+			}
+		});
+
+		horizontalOffsetFilterSpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				horizontalOffsetFilterSpinnerStateChanged(event);
+			}
+		});
+	}
+
+	private void verticalOffsetASpinnerStateChanged(ChangeEvent event) {
+		// TODO
+		XYSeries aSeries = createXYSeriesWithOffsets(Constant.CHANNEL_A,
+				rawXYSeries_.get(Constant.CHANNEL_A),
+				(int) horizontalOffsetASpinner.getValue(),
+				(int) verticalOffsetASpinner.getValue());
+		visualizer_.addSeriesToDataset(Constant.A_INDEX, aSeries);
+	}
+
+	private void verticalOffsetBSpinnerStateChanged(ChangeEvent event) {
+		// TODO
+		XYSeries bSeries = createXYSeriesWithOffsets(Constant.CHANNEL_B,
+				rawXYSeries_.get(Constant.CHANNEL_B),
+				(int) horizontalOffsetBSpinner.getValue(),
+				(int) verticalOffsetBSpinner.getValue());
+		visualizer_.addSeriesToDataset(Constant.B_INDEX, bSeries);
+	}
+
+	private void verticalOffsetMathSpinnerStateChanged(ChangeEvent event) {
+		// TODO
+		XYSeries mathSeries = createXYSeriesWithOffsets(Constant.MATH_CHANNEL,
+				rawXYSeries_.get(Constant.MATH_CHANNEL),
+				(int) horizontalOffsetMathSpinner.getValue(),
+				(int) verticalOffsetMathSpinner.getValue());
+		visualizer_.addSeriesToDataset(Constant.MATH_INDEX, mathSeries);
+	}
+
+	private void verticalOffsetFilterSpinnerStateChanged(ChangeEvent event) {
+		// TODO
+		XYSeries filterSeries = createXYSeriesWithOffsets(Constant.FILTER_CHANNEL,
+				rawXYSeries_.get(Constant.FILTER_CHANNEL),
+				(int) horizontalOffsetFilterSpinner.getValue(),
+				(int) verticalOffsetFilterSpinner.getValue());
+		visualizer_.addSeriesToDataset(Constant.FILTER_INDEX, filterSeries);
+	}
+
+	private void horizontalOffsetASpinnerStateChanged(ChangeEvent event) {
+		// TODO
+		XYSeries aSeries = createXYSeriesWithOffsets(Constant.CHANNEL_A,
+				rawXYSeries_.get(Constant.CHANNEL_A),
+				(int) horizontalOffsetASpinner.getValue(),
+				(int) verticalOffsetASpinner.getValue());
+		visualizer_.addSeriesToDataset(Constant.A_INDEX, aSeries);
+	}
+
+	private void horizontalOffsetBSpinnerStateChanged(ChangeEvent event) {
+		// TODO
+		XYSeries bSeries = createXYSeriesWithOffsets(Constant.CHANNEL_B,
+				rawXYSeries_.get(Constant.CHANNEL_B),
+				(int) horizontalOffsetBSpinner.getValue(),
+				(int) verticalOffsetBSpinner.getValue());
+		visualizer_.addSeriesToDataset(Constant.B_INDEX, bSeries);
+	}
+
+	private void horizontalOffsetMathSpinnerStateChanged(ChangeEvent event) {
+		// TODO
+		XYSeries mathSeries = createXYSeriesWithOffsets(Constant.MATH_CHANNEL,
+				rawXYSeries_.get(Constant.MATH_CHANNEL),
+				(int) horizontalOffsetMathSpinner.getValue(),
+				(int) verticalOffsetMathSpinner.getValue());
+		visualizer_.addSeriesToDataset(Constant.MATH_INDEX, mathSeries);
+	}
+
+	private void horizontalOffsetFilterSpinnerStateChanged(ChangeEvent event) {
+		// TODO
+		XYSeries filterSeries = createXYSeriesWithOffsets(Constant.FILTER_CHANNEL,
+				rawXYSeries_.get(Constant.FILTER_CHANNEL),
+				(int) horizontalOffsetFilterSpinner.getValue(),
+				(int) verticalOffsetFilterSpinner.getValue());
+		visualizer_.addSeriesToDataset(Constant.FILTER_INDEX, filterSeries);
 	}
 
 	private void cursorComboBoxItemStateChanged(ItemEvent event) {
@@ -316,72 +476,57 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private void channelACheckboxItemStateChanged(ItemEvent event) {
 		// TODO
 		if(channelACheckBox.isSelected()) {
-			setEnabledChannelA(true);
+			setEnabledChannelAControls(true);
 			showTab(Constant.TAB.CHANNEL_A);
-			XYSeries aSeries = new XYSeries("Channel A");
-			for(double i = -20; i <= 20; i = i + 0.1) {
-				aSeries.add(i, 1500 * Math.sin(i));
-			}
-			visualizer_.addSeriesToDataset(Constant.A_INDEX, aSeries);
-			cursorComboBox.addItem(Constant.CHANNEL_A);
+			showChannelPlotOnChartPanel(Constant.CHANNEL_A, Constant.A_INDEX,
+					(int) horizontalOffsetASpinner.getValue(),
+					(int) verticalOffsetASpinner.getValue());
 		} else {
-			setEnabledChannelA(false);
-			visualizer_.removeAllSeriesFromDataset(Constant.A_INDEX);
-			cursorComboBox.removeItem(Constant.CHANNEL_A);;
+			setEnabledChannelAControls(false);
+			removeChannelPlotFromChartPanel(Constant.CHANNEL_A, Constant.A_INDEX);
 		}
 	}
-
+	
+	
 	private void channelBCheckboxItemStateChanged(ItemEvent event) {
 		// TODO
 		if(channelBCheckBox.isSelected()) {
-			setEnabledChannelB(true);
+			setEnabledChannelBControls(true);
 			showTab(Constant.TAB.CHANNEL_B);
-			XYSeries aSeries = new XYSeries("Channel B");
-			for(double i = -20; i <= 20; i = i + 0.1) {
-				aSeries.add(i, 70 *Math.cos(i));
-			}
-			visualizer_.addSeriesToDataset(Constant.B_INDEX, aSeries);
-			cursorComboBox.addItem(Constant.CHANNEL_B);
+			showChannelPlotOnChartPanel(Constant.CHANNEL_B, Constant.B_INDEX,
+					(int) horizontalOffsetBSpinner.getValue(),
+					(int) verticalOffsetBSpinner.getValue());
 		} else {
-			setEnabledChannelB(false);
-			visualizer_.removeAllSeriesFromDataset(Constant.B_INDEX);
-			cursorComboBox.removeItem(Constant.CHANNEL_B);
+			setEnabledChannelBControls(false);
+			removeChannelPlotFromChartPanel(Constant.CHANNEL_B, Constant.B_INDEX);
 		}
 	}
 
 	private void mathChannelCheckboxItemStateChanged(ItemEvent event) {
 		// TODO
 		if(mathChannelCheckBox.isSelected()) {
-			setEnabledMathChannel(true);
+			setEnabledMathChannelControls(true);
 			showTab(Constant.TAB.MATH_CHANNEL);
-			XYSeries aSeries = new XYSeries("Math Channel");
-			for(double i = -20; i <= 20; i = i + 0.1) {
-				aSeries.add(i, 100 * Math.sin(i));
-			}
-			visualizer_.addSeriesToDataset(Constant.MATH_INDEX, aSeries);
-			cursorComboBox.addItem(Constant.MATH_CHANNEL);
+			showChannelPlotOnChartPanel(Constant.MATH_CHANNEL, Constant.MATH_INDEX,
+					(int) horizontalOffsetMathSpinner.getValue(),
+					(int) verticalOffsetMathSpinner.getValue());
 		} else {
-			setEnabledMathChannel(false);
-			visualizer_.removeAllSeriesFromDataset(Constant.MATH_INDEX);
-			cursorComboBox.removeItem(Constant.MATH_CHANNEL);
+			setEnabledMathChannelControls(false);
+			removeChannelPlotFromChartPanel(Constant.MATH_CHANNEL, Constant.MATH_INDEX);
 		}
 	}
-
+	
 	private void filterChannelCheckboxItemStateChanged(ItemEvent event) {
 		// TODO
 		if(filterChannelCheckBox.isSelected()) {
-			setEnabledFilterChannel(true);
+			setEnabledFilterChannelControls(true);
 			showTab(Constant.TAB.FILTER_CHANNEL);
-			XYSeries aSeries = new XYSeries("Filter Channel");
-			for(double i = -20; i <= 20; i = i + 0.1) {
-				aSeries.add(i, 150 * Math.sin(i));
-			}
-			visualizer_.addSeriesToDataset(Constant.FILTER_INDEX, aSeries);
-			cursorComboBox.addItem(Constant.FILTER_CHANNEL);
+			showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL, Constant.FILTER_INDEX,
+					(int) horizontalOffsetFilterSpinner.getValue(),
+					(int) verticalOffsetFilterSpinner.getValue());
 		} else {
-			setEnabledFilterChannel(false);
-			visualizer_.removeAllSeriesFromDataset(Constant.FILTER_INDEX);
-			cursorComboBox.removeItem(Constant.FILTER_CHANNEL);
+			setEnabledFilterChannelControls(false);
+			removeChannelPlotFromChartPanel(Constant.FILTER_CHANNEL, Constant.FILTER_INDEX);
 		}
 	}
 
@@ -569,6 +714,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		this.chartPanel_.removeChartMouseListener(this);
 		timeCrosshair_.setValue(Double.NaN);
 		voltageCrosshair_.setValue(Double.NaN);
+		cursorVerticalValueLabel.setText("0 mV");
 	}
 	
 	private String miliVoltsToString(double voltage) {
@@ -579,6 +725,53 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 			result = voltage + " mV";
 		}
 		return result;
+	}
+
+	/**
+	 * Create a XYSeries with given offset
+	 * @param channelName The name of the channel
+	 * @param xYSeries The raw XYSeries
+	 * @param horizontalOffset The horizontal offset
+	 * @param verticalOffset The vertical offset
+	 * @return
+	 */
+	private XYSeries createXYSeriesWithOffsets(String channelName, XYSeries xYSeries,
+			int horizontalOffset, int verticalOffset) {
+		XYSeries result = new XYSeries(channelName);
+		for(int i = 0; i < xYSeries.getItemCount(); i++) {
+			double xValue = xYSeries.getDataItem(i).getXValue() + horizontalOffset;
+			double yValue = xYSeries.getDataItem(i).getYValue() + verticalOffset;
+			result.add(xValue, yValue);
+		}
+		return result;
+	}
+
+	/**
+	 * Show the plot of specified channel on the chart panel
+	 * @param channelName The channel's name
+	 * @param channelIndex The channel's index
+	 * @param horizontalOffset The horizontal offset of the channel
+	 * @param verticalOffset The vertical offset of the channel
+	 */
+	private void showChannelPlotOnChartPanel(String channelName, int channelIndex,
+			int horizontalOffset, int verticalOffset) {
+		XYSeries rawSeries = rawXYSeries_.get(channelName);
+		if(rawSeries != null) {
+			XYSeries xYSeries = createXYSeriesWithOffsets(channelName, rawSeries,
+					horizontalOffset, verticalOffset);
+			visualizer_.addSeriesToDataset(channelIndex, xYSeries);
+			cursorComboBox.addItem(channelName);
+		}
+	}
+	
+	/**
+	 * Remove the plot of specified channel from the chart panel
+	 * @param channelName The channel's name
+	 * @param channelIndex The channel's index
+	 */
+	private void removeChannelPlotFromChartPanel(String channelName, int channelIndex) {
+		visualizer_.removeAllSeriesFromDataset(channelIndex);
+		cursorComboBox.removeItem(channelName);
 	}
 
 	@Override
