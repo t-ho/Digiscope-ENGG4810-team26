@@ -270,77 +270,189 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				horizontalOffsetFilterSpinnerStateChanged(event);
 			}
 		});
+		
+		verticalOffsetUnitAComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				verticalOffsetUnitAComboBoxItemStateChanged(event);
+			}
+		});
+
+		verticalOffsetUnitBComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				verticalOffsetUnitBComboBoxItemStateChanged(event);
+			}
+		});
+
+		verticalOffsetUnitMathComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				verticalOffsetUnitMathComboBoxItemStateChanged(event);
+			}
+		});
+
+		verticalOffsetUnitFilterComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				verticalOffsetUnitFilterComboBoxItemStateChanged(event);
+			}
+		});
+		
+		horizontalOffsetUnitAComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				horizontalOffsetUnitAComboBoxItemStateChanged(event);
+			}
+		});
+
+		horizontalOffsetUnitBComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				horizontalOffsetUnitBComboBoxItemStateChanged(event);
+			}
+		});
+
+		horizontalOffsetUnitMathComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				horizontalOffsetUnitMathComboBoxItemStateChanged(event);
+			}
+		});
+
+		horizontalOffsetUnitFilterComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				horizontalOffsetUnitFilterComboBoxItemStateChanged(event);
+			}
+		});
+	}
+
+	protected void verticalOffsetUnitAComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		verticalOffsetASpinner.setValue(0);
+	}
+
+	protected void verticalOffsetUnitBComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		verticalOffsetBSpinner.setValue(0);
+	}
+
+	protected void verticalOffsetUnitMathComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		verticalOffsetMathSpinner.setValue(0);
+	}
+
+	protected void verticalOffsetUnitFilterComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		verticalOffsetFilterSpinner.setValue(0);
+	}
+
+	protected void horizontalOffsetUnitAComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		horizontalOffsetASpinner.setValue(0);
+	}
+
+	protected void horizontalOffsetUnitBComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		horizontalOffsetBSpinner.setValue(0);
+	}
+
+	protected void horizontalOffsetUnitMathComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		horizontalOffsetMathSpinner.setValue(0);
+	}
+
+	protected void horizontalOffsetUnitFilterComboBoxItemStateChanged(ItemEvent event) {
+		// TODO
+		horizontalOffsetFilterSpinner.setValue(0);
 	}
 
 	private void verticalOffsetASpinnerStateChanged(ChangeEvent event) {
 		// TODO
+		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetASpinner.getValue(),
+				(String) horizontalOffsetUnitAComboBox.getSelectedItem());
+		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetASpinner.getValue(),
+				(String) verticalOffsetUnitAComboBox.getSelectedItem());
 		XYSeries aSeries = createXYSeriesWithOffsets(Constant.CHANNEL_A,
-				rawXYSeries_.get(Constant.CHANNEL_A),
-				(int) horizontalOffsetASpinner.getValue(),
-				(int) verticalOffsetASpinner.getValue());
+				rawXYSeries_.get(Constant.CHANNEL_A), horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.A_INDEX, aSeries);
 	}
-
+	
 	private void verticalOffsetBSpinnerStateChanged(ChangeEvent event) {
 		// TODO
+		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetBSpinner.getValue(),
+				(String) horizontalOffsetUnitBComboBox.getSelectedItem());
+		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetBSpinner.getValue(),
+				(String) verticalOffsetUnitBComboBox.getSelectedItem());
 		XYSeries bSeries = createXYSeriesWithOffsets(Constant.CHANNEL_B,
-				rawXYSeries_.get(Constant.CHANNEL_B),
-				(int) horizontalOffsetBSpinner.getValue(),
-				(int) verticalOffsetBSpinner.getValue());
+				rawXYSeries_.get(Constant.CHANNEL_B), horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.B_INDEX, bSeries);
 	}
 
 	private void verticalOffsetMathSpinnerStateChanged(ChangeEvent event) {
 		// TODO
+		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetMathSpinner.getValue(),
+				(String) horizontalOffsetUnitMathComboBox.getSelectedItem());
+		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetMathSpinner.getValue(),
+				(String) verticalOffsetUnitMathComboBox.getSelectedItem());
 		XYSeries mathSeries = createXYSeriesWithOffsets(Constant.MATH_CHANNEL,
-				rawXYSeries_.get(Constant.MATH_CHANNEL),
-				(int) horizontalOffsetMathSpinner.getValue(),
-				(int) verticalOffsetMathSpinner.getValue());
+				rawXYSeries_.get(Constant.MATH_CHANNEL),horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.MATH_INDEX, mathSeries);
 	}
 
 	private void verticalOffsetFilterSpinnerStateChanged(ChangeEvent event) {
 		// TODO
+		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetFilterSpinner.getValue(),
+				(String) horizontalOffsetUnitFilterComboBox.getSelectedItem());
+		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetFilterSpinner.getValue(),
+				(String) verticalOffsetUnitFilterComboBox.getSelectedItem());
 		XYSeries filterSeries = createXYSeriesWithOffsets(Constant.FILTER_CHANNEL,
-				rawXYSeries_.get(Constant.FILTER_CHANNEL),
-				(int) horizontalOffsetFilterSpinner.getValue(),
-				(int) verticalOffsetFilterSpinner.getValue());
+				rawXYSeries_.get(Constant.FILTER_CHANNEL), horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.FILTER_INDEX, filterSeries);
 	}
 
 	private void horizontalOffsetASpinnerStateChanged(ChangeEvent event) {
 		// TODO
+		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetASpinner.getValue(),
+				(String) horizontalOffsetUnitAComboBox.getSelectedItem());
+		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetASpinner.getValue(),
+				(String) verticalOffsetUnitAComboBox.getSelectedItem());
 		XYSeries aSeries = createXYSeriesWithOffsets(Constant.CHANNEL_A,
-				rawXYSeries_.get(Constant.CHANNEL_A),
-				(int) horizontalOffsetASpinner.getValue(),
-				(int) verticalOffsetASpinner.getValue());
+				rawXYSeries_.get(Constant.CHANNEL_A), horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.A_INDEX, aSeries);
 	}
 
 	private void horizontalOffsetBSpinnerStateChanged(ChangeEvent event) {
 		// TODO
+		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetBSpinner.getValue(),
+				(String) horizontalOffsetUnitBComboBox.getSelectedItem());
+		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetBSpinner.getValue(),
+				(String) verticalOffsetUnitBComboBox.getSelectedItem());
 		XYSeries bSeries = createXYSeriesWithOffsets(Constant.CHANNEL_B,
-				rawXYSeries_.get(Constant.CHANNEL_B),
-				(int) horizontalOffsetBSpinner.getValue(),
-				(int) verticalOffsetBSpinner.getValue());
+				rawXYSeries_.get(Constant.CHANNEL_B), horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.B_INDEX, bSeries);
 	}
 
 	private void horizontalOffsetMathSpinnerStateChanged(ChangeEvent event) {
 		// TODO
+		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetMathSpinner.getValue(),
+				(String) horizontalOffsetUnitMathComboBox.getSelectedItem());
+		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetMathSpinner.getValue(),
+				(String) verticalOffsetUnitMathComboBox.getSelectedItem());
 		XYSeries mathSeries = createXYSeriesWithOffsets(Constant.MATH_CHANNEL,
-				rawXYSeries_.get(Constant.MATH_CHANNEL),
-				(int) horizontalOffsetMathSpinner.getValue(),
-				(int) verticalOffsetMathSpinner.getValue());
+				rawXYSeries_.get(Constant.MATH_CHANNEL),horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.MATH_INDEX, mathSeries);
 	}
 
 	private void horizontalOffsetFilterSpinnerStateChanged(ChangeEvent event) {
 		// TODO
+		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetFilterSpinner.getValue(),
+				(String) horizontalOffsetUnitFilterComboBox.getSelectedItem());
+		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetFilterSpinner.getValue(),
+				(String) verticalOffsetUnitFilterComboBox.getSelectedItem());
 		XYSeries filterSeries = createXYSeriesWithOffsets(Constant.FILTER_CHANNEL,
-				rawXYSeries_.get(Constant.FILTER_CHANNEL),
-				(int) horizontalOffsetFilterSpinner.getValue(),
-				(int) verticalOffsetFilterSpinner.getValue());
+				rawXYSeries_.get(Constant.FILTER_CHANNEL), horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.FILTER_INDEX, filterSeries);
 	}
 
@@ -538,25 +650,25 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private int changeVoltStringToMiliVolts(String voltString) {
 		int value = 0;
 		switch(voltString) {
-			case "20 mV":
+			case Constant.TWENTY_MILIVOLTS:
 				value = 20;
 				break;
-			case "50 mV":
+			case Constant.FIFTY_MILIVOLTS:
 				value = 50;
 				break;
-			case "100 mV":
+			case Constant.ONE_HUNDRED_MILIVOLTS:
 				value = 100;
 				break;
-			case "200 mV":
+			case Constant.TWO_HUNDRED_MILIVOLTS:
 				value = 200;
 				break;
-			case "500 mV":
+			case Constant.FIVE_HUNDRED_MILIVOLTS:
 				value = 500;
 				break;
-			case "1 V":
+			case Constant.ONE_VOLT:
 				value = 1000;
 				break;
-			case "2 V":
+			case Constant.TWO_VOLTS:
 				value = 2000;
 				break;
 			default:
@@ -574,61 +686,61 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private int changeTimeStringToMicroSeconds(String timeString) {
 		int value = 0;
 		switch(timeString) {
-			case "1 us":
+			case Constant.ONE_MICROSECOND:
 				value = 1;
 				break;
-			case "2 us":
+			case Constant.TWO_MICROSECONDS:
 				value = 2;
 				break;
-			case "5 us":
+			case Constant.FIVE_MICROSECONDS:
 				value = 5;
 				break;
-			case "10 us":
+			case Constant.TEN_MICROSECONDS:
 				value = 10;
 				break;
-			case "20 us":
+			case Constant.TWENTY_MICROSECONDS:
 				value = 20;
 				break;
-			case "50 us":
+			case Constant.FIFTY_MICROSECONDS:
 				value = 50;
 				break;
-			case "100 us":
+			case Constant.ONE_HUNDRED_MICROSECONDS:
 				value = 100;
 				break;
-			case "200 us":
+			case Constant.TWO_HUNDRED_MICROSECONDS:
 				value = 200;
 				break;
-			case "500 us":
+			case Constant.FIVE_HUNDRED_MICROSECONDS:
 				value = 500;
 				break;
-			case "1 ms":
+			case Constant.ONE_MILISECOND:
 				value = 1000;
 				break;
-			case "2 ms":
+			case Constant.TWO_MILISECONDS:
 				value = 2000;
 				break;
-			case "5 ms":
+			case Constant.FIVE_MILISECONDS:
 				value = 5000;
 				break;
-			case "10 ms":
+			case Constant.TEN_MILISECONDS:
 				value = 10000;
 				break;
-			case "20 ms":
+			case Constant.TWENTY_MILISECONDS:
 				value = 20000;
 				break;
-			case "50 ms":
+			case Constant.FIFTY_MILISECONDS:
 				value = 50000;
 				break;
-			case "100 ms":
+			case Constant.ONE_HUNDRED_MILISECONDS:
 				value = 100000;
 				break;
-			case "200 ms":
+			case Constant.TWO_HUNDRED_MILISECONDS:
 				value = 200000;
 				break;
-			case "500 ms":
+			case Constant.FIVE_HUNDRED_MILISECONDS:
 				value = 500000;
 				break;
-			case "1 s":
+			case Constant.ONE_SECOND:
 				value = 1000000;
 				break;
 			default:
@@ -776,6 +888,48 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private void removeChannelPlotFromChartPanel(String channelName, int channelIndex) {
 		visualizer_.removeAllSeriesFromDataset(channelIndex);
 		cursorComboBox.removeItem(channelName);
+	}
+
+	/**
+	 * Get vertical offset value
+	 * @param offset the value from verticalOffset spinner
+	 * @param unit the selected unit from verticalOffsetUnit combobox
+	 * @return vertical offset value in milivolts
+	 */
+	private int getVerticalOffsetValue(int offset, String unit) {
+		if(unit.equals(Constant.TEN_MILIVOLTS)) {
+			return offset * 10;
+		} else if(unit.equals(Constant.ONE_HUNDRED_MILIVOLTS)) {
+			return offset * 100;
+		} else if(unit.equals(Constant.ONE_VOLT)) {
+			return offset * 1000;
+		}else { // unit == Constant.ONE_MILIVOLT
+			return offset;
+		}
+	}
+	
+	/**
+	 * Get horizontal offset value
+	 * @param offset the value from horizontalOffset spinner
+	 * @param unit the selected unit from horizontalOffsetUnit combobox
+	 * @return horizontal offset value in micro-seconds
+	 */
+	private int getHorizontalOffsetValue(int offset, String unit) {
+		if(unit.equals(Constant.TEN_MICROSECONDS)) {
+			return offset * 10;
+		} else if(unit.equals(Constant.ONE_HUNDRED_MICROSECONDS)) {
+			return offset * 100;
+		} else if(unit.equals(Constant.ONE_MILISECOND)) {
+			return offset * 1000;
+		} else if(unit.equals(Constant.TEN_MILISECONDS)) {
+			return offset * 10000;
+		} else if(unit.equals(Constant.ONE_HUNDRED_MILISECONDS)) {
+			return offset * 100000;
+		} else if(unit.equals(Constant.ONE_SECOND)){
+			return offset * 1000000;
+		} else { // unit == Constant.ONE_MICROSECOND 
+			return offset;
+		}
 	}
 
 	@Override
