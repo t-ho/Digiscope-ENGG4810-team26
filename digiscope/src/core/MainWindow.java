@@ -672,6 +672,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		this.launchWindow_ = launchWindow;
 	}
 	
+	public Map<String, XYSeries> getRawXYSeries(){
+		return rawXYSeries_;
+	}
+	
 	/**
 	 * Show cursor measurement and set channel index which will be measured
 	 * @param channelIndex the index of the measured channel
