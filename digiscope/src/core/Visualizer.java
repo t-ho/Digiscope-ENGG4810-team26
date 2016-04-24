@@ -53,16 +53,18 @@ public class Visualizer {
 	}
 
 	public void addSeriesToDataset(int channelIndex, XYSeries xYSeries) {
-		datasets[channelIndex].removeAllSeries();
-		datasets[channelIndex].addSeries(xYSeries);
-		if(channelIndex == Constant.A_INDEX) {
-			renderers[channelIndex].setSeriesPaint(0, Constant.A_COLOR);
-		} else if(channelIndex == Constant.B_INDEX) {
-			renderers[channelIndex].setSeriesPaint(0, Constant.B_COLOR);
-		} else if(channelIndex == Constant.MATH_INDEX) {
-			renderers[channelIndex].setSeriesPaint(0, Constant.MATH_COLOR);
-		} else if(channelIndex == Constant.FILTER_INDEX) {
-			renderers[channelIndex].setSeriesPaint(0, Constant.FILTER_COLOR);
+		if(xYSeries != null) {
+			datasets[channelIndex].removeAllSeries();
+			datasets[channelIndex].addSeries(xYSeries);
+			if(channelIndex == Constant.A_INDEX) {
+				renderers[channelIndex].setSeriesPaint(0, Constant.A_COLOR);
+			} else if(channelIndex == Constant.B_INDEX) {
+				renderers[channelIndex].setSeriesPaint(0, Constant.B_COLOR);
+			} else if(channelIndex == Constant.MATH_INDEX) {
+				renderers[channelIndex].setSeriesPaint(0, Constant.MATH_COLOR);
+			} else if(channelIndex == Constant.FILTER_INDEX) {
+				renderers[channelIndex].setSeriesPaint(0, Constant.FILTER_COLOR);
+			}
 		}
 	}
 
@@ -196,6 +198,8 @@ public class Visualizer {
 	}
 
 	public void changeVerticalOffset(int channelIndex, double offset) {
+		//TODO
+		//TEST
 		System.out.println("\n" + xYPlot.getAxisOffset());
 		xYPlot.setAxisOffset(new RectangleInsets(0, 0, 0, 0));
 		System.out.println(xYPlot.getAxisOffset());

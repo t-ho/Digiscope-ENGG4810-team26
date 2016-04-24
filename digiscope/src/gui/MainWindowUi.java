@@ -1531,6 +1531,7 @@ public class MainWindowUi extends JFrame {
         verticalOffsetMathSpinner.setEnabled(enabled);
         verticalOffsetUnitMathComboBox.setEnabled(enabled);
         verticalRangeMathComboBox.setEnabled(enabled);
+        mathDivisionInfoLabel.setEnabled(enabled);
     }
 
     /**
@@ -1546,6 +1547,7 @@ public class MainWindowUi extends JFrame {
         verticalOffsetFilterSpinner.setEnabled(enabled);
         verticalOffsetUnitFilterComboBox.setEnabled(enabled);
         verticalRangeFilterComboBox.setEnabled(enabled);
+        filterDivisionInfoLabel.setEnabled(enabled);
     }
 
     /**
@@ -1559,6 +1561,7 @@ public class MainWindowUi extends JFrame {
         verticalOffsetASpinner.setEnabled(enabled);
         verticalOffsetUnitAComboBox.setEnabled(enabled);
         verticalRangeAComboBox.setEnabled(enabled);
+        aDivisionInfoLabel.setEnabled(enabled);
     }
 
     /**
@@ -1572,6 +1575,7 @@ public class MainWindowUi extends JFrame {
         verticalOffsetBSpinner.setEnabled(enabled);
         verticalOffsetUnitBComboBox.setEnabled(enabled);
         verticalRangeBComboBox.setEnabled(enabled);
+        bDivisionInfoLabel.setEnabled(enabled);
     }
     
     /**

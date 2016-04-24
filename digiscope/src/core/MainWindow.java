@@ -81,12 +81,12 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		rawXYSeries_.put(Constant.MATH_CHANNEL, mathSeries);
 		// endTest
 
-		// Filter Channel
-		XYSeries filterSeries = new XYSeries(Constant.FILTER_CHANNEL);
-		for(double i = -20; i <= 20; i = i + 0.1) {
-			filterSeries.add(i, 280 * Math.sin(i));
-		}
-		rawXYSeries_.put(Constant.FILTER_CHANNEL, filterSeries);
+//		// Filter Channel
+//		XYSeries filterSeries = new XYSeries(Constant.FILTER_CHANNEL);
+//		for(double i = -20; i <= 20; i = i + 0.1) {
+//			filterSeries.add(i, 280 * Math.sin(i));
+//		}
+//		rawXYSeries_.put(Constant.FILTER_CHANNEL, filterSeries);
 	}
 
 	private void addListenersToComponents() {
@@ -326,6 +326,19 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				horizontalOffsetUnitFilterComboBoxItemStateChanged(event);
 			}
 		});
+		
+		newEquationButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				newEquationButtonActionPerformed(event);
+			}
+		});
+	}
+
+	protected void newEquationButtonActionPerformed(ActionEvent event) {
+		// TODO
+		EquationDialog equationDialog = new EquationDialog(this);
+		equationDialog.setVisible(true);
 	}
 
 	protected void verticalOffsetUnitAComboBoxItemStateChanged(ItemEvent event) {
@@ -849,15 +862,19 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	 * @param xYSeries The raw XYSeries
 	 * @param horizontalOffset The horizontal offset
 	 * @param verticalOffset The vertical offset
-	 * @return
+	 * @return a XYSeries with given offset or null if the given xYSeries is null.
 	 */
 	private XYSeries createXYSeriesWithOffsets(String channelName, XYSeries xYSeries,
 			int horizontalOffset, int verticalOffset) {
 		XYSeries result = new XYSeries(channelName);
-		for(int i = 0; i < xYSeries.getItemCount(); i++) {
-			double xValue = xYSeries.getDataItem(i).getXValue() + horizontalOffset;
-			double yValue = xYSeries.getDataItem(i).getYValue() + verticalOffset;
-			result.add(xValue, yValue);
+		if(xYSeries != null) {
+			for(int i = 0; i < xYSeries.getItemCount(); i++) {
+				double xValue = xYSeries.getDataItem(i).getXValue() + horizontalOffset;
+				double yValue = xYSeries.getDataItem(i).getYValue() + verticalOffset;
+				result.add(xValue, yValue);
+			}
+		} else {
+			result = null;
 		}
 		return result;
 	}
