@@ -347,11 +347,11 @@ void heartBeatFxn(UArg arg0, UArg arg1)
         Task_sleep((unsigned int)arg0);
         GPIO_toggle(Board_LED0);
 
-        if (!GPIO_read(T_IRQ))
-        {
-        	Touch_Read(&x, &y);
-            System_printf("x: %d, y: %d\r", x, y);
-        }
+//        if (!GPIO_read(T_IRQ))
+//        {
+//        	Touch_Read(&x, &y);
+//            System_printf("x: %d, y: %d\r", x, y);
+//        }
 
         ADCProcessorTrigger(ADC0_BASE, 0);
         while(!ADCIntStatus(ADC0_BASE, 0, false));
@@ -496,7 +496,7 @@ int main(void)
     /* Call board init functions */
     Board_initGeneral();
     Board_initGPIO();
-    //Board_initEMAC();
+    Board_initEMAC();
     // Board_initI2C();
     // Board_initSDSPI();
     // Board_initSPI();
@@ -516,11 +516,8 @@ int main(void)
     Lcd_Init();
     Touch_Init();
 
-//    GPIO_setCallback(T_IRQ, touchCallback);
-//    GPIO_enableInt(T_IRQ);
-
-    float test = 1.5;
-    test /= 5;
+    GPIO_setCallback(T_IRQ, touchCallback);
+    GPIO_enableInt(T_IRQ);
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 
@@ -533,14 +530,13 @@ int main(void)
 
     /* Construct heartBeat Task  thread */
     Task_Params_init(&taskParams);
-    taskParams.arg0 = 100;
+    taskParams.arg0 = 200;
     taskParams.stackSize = TASKSTACKSIZE;
     taskParams.stack = &task0Stack;
     Task_construct(&task0Struct, (Task_FuncPtr)heartBeatFxn, &taskParams, NULL);
 
     taskParams.stack = &task1Stack;
     Task_construct(&task1Struct, (Task_FuncPtr)screenDemo, &taskParams, NULL);
-
 
      /* Turn on user LED */
     GPIO_write(Board_LED0, Board_LED_ON);
