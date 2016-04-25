@@ -24,6 +24,18 @@ public class EquationDialog extends EquationDialogUi implements ActionListener{
 		for(int i = 0; i < buttons.length; i++) {
 			buttons[i].addActionListener(this);
 		}
+		
+		cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				cancelButtonActionPerformed(event);
+			}
+		});
+	}
+
+	private void cancelButtonActionPerformed(ActionEvent event) {
+		// TODO
+		this.dispose();
 	}
 
 	@Override
@@ -32,11 +44,11 @@ public class EquationDialog extends EquationDialogUi implements ActionListener{
 		String currentString = equationTextField.getText();
 		if(event.getActionCommand().equals("Delete")) {
 			if(currentString.length() > 0) {
-				equationTextField.setText(currentString.substring(0, currentString.length() - 1));
+				equationTextField.setText(currentString.substring(0,
+						currentString.length() - 1));
 			}
 		} else {
 			equationTextField.setText(currentString + event.getActionCommand());
 		}
 	}
-
 }

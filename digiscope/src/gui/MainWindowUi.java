@@ -1,10 +1,14 @@
 package gui;
 
+import data.Constant;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -14,15 +18,18 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
-import data.Constant;
+import org.jfree.data.xy.XYSeries;
 
 /**
  *
@@ -31,7 +38,8 @@ import data.Constant;
 public class MainWindowUi extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	protected JLabel aDivisionInfoLabel;
+	protected JComboBox<String> FunctionGeneratorOffsetUnitComboBox;
+    protected JLabel aDivisionInfoLabel;
     protected JLabel averageVoltageALabel;
     private JLabel averageVoltageALabel_;
     protected JLabel averageVoltageBLabel;
@@ -57,7 +65,7 @@ public class MainWindowUi extends JFrame {
     protected JButton editEquationButton;
     private JPanel equationBottomPanel_;
     private JPanel equationPannel_;
-    protected JTextField equationTextField;
+    protected JTextArea equationTextArea;
     private JPanel equationTopPanel_;
     protected JCheckBox filterChannelCheckBox;
     private JPanel filterChannelPanel_;
@@ -74,7 +82,8 @@ public class MainWindowUi extends JFrame {
     private JPanel functionGeneratorBottomLeftPanel_;
     private JPanel functionGeneratorBottomRightPanel_;
     private JPanel functionGeneratorMiddlePanel_;
-    private JLabel functionGeneratorOffsetLabel_;
+    private JLabel functionGeneratorOffsetLabel1_;
+    private JLabel functionGeneratorOffsetLabel2_;
     protected JSpinner functionGeneratorOffsetSpinner;
     private JPanel functionGeneratorPanel_;
     private JPanel functionGeneratorTopPanel_;
@@ -116,7 +125,6 @@ public class MainWindowUi extends JFrame {
     protected JComboBox<String> horizontalRangeFilterComboBox;
     private JLabel horizontalRangeFilterLabel1_;
     private JLabel horizontalRangeFilterLabel2_;
-    private JLabel horizontalRangeLabel_54;
     protected JComboBox<String> horizontalRangeMathComboBox;
     private JLabel horizontalRangeMathLabel1_;
     private JLabel horizontalRangeMathLabel2_;
@@ -190,6 +198,7 @@ public class MainWindowUi extends JFrame {
     protected JTextField p2pVoltageTextField;
     protected JButton rearmTriggerButton;
     private JPanel rightPanel_;
+    private JScrollPane scrollPane;
     private JLabel spaceLabel_;
     protected JLabel standardDeviationVoltageALabel;
     private JLabel standardDeviationVoltageALabel_;
@@ -258,10 +267,13 @@ public class MainWindowUi extends JFrame {
     private JLabel verticalRangeMathLabel2_;
     protected JComboBox<String> waveTypeComboBox;
     private JLabel waveTypeLabel_;
+    protected Map<String, XYSeries> rawXYSeries;
+
     /**
      * Creates new form MainWindowUI
      */
     public MainWindowUi() {
+        rawXYSeries = new HashMap<String, XYSeries>();
         initComponents();
         Constant.setApplicationIcon(this);
         validate();
@@ -362,7 +374,8 @@ public class MainWindowUi extends JFrame {
         mathChannelPanel_ = new JPanel();
         equationPannel_ = new JPanel();
         equationTopPanel_ = new JPanel();
-        equationTextField = new JTextField();
+        scrollPane = new JScrollPane();
+        equationTextArea = new JTextArea();
         equationBottomPanel_ = new JPanel();
         newEquationButton = new JButton();
         editEquationButton = new JButton();
@@ -483,9 +496,10 @@ public class MainWindowUi extends JFrame {
         p2pVoltageLabel_ = new JLabel();
         p2pVoltageTextField = new JTextField();
         functionGeneratorBottomRightPanel_ = new JPanel();
-        functionGeneratorOffsetLabel_ = new JLabel();
+        functionGeneratorOffsetLabel1_ = new JLabel();
         functionGeneratorOffsetSpinner = new JSpinner();
-        horizontalRangeLabel_54 = new JLabel();
+        functionGeneratorOffsetLabel2_ = new JLabel();
+        FunctionGeneratorOffsetUnitComboBox = new JComboBox<String>();
         rightPanel_ = new JPanel();
         divisionInfoPanel_ = new JPanel();
         aDivisionInfoLabel = new JLabel();
@@ -505,11 +519,11 @@ public class MainWindowUi extends JFrame {
         setMinimumSize(new Dimension(1165, 735));
 
         leftPanel_.setBorder(BorderFactory.createTitledBorder(""));
-        leftPanel_.setPreferredSize(new Dimension(370, 650));
+        leftPanel_.setPreferredSize(new Dimension(400, 650));
         leftPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 2, 3));
 
         channelVisibilityPanel_.setBorder(BorderFactory.createTitledBorder("Channel Visibility"));
-        channelVisibilityPanel_.setPreferredSize(new Dimension(366, 45));
+        channelVisibilityPanel_.setPreferredSize(new Dimension(396, 45));
         channelVisibilityPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 0));
 
         channelACheckBox.setText("A");
@@ -535,13 +549,13 @@ public class MainWindowUi extends JFrame {
         leftPanel_.add(channelVisibilityPanel_);
 
         channelTabbedPane_.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        channelTabbedPane_.setPreferredSize(new Dimension(366, 360));
+        channelTabbedPane_.setPreferredSize(new Dimension(396, 360));
 
         horizontalAPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
-        horizontalAPanel_.setPreferredSize(new Dimension(360, 55));
+        horizontalAPanel_.setPreferredSize(new Dimension(390, 55));
         horizontalAPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
-        horizontalALeftPanel_.setPreferredSize(new Dimension(155, 30));
+        horizontalALeftPanel_.setPreferredSize(new Dimension(170, 30));
         horizontalALeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         horizontalRangeALabel1_.setText("Range:");
@@ -549,7 +563,7 @@ public class MainWindowUi extends JFrame {
 
         horizontalRangeAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_RANGE_VALUES));
         horizontalRangeAComboBox.setEnabled(false);
-        horizontalRangeAComboBox.setPreferredSize(new Dimension(70, 20));
+        horizontalRangeAComboBox.setPreferredSize(new Dimension(75, 20));
         horizontalALeftPanel_.add(horizontalRangeAComboBox);
 
         horizontalRangeALabel2_.setText("/div");
@@ -557,7 +571,7 @@ public class MainWindowUi extends JFrame {
 
         horizontalAPanel_.add(horizontalALeftPanel_);
 
-        horizontalARightPanel_.setPreferredSize(new Dimension(190, 30));
+        horizontalARightPanel_.setPreferredSize(new Dimension(205, 30));
         horizontalARightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
         horizontalOffsetALabel1_.setText("Offset:");
@@ -572,7 +586,7 @@ public class MainWindowUi extends JFrame {
 
         horizontalOffsetUnitAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_OFFSET_UNITS));
         horizontalOffsetUnitAComboBox.setEnabled(false);
-        horizontalOffsetUnitAComboBox.setPreferredSize(new Dimension(70, 20));
+        horizontalOffsetUnitAComboBox.setPreferredSize(new Dimension(75, 20));
         horizontalARightPanel_.add(horizontalOffsetUnitAComboBox);
 
         horizontalAPanel_.add(horizontalARightPanel_);
@@ -580,10 +594,10 @@ public class MainWindowUi extends JFrame {
         channelAPanel_.add(horizontalAPanel_);
 
         verticalAPannel_.setBorder(BorderFactory.createTitledBorder("Vertical"));
-        verticalAPannel_.setPreferredSize(new Dimension(360, 55));
+        verticalAPannel_.setPreferredSize(new Dimension(390, 55));
         verticalAPannel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
-        verticalALeftPanel_.setPreferredSize(new Dimension(155, 30));
+        verticalALeftPanel_.setPreferredSize(new Dimension(170, 30));
         verticalALeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         verticalRangeALabel1_.setText("Range:");
@@ -591,7 +605,7 @@ public class MainWindowUi extends JFrame {
 
         verticalRangeAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_RANGE_VALUES));
         verticalRangeAComboBox.setEnabled(false);
-        verticalRangeAComboBox.setPreferredSize(new Dimension(70, 20));
+        verticalRangeAComboBox.setPreferredSize(new Dimension(75, 20));
         verticalALeftPanel_.add(verticalRangeAComboBox);
 
         verticalRangeALabel2_.setText("/div");
@@ -599,7 +613,7 @@ public class MainWindowUi extends JFrame {
 
         verticalAPannel_.add(verticalALeftPanel_);
 
-        verticalARightPanel_.setPreferredSize(new Dimension(190, 30));
+        verticalARightPanel_.setPreferredSize(new Dimension(205, 30));
         verticalARightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
         verticalOffsetALabel1_.setText("Offset:");
@@ -614,7 +628,7 @@ public class MainWindowUi extends JFrame {
 
         verticalOffsetUnitAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
         verticalOffsetUnitAComboBox.setEnabled(false);
-        verticalOffsetUnitAComboBox.setPreferredSize(new Dimension(70, 20));
+        verticalOffsetUnitAComboBox.setPreferredSize(new Dimension(75, 20));
         verticalARightPanel_.add(verticalOffsetUnitAComboBox);
 
         verticalAPannel_.add(verticalARightPanel_);
@@ -622,10 +636,10 @@ public class MainWindowUi extends JFrame {
         channelAPanel_.add(verticalAPannel_);
 
         measurementsAPanel_.setBorder(BorderFactory.createTitledBorder("Measurements"));
-        measurementsAPanel_.setPreferredSize(new Dimension(360, 105));
+        measurementsAPanel_.setPreferredSize(new Dimension(390, 105));
         measurementsAPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 1));
 
-        measurementATopLeftPanel_.setPreferredSize(new Dimension(175, 25));
+        measurementATopLeftPanel_.setPreferredSize(new Dimension(190, 25));
         measurementATopLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxVoltageALabel_.setText("Max Voltage:");
@@ -633,12 +647,12 @@ public class MainWindowUi extends JFrame {
 
         maxVoltageALabel.setText("00.00");
         maxVoltageALabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxVoltageALabel.setPreferredSize(new Dimension(45, 19));
+        maxVoltageALabel.setPreferredSize(new Dimension(60, 19));
         measurementATopLeftPanel_.add(maxVoltageALabel);
 
         measurementsAPanel_.add(measurementATopLeftPanel_);
 
-        measurementATopRightPanel_.setPreferredSize(new Dimension(170, 25));
+        measurementATopRightPanel_.setPreferredSize(new Dimension(185, 25));
         measurementATopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
 
         minVoltageALabel_.setText("Min Voltage:");
@@ -646,12 +660,12 @@ public class MainWindowUi extends JFrame {
 
         minVoltageALabel.setText("00.00");
         minVoltageALabel.setBorder(BorderFactory.createTitledBorder(""));
-        minVoltageALabel.setPreferredSize(new Dimension(45, 19));
+        minVoltageALabel.setPreferredSize(new Dimension(60, 19));
         measurementATopRightPanel_.add(minVoltageALabel);
 
         measurementsAPanel_.add(measurementATopRightPanel_);
 
-        measurementAMiddleLeftPanel_.setPreferredSize(new Dimension(175, 25));
+        measurementAMiddleLeftPanel_.setPreferredSize(new Dimension(190, 25));
         measurementAMiddleLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxP2pVoltageALabel_.setText("Max P2P Voltage:");
@@ -659,12 +673,12 @@ public class MainWindowUi extends JFrame {
 
         maxP2pVoltageALabel.setText("00.00");
         maxP2pVoltageALabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxP2pVoltageALabel.setPreferredSize(new Dimension(45, 19));
+        maxP2pVoltageALabel.setPreferredSize(new Dimension(60, 19));
         measurementAMiddleLeftPanel_.add(maxP2pVoltageALabel);
 
         measurementsAPanel_.add(measurementAMiddleLeftPanel_);
 
-        measurementAMiddleRightPanel_.setPreferredSize(new Dimension(170, 25));
+        measurementAMiddleRightPanel_.setPreferredSize(new Dimension(185, 25));
         measurementAMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
 
         averageVoltageALabel_.setText("Average Voltage:");
@@ -672,12 +686,12 @@ public class MainWindowUi extends JFrame {
 
         averageVoltageALabel.setText("00.00");
         averageVoltageALabel.setBorder(BorderFactory.createTitledBorder(""));
-        averageVoltageALabel.setPreferredSize(new Dimension(45, 19));
+        averageVoltageALabel.setPreferredSize(new Dimension(60, 19));
         measurementAMiddleRightPanel_.add(averageVoltageALabel);
 
         measurementsAPanel_.add(measurementAMiddleRightPanel_);
 
-        measurementABottomLeftPanel_.setPreferredSize(new Dimension(175, 25));
+        measurementABottomLeftPanel_.setPreferredSize(new Dimension(190, 25));
         measurementABottomLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         standardDeviationVoltageALabel_.setText("SD of Voltage:");
@@ -685,12 +699,12 @@ public class MainWindowUi extends JFrame {
 
         standardDeviationVoltageALabel.setText("00.00");
         standardDeviationVoltageALabel.setBorder(BorderFactory.createTitledBorder(""));
-        standardDeviationVoltageALabel.setPreferredSize(new Dimension(45, 19));
+        standardDeviationVoltageALabel.setPreferredSize(new Dimension(60, 19));
         measurementABottomLeftPanel_.add(standardDeviationVoltageALabel);
 
         measurementsAPanel_.add(measurementABottomLeftPanel_);
 
-        measurementABottomRightPanel_.setPreferredSize(new Dimension(170, 25));
+        measurementABottomRightPanel_.setPreferredSize(new Dimension(185, 25));
         measurementABottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
 
         frequencyALabel_.setText("Frequency:");
@@ -698,7 +712,7 @@ public class MainWindowUi extends JFrame {
 
         frequencyALabel.setText("00.00");
         frequencyALabel.setBorder(BorderFactory.createTitledBorder(""));
-        frequencyALabel.setPreferredSize(new Dimension(45, 19));
+        frequencyALabel.setPreferredSize(new Dimension(60, 19));
         measurementABottomRightPanel_.add(frequencyALabel);
 
         measurementsAPanel_.add(measurementABottomRightPanel_);
@@ -708,10 +722,10 @@ public class MainWindowUi extends JFrame {
         channelTabbedPane_.addTab("Channel A", channelAPanel_);
 
         horizontalBPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
-        horizontalBPanel_.setPreferredSize(new Dimension(360, 55));
+        horizontalBPanel_.setPreferredSize(new Dimension(390, 55));
         horizontalBPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
-        horizontalBLeftPanel_.setPreferredSize(new Dimension(155, 30));
+        horizontalBLeftPanel_.setPreferredSize(new Dimension(170, 30));
         horizontalBLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         horizontalRangeBLabel1_.setText("Range:");
@@ -719,7 +733,7 @@ public class MainWindowUi extends JFrame {
 
         horizontalRangeBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_RANGE_VALUES));
         horizontalRangeBComboBox.setEnabled(false);
-        horizontalRangeBComboBox.setPreferredSize(new Dimension(70, 20));
+        horizontalRangeBComboBox.setPreferredSize(new Dimension(75, 20));
         horizontalBLeftPanel_.add(horizontalRangeBComboBox);
 
         horizontalRangeBLabel2_.setText("/div");
@@ -727,7 +741,7 @@ public class MainWindowUi extends JFrame {
 
         horizontalBPanel_.add(horizontalBLeftPanel_);
 
-        horizontalBRightPanel_.setPreferredSize(new Dimension(190, 30));
+        horizontalBRightPanel_.setPreferredSize(new Dimension(205, 30));
         horizontalBRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
         horizontalOffsetBLabel1_.setText("Offset:");
@@ -742,7 +756,7 @@ public class MainWindowUi extends JFrame {
 
         horizontalOffsetUnitBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_OFFSET_UNITS));
         horizontalOffsetUnitBComboBox.setEnabled(false);
-        horizontalOffsetUnitBComboBox.setPreferredSize(new Dimension(70, 20));
+        horizontalOffsetUnitBComboBox.setPreferredSize(new Dimension(75, 20));
         horizontalBRightPanel_.add(horizontalOffsetUnitBComboBox);
 
         horizontalBPanel_.add(horizontalBRightPanel_);
@@ -750,10 +764,10 @@ public class MainWindowUi extends JFrame {
         channelBPanel_.add(horizontalBPanel_);
 
         verticalBPanel_.setBorder(BorderFactory.createTitledBorder("Vertical"));
-        verticalBPanel_.setPreferredSize(new Dimension(360, 55));
+        verticalBPanel_.setPreferredSize(new Dimension(390, 55));
         verticalBPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
-        verticalBLeftPanel_.setPreferredSize(new Dimension(155, 30));
+        verticalBLeftPanel_.setPreferredSize(new Dimension(170, 30));
         verticalBLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         verticalRangeBLabel1_.setText("Range:");
@@ -761,7 +775,7 @@ public class MainWindowUi extends JFrame {
 
         verticalRangeBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_RANGE_VALUES));
         verticalRangeBComboBox.setEnabled(false);
-        verticalRangeBComboBox.setPreferredSize(new Dimension(70, 20));
+        verticalRangeBComboBox.setPreferredSize(new Dimension(75, 20));
         verticalBLeftPanel_.add(verticalRangeBComboBox);
 
         verticalRangeBLabel2_.setText("/div");
@@ -769,7 +783,7 @@ public class MainWindowUi extends JFrame {
 
         verticalBPanel_.add(verticalBLeftPanel_);
 
-        verticalBRightPanel_.setPreferredSize(new Dimension(190, 30));
+        verticalBRightPanel_.setPreferredSize(new Dimension(205, 30));
         verticalBRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
         verticalOffsetBLabel1_.setText("Offset:");
@@ -784,7 +798,7 @@ public class MainWindowUi extends JFrame {
 
         verticalOffsetUnitBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
         verticalOffsetUnitBComboBox.setEnabled(false);
-        verticalOffsetUnitBComboBox.setPreferredSize(new Dimension(70, 20));
+        verticalOffsetUnitBComboBox.setPreferredSize(new Dimension(75, 20));
         verticalBRightPanel_.add(verticalOffsetUnitBComboBox);
 
         verticalBPanel_.add(verticalBRightPanel_);
@@ -792,10 +806,10 @@ public class MainWindowUi extends JFrame {
         channelBPanel_.add(verticalBPanel_);
 
         measurementsBPanel_.setBorder(BorderFactory.createTitledBorder("Measurements"));
-        measurementsBPanel_.setPreferredSize(new Dimension(360, 105));
+        measurementsBPanel_.setPreferredSize(new Dimension(390, 105));
         measurementsBPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 1));
 
-        measurementBTopLeftPanel_.setPreferredSize(new Dimension(175, 25));
+        measurementBTopLeftPanel_.setPreferredSize(new Dimension(190, 25));
         measurementBTopLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxVoltageBLabel_.setText("Max Voltage:");
@@ -803,12 +817,12 @@ public class MainWindowUi extends JFrame {
 
         maxVoltageBLabel.setText("00.00");
         maxVoltageBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxVoltageBLabel.setPreferredSize(new Dimension(45, 19));
+        maxVoltageBLabel.setPreferredSize(new Dimension(60, 19));
         measurementBTopLeftPanel_.add(maxVoltageBLabel);
 
         measurementsBPanel_.add(measurementBTopLeftPanel_);
 
-        measurementBTopRightPanel_.setPreferredSize(new Dimension(170, 25));
+        measurementBTopRightPanel_.setPreferredSize(new Dimension(185, 25));
         measurementBTopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
 
         minVoltageBLabel_.setText("Min Voltage:");
@@ -816,12 +830,12 @@ public class MainWindowUi extends JFrame {
 
         minVoltageBLabel.setText("00.00");
         minVoltageBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        minVoltageBLabel.setPreferredSize(new Dimension(45, 19));
+        minVoltageBLabel.setPreferredSize(new Dimension(60, 19));
         measurementBTopRightPanel_.add(minVoltageBLabel);
 
         measurementsBPanel_.add(measurementBTopRightPanel_);
 
-        measurementBMiddleLeftPanel_.setPreferredSize(new Dimension(175, 25));
+        measurementBMiddleLeftPanel_.setPreferredSize(new Dimension(190, 25));
         measurementBMiddleLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxP2pVoltageBLabel_.setText("Max P2P Voltage:");
@@ -829,12 +843,12 @@ public class MainWindowUi extends JFrame {
 
         maxP2pVoltageBLabel.setText("00.00");
         maxP2pVoltageBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxP2pVoltageBLabel.setPreferredSize(new Dimension(45, 19));
+        maxP2pVoltageBLabel.setPreferredSize(new Dimension(60, 19));
         measurementBMiddleLeftPanel_.add(maxP2pVoltageBLabel);
 
         measurementsBPanel_.add(measurementBMiddleLeftPanel_);
 
-        measurementBMiddleRightPanel_.setPreferredSize(new Dimension(170, 25));
+        measurementBMiddleRightPanel_.setPreferredSize(new Dimension(185, 25));
         measurementBMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
 
         averageVoltageBLabel_.setText("Average Voltage:");
@@ -842,12 +856,12 @@ public class MainWindowUi extends JFrame {
 
         averageVoltageBLabel.setText("00.00");
         averageVoltageBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        averageVoltageBLabel.setPreferredSize(new Dimension(45, 19));
+        averageVoltageBLabel.setPreferredSize(new Dimension(60, 19));
         measurementBMiddleRightPanel_.add(averageVoltageBLabel);
 
         measurementsBPanel_.add(measurementBMiddleRightPanel_);
 
-        measurementBBottomLeftPanel_.setPreferredSize(new Dimension(175, 25));
+        measurementBBottomLeftPanel_.setPreferredSize(new Dimension(190, 25));
         measurementBBottomLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         standardDeviationVoltageBLabel_.setText("SD of Voltage:");
@@ -855,12 +869,12 @@ public class MainWindowUi extends JFrame {
 
         standardDeviationVoltageBLabel.setText("00.00");
         standardDeviationVoltageBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        standardDeviationVoltageBLabel.setPreferredSize(new Dimension(45, 19));
+        standardDeviationVoltageBLabel.setPreferredSize(new Dimension(60, 19));
         measurementBBottomLeftPanel_.add(standardDeviationVoltageBLabel);
 
         measurementsBPanel_.add(measurementBBottomLeftPanel_);
 
-        measurementBBottomRightPanel_.setPreferredSize(new Dimension(170, 25));
+        measurementBBottomRightPanel_.setPreferredSize(new Dimension(185, 25));
         measurementBBottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
 
         frequencyBLabel_.setText("Frequency:");
@@ -868,7 +882,7 @@ public class MainWindowUi extends JFrame {
 
         frequencyBLabel.setText("00.00");
         frequencyBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        frequencyBLabel.setPreferredSize(new Dimension(45, 19));
+        frequencyBLabel.setPreferredSize(new Dimension(60, 19));
         measurementBBottomRightPanel_.add(frequencyBLabel);
 
         measurementsBPanel_.add(measurementBBottomRightPanel_);
@@ -878,20 +892,26 @@ public class MainWindowUi extends JFrame {
         channelTabbedPane_.addTab("Channel B", channelBPanel_);
 
         equationPannel_.setBorder(BorderFactory.createTitledBorder("Equation"));
-        equationPannel_.setPreferredSize(new Dimension(360, 95));
+        equationPannel_.setPreferredSize(new Dimension(390, 95));
         equationPannel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
 
-        equationTopPanel_.setPreferredSize(new Dimension(350, 30));
+        equationTopPanel_.setPreferredSize(new Dimension(380, 40));
         equationTopPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
 
-        equationTextField.setEnabled(false);
-        equationTextField.setPreferredSize(new Dimension(320, 23));
-        equationTopPanel_.add(equationTextField);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setPreferredSize(new Dimension(350, 35));
+
+        equationTextArea.setEditable(false);
+        equationTextArea.setColumns(20);
+        equationTextArea.setRows(5);
+        scrollPane.setViewportView(equationTextArea);
+
+        equationTopPanel_.add(scrollPane);
 
         equationPannel_.add(equationTopPanel_);
 
-        equationBottomPanel_.setPreferredSize(new Dimension(320, 35));
-        equationBottomPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 8));
+        equationBottomPanel_.setPreferredSize(new Dimension(350, 30));
+        equationBottomPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 4));
 
         newEquationButton.setText("New");
         newEquationButton.setEnabled(false);
@@ -908,10 +928,10 @@ public class MainWindowUi extends JFrame {
         mathChannelPanel_.add(equationPannel_);
 
         horizontalMathPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
-        horizontalMathPanel_.setPreferredSize(new Dimension(360, 55));
+        horizontalMathPanel_.setPreferredSize(new Dimension(390, 55));
         horizontalMathPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
-        horizontalMathLeftPanel_.setPreferredSize(new Dimension(155, 30));
+        horizontalMathLeftPanel_.setPreferredSize(new Dimension(170, 30));
         horizontalMathLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         horizontalRangeMathLabel1_.setText("Range:");
@@ -919,7 +939,7 @@ public class MainWindowUi extends JFrame {
 
         horizontalRangeMathComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_RANGE_VALUES));
         horizontalRangeMathComboBox.setEnabled(false);
-        horizontalRangeMathComboBox.setPreferredSize(new Dimension(70, 20));
+        horizontalRangeMathComboBox.setPreferredSize(new Dimension(75, 20));
         horizontalMathLeftPanel_.add(horizontalRangeMathComboBox);
 
         horizontalRangeMathLabel2_.setText("/div");
@@ -927,7 +947,7 @@ public class MainWindowUi extends JFrame {
 
         horizontalMathPanel_.add(horizontalMathLeftPanel_);
 
-        horizontalMathRightPanel_.setPreferredSize(new Dimension(190, 30));
+        horizontalMathRightPanel_.setPreferredSize(new Dimension(205, 30));
         horizontalMathRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
         horizontalOffsetMathLabel1_.setText("Offset:");
@@ -942,7 +962,7 @@ public class MainWindowUi extends JFrame {
 
         horizontalOffsetUnitMathComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_OFFSET_UNITS));
         horizontalOffsetUnitMathComboBox.setEnabled(false);
-        horizontalOffsetUnitMathComboBox.setPreferredSize(new Dimension(70, 20));
+        horizontalOffsetUnitMathComboBox.setPreferredSize(new Dimension(75, 20));
         horizontalMathRightPanel_.add(horizontalOffsetUnitMathComboBox);
 
         horizontalMathPanel_.add(horizontalMathRightPanel_);
@@ -950,10 +970,10 @@ public class MainWindowUi extends JFrame {
         mathChannelPanel_.add(horizontalMathPanel_);
 
         verticalMathPanel_.setBorder(BorderFactory.createTitledBorder("Vertical"));
-        verticalMathPanel_.setPreferredSize(new Dimension(360, 55));
+        verticalMathPanel_.setPreferredSize(new Dimension(390, 55));
         verticalMathPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
-        verticalMathLeftPanel_.setPreferredSize(new Dimension(155, 30));
+        verticalMathLeftPanel_.setPreferredSize(new Dimension(170, 30));
         verticalMathLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         verticalRangeMathLabel1_.setText("Range:");
@@ -961,7 +981,7 @@ public class MainWindowUi extends JFrame {
 
         verticalRangeMathComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_RANGE_VALUES));
         verticalRangeMathComboBox.setEnabled(false);
-        verticalRangeMathComboBox.setPreferredSize(new Dimension(70, 20));
+        verticalRangeMathComboBox.setPreferredSize(new Dimension(75, 20));
         verticalMathLeftPanel_.add(verticalRangeMathComboBox);
 
         verticalRangeMathLabel2_.setText("/div");
@@ -969,7 +989,7 @@ public class MainWindowUi extends JFrame {
 
         verticalMathPanel_.add(verticalMathLeftPanel_);
 
-        verticalMathRightPanel_.setPreferredSize(new Dimension(190, 30));
+        verticalMathRightPanel_.setPreferredSize(new Dimension(205, 30));
         verticalMathRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
         verticalOffsetMathLabel1_.setText("Offset:");
@@ -984,7 +1004,7 @@ public class MainWindowUi extends JFrame {
 
         verticalOffsetUnitMathComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
         verticalOffsetUnitMathComboBox.setEnabled(false);
-        verticalOffsetUnitMathComboBox.setPreferredSize(new Dimension(70, 20));
+        verticalOffsetUnitMathComboBox.setPreferredSize(new Dimension(75, 20));
         verticalMathRightPanel_.add(verticalOffsetUnitMathComboBox);
 
         verticalMathPanel_.add(verticalMathRightPanel_);
@@ -992,10 +1012,10 @@ public class MainWindowUi extends JFrame {
         mathChannelPanel_.add(verticalMathPanel_);
 
         measurementsMathPanel_.setBorder(BorderFactory.createTitledBorder("Measurements"));
-        measurementsMathPanel_.setPreferredSize(new Dimension(360, 105));
+        measurementsMathPanel_.setPreferredSize(new Dimension(390, 105));
         measurementsMathPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 1));
 
-        measurementMathTopLeftPanel_.setPreferredSize(new Dimension(175, 25));
+        measurementMathTopLeftPanel_.setPreferredSize(new Dimension(190, 25));
         measurementMathTopLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxVoltageMathLabel_.setText("Max Voltage:");
@@ -1003,12 +1023,12 @@ public class MainWindowUi extends JFrame {
 
         maxVoltageMathLabel.setText("00.00");
         maxVoltageMathLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxVoltageMathLabel.setPreferredSize(new Dimension(45, 19));
+        maxVoltageMathLabel.setPreferredSize(new Dimension(60, 19));
         measurementMathTopLeftPanel_.add(maxVoltageMathLabel);
 
         measurementsMathPanel_.add(measurementMathTopLeftPanel_);
 
-        measurementMathTopRightPanel_.setPreferredSize(new Dimension(170, 25));
+        measurementMathTopRightPanel_.setPreferredSize(new Dimension(185, 25));
         measurementMathTopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
 
         minVoltageMathLabel_.setText("Min Voltage:");
@@ -1016,12 +1036,12 @@ public class MainWindowUi extends JFrame {
 
         minVoltageMathLabel.setText("00.00");
         minVoltageMathLabel.setBorder(BorderFactory.createTitledBorder(""));
-        minVoltageMathLabel.setPreferredSize(new Dimension(45, 19));
+        minVoltageMathLabel.setPreferredSize(new Dimension(60, 19));
         measurementMathTopRightPanel_.add(minVoltageMathLabel);
 
         measurementsMathPanel_.add(measurementMathTopRightPanel_);
 
-        measurementMathMiddleLeftPanel_.setPreferredSize(new Dimension(175, 25));
+        measurementMathMiddleLeftPanel_.setPreferredSize(new Dimension(190, 25));
         measurementMathMiddleLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxP2pVoltageMathLabel_.setText("Max P2P Voltage:");
@@ -1029,12 +1049,12 @@ public class MainWindowUi extends JFrame {
 
         maxP2pVoltageMathLabel.setText("00.00");
         maxP2pVoltageMathLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxP2pVoltageMathLabel.setPreferredSize(new Dimension(45, 19));
+        maxP2pVoltageMathLabel.setPreferredSize(new Dimension(60, 19));
         measurementMathMiddleLeftPanel_.add(maxP2pVoltageMathLabel);
 
         measurementsMathPanel_.add(measurementMathMiddleLeftPanel_);
 
-        measurementMathMiddleRightPanel_.setPreferredSize(new Dimension(170, 25));
+        measurementMathMiddleRightPanel_.setPreferredSize(new Dimension(185, 25));
         measurementMathMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
 
         averageVoltageMathLabel_.setText("Average Voltage:");
@@ -1042,12 +1062,12 @@ public class MainWindowUi extends JFrame {
 
         averageVoltageMathLabel.setText("00.00");
         averageVoltageMathLabel.setBorder(BorderFactory.createTitledBorder(""));
-        averageVoltageMathLabel.setPreferredSize(new Dimension(45, 19));
+        averageVoltageMathLabel.setPreferredSize(new Dimension(60, 19));
         measurementMathMiddleRightPanel_.add(averageVoltageMathLabel);
 
         measurementsMathPanel_.add(measurementMathMiddleRightPanel_);
 
-        measurementMathBottomLeftPanel_.setPreferredSize(new Dimension(175, 25));
+        measurementMathBottomLeftPanel_.setPreferredSize(new Dimension(190, 25));
         measurementMathBottomLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         standardDeviationVoltageMathLabel_.setText("SD of Voltage:");
@@ -1055,12 +1075,12 @@ public class MainWindowUi extends JFrame {
 
         standardDeviationVoltageMathLabel.setText("00.00");
         standardDeviationVoltageMathLabel.setBorder(BorderFactory.createTitledBorder(""));
-        standardDeviationVoltageMathLabel.setPreferredSize(new Dimension(45, 19));
+        standardDeviationVoltageMathLabel.setPreferredSize(new Dimension(60, 19));
         measurementMathBottomLeftPanel_.add(standardDeviationVoltageMathLabel);
 
         measurementsMathPanel_.add(measurementMathBottomLeftPanel_);
 
-        measurementMathBottomRightPanel_.setPreferredSize(new Dimension(170, 25));
+        measurementMathBottomRightPanel_.setPreferredSize(new Dimension(185, 25));
         measurementMathBottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
 
         frequencyMathLabel_.setText("Frequency:");
@@ -1068,7 +1088,7 @@ public class MainWindowUi extends JFrame {
 
         frequencyMathLabel.setText("00.00");
         frequencyMathLabel.setBorder(BorderFactory.createTitledBorder(""));
-        frequencyMathLabel.setPreferredSize(new Dimension(45, 19));
+        frequencyMathLabel.setPreferredSize(new Dimension(60, 19));
         measurementMathBottomRightPanel_.add(frequencyMathLabel);
 
         measurementsMathPanel_.add(measurementMathBottomRightPanel_);
@@ -1078,7 +1098,7 @@ public class MainWindowUi extends JFrame {
         channelTabbedPane_.addTab("Math Channel", mathChannelPanel_);
 
         inputPanel_.setBorder(BorderFactory.createTitledBorder("Input"));
-        inputPanel_.setPreferredSize(new Dimension(360, 95));
+        inputPanel_.setPreferredSize(new Dimension(390, 95));
         inputPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
         inputTopPanel_.setPreferredSize(new Dimension(350, 35));
@@ -1089,18 +1109,18 @@ public class MainWindowUi extends JFrame {
 
         inputChannelComboBox.setModel(new DefaultComboBoxModel<String>(Constant.INPUT_CHANNELS));
         inputChannelComboBox.setEnabled(false);
-        inputChannelComboBox.setPreferredSize(new Dimension(210, 20));
+        inputChannelComboBox.setPreferredSize(new Dimension(230, 20));
         inputTopPanel_.add(inputChannelComboBox);
 
         inputPanel_.add(inputTopPanel_);
 
-        inputBottomPanel_.setPreferredSize(new Dimension(350, 35));
+        inputBottomPanel_.setPreferredSize(new Dimension(380, 35));
         inputBottomPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         csvFilePathTextField.setEditable(false);
         csvFilePathTextField.setText("Choose CSV file");
         csvFilePathTextField.setToolTipText("");
-        csvFilePathTextField.setPreferredSize(new Dimension(250, 23));
+        csvFilePathTextField.setPreferredSize(new Dimension(270, 23));
         inputBottomPanel_.add(csvFilePathTextField);
 
         browseButton.setText("Browse");
@@ -1113,10 +1133,10 @@ public class MainWindowUi extends JFrame {
         filterChannelPanel_.add(inputPanel_);
 
         horizontalFilterPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
-        horizontalFilterPanel_.setPreferredSize(new Dimension(360, 55));
+        horizontalFilterPanel_.setPreferredSize(new Dimension(390, 55));
         horizontalFilterPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
-        horizontalFilterLeftPanel_.setPreferredSize(new Dimension(155, 30));
+        horizontalFilterLeftPanel_.setPreferredSize(new Dimension(170, 30));
         horizontalFilterLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         horizontalRangeFilterLabel1_.setText("Range:");
@@ -1124,7 +1144,7 @@ public class MainWindowUi extends JFrame {
 
         horizontalRangeFilterComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_RANGE_VALUES));
         horizontalRangeFilterComboBox.setEnabled(false);
-        horizontalRangeFilterComboBox.setPreferredSize(new Dimension(70, 20));
+        horizontalRangeFilterComboBox.setPreferredSize(new Dimension(75, 20));
         horizontalFilterLeftPanel_.add(horizontalRangeFilterComboBox);
 
         horizontalRangeFilterLabel2_.setText("/div");
@@ -1132,7 +1152,7 @@ public class MainWindowUi extends JFrame {
 
         horizontalFilterPanel_.add(horizontalFilterLeftPanel_);
 
-        horizontalFilterRightPanel_.setPreferredSize(new Dimension(190, 30));
+        horizontalFilterRightPanel_.setPreferredSize(new Dimension(205, 30));
         horizontalFilterRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
         horizontalOffsetFilterLabel1_.setText("Offset:");
@@ -1147,7 +1167,7 @@ public class MainWindowUi extends JFrame {
 
         horizontalOffsetUnitFilterComboBox.setModel(new DefaultComboBoxModel<String>(Constant.HORIZONTAL_OFFSET_UNITS));
         horizontalOffsetUnitFilterComboBox.setEnabled(false);
-        horizontalOffsetUnitFilterComboBox.setPreferredSize(new Dimension(70, 20));
+        horizontalOffsetUnitFilterComboBox.setPreferredSize(new Dimension(75, 20));
         horizontalFilterRightPanel_.add(horizontalOffsetUnitFilterComboBox);
 
         horizontalFilterPanel_.add(horizontalFilterRightPanel_);
@@ -1155,10 +1175,10 @@ public class MainWindowUi extends JFrame {
         filterChannelPanel_.add(horizontalFilterPanel_);
 
         verticalFilterPanel_.setBorder(BorderFactory.createTitledBorder("Vertical"));
-        verticalFilterPanel_.setPreferredSize(new Dimension(360, 55));
+        verticalFilterPanel_.setPreferredSize(new Dimension(390, 55));
         verticalFilterPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
-        verticalFilterLeftPanel_.setPreferredSize(new Dimension(155, 30));
+        verticalFilterLeftPanel_.setPreferredSize(new Dimension(170, 30));
         verticalFilterLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         verticalRangeFilterLabel1_.setText("Range:");
@@ -1166,7 +1186,7 @@ public class MainWindowUi extends JFrame {
 
         verticalRangeFilterComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_RANGE_VALUES));
         verticalRangeFilterComboBox.setEnabled(false);
-        verticalRangeFilterComboBox.setPreferredSize(new Dimension(70, 20));
+        verticalRangeFilterComboBox.setPreferredSize(new Dimension(75, 20));
         verticalFilterLeftPanel_.add(verticalRangeFilterComboBox);
 
         verticalRangeFilterLabel2_.setText("/div");
@@ -1174,7 +1194,7 @@ public class MainWindowUi extends JFrame {
 
         verticalFilterPanel_.add(verticalFilterLeftPanel_);
 
-        verticalFilterRightPanel_.setPreferredSize(new Dimension(190, 30));
+        verticalFilterRightPanel_.setPreferredSize(new Dimension(205, 30));
         verticalFilterRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
         verticalOffsetFilterLabel1_.setText("Offset:");
@@ -1189,7 +1209,7 @@ public class MainWindowUi extends JFrame {
 
         verticalOffsetUnitFilterComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
         verticalOffsetUnitFilterComboBox.setEnabled(false);
-        verticalOffsetUnitFilterComboBox.setPreferredSize(new Dimension(70, 20));
+        verticalOffsetUnitFilterComboBox.setPreferredSize(new Dimension(75, 20));
         verticalFilterRightPanel_.add(verticalOffsetUnitFilterComboBox);
 
         verticalFilterPanel_.add(verticalFilterRightPanel_);
@@ -1197,10 +1217,10 @@ public class MainWindowUi extends JFrame {
         filterChannelPanel_.add(verticalFilterPanel_);
 
         measurementsFilterPanel_.setBorder(BorderFactory.createTitledBorder("Measurements"));
-        measurementsFilterPanel_.setPreferredSize(new Dimension(360, 105));
+        measurementsFilterPanel_.setPreferredSize(new Dimension(390, 105));
         measurementsFilterPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 1));
 
-        measurementFilterTopLeftPanel_.setPreferredSize(new Dimension(175, 25));
+        measurementFilterTopLeftPanel_.setPreferredSize(new Dimension(190, 25));
         measurementFilterTopLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxVoltageFilterLabel_.setText("Max Voltage:");
@@ -1208,12 +1228,12 @@ public class MainWindowUi extends JFrame {
 
         maxVoltageFilterLabel.setText("00.00");
         maxVoltageFilterLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxVoltageFilterLabel.setPreferredSize(new Dimension(45, 19));
+        maxVoltageFilterLabel.setPreferredSize(new Dimension(60, 19));
         measurementFilterTopLeftPanel_.add(maxVoltageFilterLabel);
 
         measurementsFilterPanel_.add(measurementFilterTopLeftPanel_);
 
-        measurementFilterTopRightPanel_.setPreferredSize(new Dimension(170, 25));
+        measurementFilterTopRightPanel_.setPreferredSize(new Dimension(185, 25));
         measurementFilterTopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
 
         minVoltageFilterLabel_.setText("Min Voltage:");
@@ -1221,12 +1241,12 @@ public class MainWindowUi extends JFrame {
 
         minVoltageFilterLabel.setText("00.00");
         minVoltageFilterLabel.setBorder(BorderFactory.createTitledBorder(""));
-        minVoltageFilterLabel.setPreferredSize(new Dimension(45, 19));
+        minVoltageFilterLabel.setPreferredSize(new Dimension(60, 19));
         measurementFilterTopRightPanel_.add(minVoltageFilterLabel);
 
         measurementsFilterPanel_.add(measurementFilterTopRightPanel_);
 
-        measurementFilterMiddleLeftPanel_.setPreferredSize(new Dimension(175, 25));
+        measurementFilterMiddleLeftPanel_.setPreferredSize(new Dimension(190, 25));
         measurementFilterMiddleLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxP2pVoltageFilterLabel_.setText("Max P2P Voltage:");
@@ -1234,12 +1254,12 @@ public class MainWindowUi extends JFrame {
 
         maxP2pVoltageFilterLabel.setText("00.00");
         maxP2pVoltageFilterLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxP2pVoltageFilterLabel.setPreferredSize(new Dimension(45, 19));
+        maxP2pVoltageFilterLabel.setPreferredSize(new Dimension(60, 19));
         measurementFilterMiddleLeftPanel_.add(maxP2pVoltageFilterLabel);
 
         measurementsFilterPanel_.add(measurementFilterMiddleLeftPanel_);
 
-        measurementFilterMiddleRightPanel_.setPreferredSize(new Dimension(170, 25));
+        measurementFilterMiddleRightPanel_.setPreferredSize(new Dimension(185, 25));
         measurementFilterMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
 
         averageVoltageFilterLabel_.setText("Average Voltage:");
@@ -1247,12 +1267,12 @@ public class MainWindowUi extends JFrame {
 
         averageVoltageFilterLabel.setText("00.00");
         averageVoltageFilterLabel.setBorder(BorderFactory.createTitledBorder(""));
-        averageVoltageFilterLabel.setPreferredSize(new Dimension(45, 19));
+        averageVoltageFilterLabel.setPreferredSize(new Dimension(60, 19));
         measurementFilterMiddleRightPanel_.add(averageVoltageFilterLabel);
 
         measurementsFilterPanel_.add(measurementFilterMiddleRightPanel_);
 
-        measurementFilterBottomLeftPanel_.setPreferredSize(new Dimension(175, 25));
+        measurementFilterBottomLeftPanel_.setPreferredSize(new Dimension(190, 25));
         measurementFilterBottomLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         standardDeviationVoltageFilterLabel_.setText("SD of Voltage:");
@@ -1260,12 +1280,12 @@ public class MainWindowUi extends JFrame {
 
         standardDeviationVoltageFilterLabel.setText("00.00");
         standardDeviationVoltageFilterLabel.setBorder(BorderFactory.createTitledBorder(""));
-        standardDeviationVoltageFilterLabel.setPreferredSize(new Dimension(45, 19));
+        standardDeviationVoltageFilterLabel.setPreferredSize(new Dimension(60, 19));
         measurementFilterBottomLeftPanel_.add(standardDeviationVoltageFilterLabel);
 
         measurementsFilterPanel_.add(measurementFilterBottomLeftPanel_);
 
-        measurementFilterBottomRightPanel_.setPreferredSize(new Dimension(170, 25));
+        measurementFilterBottomRightPanel_.setPreferredSize(new Dimension(185, 25));
         measurementFilterBottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
 
         frequencyFilterLabel_.setText("Frequency:");
@@ -1273,7 +1293,7 @@ public class MainWindowUi extends JFrame {
 
         frequencyFilterLabel.setText("00.00");
         frequencyFilterLabel.setBorder(BorderFactory.createTitledBorder(""));
-        frequencyFilterLabel.setPreferredSize(new Dimension(45, 19));
+        frequencyFilterLabel.setPreferredSize(new Dimension(60, 19));
         measurementFilterBottomRightPanel_.add(frequencyFilterLabel);
 
         measurementsFilterPanel_.add(measurementFilterBottomRightPanel_);
@@ -1285,7 +1305,7 @@ public class MainWindowUi extends JFrame {
         leftPanel_.add(channelTabbedPane_);
 
         triggerPanel_.setBorder(BorderFactory.createTitledBorder("Trigger"));
-        triggerPanel_.setPreferredSize(new Dimension(366, 140));
+        triggerPanel_.setPreferredSize(new Dimension(396, 140));
         triggerPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
         triggerTopPanel_.setPreferredSize(new Dimension(350, 25));
@@ -1303,7 +1323,7 @@ public class MainWindowUi extends JFrame {
 
         triggerPanel_.add(triggerTopPanel_);
 
-        triggerMiddleLeftPanel1_.setPreferredSize(new Dimension(210, 30));
+        triggerMiddleLeftPanel1_.setPreferredSize(new Dimension(225, 30));
         triggerMiddleLeftPanel1_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         triggerModeLabel_.setText("Mode:");
@@ -1311,12 +1331,12 @@ public class MainWindowUi extends JFrame {
         triggerMiddleLeftPanel1_.add(triggerModeLabel_);
 
         triggerModeComboBox.setModel(new DefaultComboBoxModel<String>(Constant.TRIGGER_MODES));
-        triggerModeComboBox.setPreferredSize(new Dimension(130, 20));
+        triggerModeComboBox.setPreferredSize(new Dimension(135, 20));
         triggerMiddleLeftPanel1_.add(triggerModeComboBox);
 
         triggerPanel_.add(triggerMiddleLeftPanel1_);
 
-        triggerMiddleRightPanel1_.setPreferredSize(new Dimension(140, 30));
+        triggerMiddleRightPanel1_.setPreferredSize(new Dimension(155, 30));
         triggerMiddleRightPanel1_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 3));
 
         forceTriggerButton.setText("Force Trigger");
@@ -1325,7 +1345,7 @@ public class MainWindowUi extends JFrame {
 
         triggerPanel_.add(triggerMiddleRightPanel1_);
 
-        triggerMiddleLeftPanel2_.setPreferredSize(new Dimension(210, 30));
+        triggerMiddleLeftPanel2_.setPreferredSize(new Dimension(225, 30));
         triggerMiddleLeftPanel2_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         triggerTypeLabel_.setText("Type:");
@@ -1333,12 +1353,12 @@ public class MainWindowUi extends JFrame {
         triggerMiddleLeftPanel2_.add(triggerTypeLabel_);
 
         triggerTypeComboBox.setModel(new DefaultComboBoxModel<String>(Constant.TRIGGER_TYPES));
-        triggerTypeComboBox.setPreferredSize(new Dimension(130, 20));
+        triggerTypeComboBox.setPreferredSize(new Dimension(135, 20));
         triggerMiddleLeftPanel2_.add(triggerTypeComboBox);
 
         triggerPanel_.add(triggerMiddleLeftPanel2_);
 
-        triggerMiddleRightPanel2_.setPreferredSize(new Dimension(140, 30));
+        triggerMiddleRightPanel2_.setPreferredSize(new Dimension(155, 30));
         triggerMiddleRightPanel2_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 3));
 
         rearmTriggerButton.setText("Re-arm Trigger");
@@ -1347,19 +1367,19 @@ public class MainWindowUi extends JFrame {
 
         triggerPanel_.add(triggerMiddleRightPanel2_);
 
-        triggerBottomLeftPanel3_.setPreferredSize(new Dimension(210, 30));
+        triggerBottomLeftPanel3_.setPreferredSize(new Dimension(225, 30));
         triggerBottomLeftPanel3_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         noOfSamplesLabel_.setText("No. of Samples:");
-        noOfSamplesLabel_.setPreferredSize(new Dimension(90, 14));
+        noOfSamplesLabel_.setPreferredSize(new Dimension(105, 14));
         triggerBottomLeftPanel3_.add(noOfSamplesLabel_);
 
-        noOfSamplesSpinner.setPreferredSize(new Dimension(80, 20));
+        noOfSamplesSpinner.setPreferredSize(new Dimension(70, 20));
         triggerBottomLeftPanel3_.add(noOfSamplesSpinner);
 
         triggerPanel_.add(triggerBottomLeftPanel3_);
 
-        triggerBottomRightPanel3_.setPreferredSize(new Dimension(140, 30));
+        triggerBottomRightPanel3_.setPreferredSize(new Dimension(155, 30));
 
         triggerThresholdLabel_.setText("Threshold:");
         triggerBottomRightPanel3_.add(triggerThresholdLabel_);
@@ -1372,10 +1392,10 @@ public class MainWindowUi extends JFrame {
         leftPanel_.add(triggerPanel_);
 
         functionGeneratorPanel_.setBorder(BorderFactory.createTitledBorder("Function Generator"));
-        functionGeneratorPanel_.setPreferredSize(new Dimension(366, 115));
+        functionGeneratorPanel_.setPreferredSize(new Dimension(396, 115));
         functionGeneratorPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
-        functionGeneratorTopPanel_.setPreferredSize(new Dimension(350, 30));
+        functionGeneratorTopPanel_.setPreferredSize(new Dimension(380, 30));
         functionGeneratorTopPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
 
         outputLabel_.setText("Output");
@@ -1387,39 +1407,45 @@ public class MainWindowUi extends JFrame {
 
         functionGeneratorPanel_.add(functionGeneratorTopPanel_);
 
-        functionGeneratorMiddlePanel_.setPreferredSize(new Dimension(350, 30));
+        functionGeneratorMiddlePanel_.setPreferredSize(new Dimension(380, 30));
         functionGeneratorMiddlePanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         waveTypeLabel_.setText("Wave Type:");
         functionGeneratorMiddlePanel_.add(waveTypeLabel_);
 
         waveTypeComboBox.setModel(new DefaultComboBoxModel<String>(Constant.WAVE_TYPES));
-        waveTypeComboBox.setPreferredSize(new Dimension(235, 20));
+        waveTypeComboBox.setPreferredSize(new Dimension(265, 20));
         functionGeneratorMiddlePanel_.add(waveTypeComboBox);
 
         functionGeneratorPanel_.add(functionGeneratorMiddlePanel_);
 
-        functionGeneratorBottomLeftPanel_.setPreferredSize(new Dimension(190, 30));
+        functionGeneratorBottomLeftPanel_.setPreferredSize(new Dimension(170, 30));
         functionGeneratorBottomLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         p2pVoltageLabel_.setText("P2P Voltage:");
         functionGeneratorBottomLeftPanel_.add(p2pVoltageLabel_);
 
-        p2pVoltageTextField.setPreferredSize(new Dimension(75, 20));
+        p2pVoltageTextField.setPreferredSize(new Dimension(70, 20));
         functionGeneratorBottomLeftPanel_.add(p2pVoltageTextField);
 
         functionGeneratorPanel_.add(functionGeneratorBottomLeftPanel_);
 
+        functionGeneratorBottomRightPanel_.setPreferredSize(new Dimension(205, 30));
         functionGeneratorBottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-        functionGeneratorOffsetLabel_.setText("Offset:");
-        functionGeneratorBottomRightPanel_.add(functionGeneratorOffsetLabel_);
+        functionGeneratorOffsetLabel1_.setText("Offset:");
+        functionGeneratorBottomRightPanel_.add(functionGeneratorOffsetLabel1_);
 
-        functionGeneratorOffsetSpinner.setPreferredSize(new Dimension(60, 20));
+        functionGeneratorOffsetSpinner.setPreferredSize(new Dimension(55, 20));
         functionGeneratorBottomRightPanel_.add(functionGeneratorOffsetSpinner);
 
-        horizontalRangeLabel_54.setText("volts");
-        functionGeneratorBottomRightPanel_.add(horizontalRangeLabel_54);
+        functionGeneratorOffsetLabel2_.setText("x");
+        functionGeneratorBottomRightPanel_.add(functionGeneratorOffsetLabel2_);
+
+        FunctionGeneratorOffsetUnitComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
+        FunctionGeneratorOffsetUnitComboBox.setEnabled(false);
+        FunctionGeneratorOffsetUnitComboBox.setPreferredSize(new Dimension(75, 20));
+        functionGeneratorBottomRightPanel_.add(FunctionGeneratorOffsetUnitComboBox);
 
         functionGeneratorPanel_.add(functionGeneratorBottomRightPanel_);
 
@@ -1490,12 +1516,13 @@ public class MainWindowUi extends JFrame {
 
         getContentPane().add(rightPanel_, BorderLayout.CENTER);
 
-        setSize(new Dimension(1170, 735));
+        setSize(new Dimension(1200, 735));
         setLocationRelativeTo(null);
     }
 
     /**
      * Show tab on channel tabbedpane
+     *
      * @param tab Constant.TAB
      */
     protected void showTab(Constant.TAB tab) {
@@ -1519,67 +1546,81 @@ public class MainWindowUi extends JFrame {
 
     /**
      * Enable or disable all the components on the Math channel panel
+     *
      * @param enabled boolean
      */
     protected void setEnabledMathChannelControls(boolean enabled) {
-        equationTextField.setEnabled(enabled);
         newEquationButton.setEnabled(enabled);
-        editEquationButton.setEnabled(enabled);
-        horizontalOffsetMathSpinner.setEnabled(enabled);
-        horizontalOffsetUnitMathComboBox.setEnabled(enabled);
-        horizontalRangeMathComboBox.setEnabled(enabled);
-        verticalOffsetMathSpinner.setEnabled(enabled);
-        verticalOffsetUnitMathComboBox.setEnabled(enabled);
-        verticalRangeMathComboBox.setEnabled(enabled);
-        mathDivisionInfoLabel.setEnabled(enabled);
+        if (!equationTextArea.getText().equals("")) {
+            editEquationButton.setEnabled(enabled);
+        }
+        if (rawXYSeries.containsKey(Constant.MATH_CHANNEL)) {
+            horizontalOffsetMathSpinner.setEnabled(enabled);
+            horizontalOffsetUnitMathComboBox.setEnabled(enabled);
+            horizontalRangeMathComboBox.setEnabled(enabled);
+            verticalOffsetMathSpinner.setEnabled(enabled);
+            verticalOffsetUnitMathComboBox.setEnabled(enabled);
+            verticalRangeMathComboBox.setEnabled(enabled);
+            mathDivisionInfoLabel.setEnabled(enabled);
+        }
     }
 
     /**
      * Enable or disable all the components on the Filter channel panel
+     *
      * @param enabled boolean
      */
     protected void setEnabledFilterChannelControls(boolean enabled) {
         inputChannelComboBox.setEnabled(enabled);
         browseButton.setEnabled(enabled);
-        horizontalOffsetFilterSpinner.setEnabled(enabled);
-        horizontalOffsetUnitFilterComboBox.setEnabled(enabled);
-        horizontalRangeFilterComboBox.setEnabled(enabled);
-        verticalOffsetFilterSpinner.setEnabled(enabled);
-        verticalOffsetUnitFilterComboBox.setEnabled(enabled);
-        verticalRangeFilterComboBox.setEnabled(enabled);
-        filterDivisionInfoLabel.setEnabled(enabled);
+        if (rawXYSeries.containsKey(Constant.FILTER_CHANNEL)) {
+            horizontalOffsetFilterSpinner.setEnabled(enabled);
+            horizontalOffsetUnitFilterComboBox.setEnabled(enabled);
+            horizontalRangeFilterComboBox.setEnabled(enabled);
+            verticalOffsetFilterSpinner.setEnabled(enabled);
+            verticalOffsetUnitFilterComboBox.setEnabled(enabled);
+            verticalRangeFilterComboBox.setEnabled(enabled);
+            filterDivisionInfoLabel.setEnabled(enabled);
+        }
     }
 
     /**
      * Enable or disable all the components on the channel A panel
+     *
      * @param enabled boolean
      */
     protected void setEnabledChannelAControls(boolean enabled) {
-        horizontalOffsetASpinner.setEnabled(enabled);
-        horizontalOffsetUnitAComboBox.setEnabled(enabled);
-        horizontalRangeAComboBox.setEnabled(enabled);
-        verticalOffsetASpinner.setEnabled(enabled);
-        verticalOffsetUnitAComboBox.setEnabled(enabled);
-        verticalRangeAComboBox.setEnabled(enabled);
-        aDivisionInfoLabel.setEnabled(enabled);
+        if (rawXYSeries.containsKey(Constant.CHANNEL_A)) {
+            horizontalOffsetASpinner.setEnabled(enabled);
+            horizontalOffsetUnitAComboBox.setEnabled(enabled);
+            horizontalRangeAComboBox.setEnabled(enabled);
+            verticalOffsetASpinner.setEnabled(enabled);
+            verticalOffsetUnitAComboBox.setEnabled(enabled);
+            verticalRangeAComboBox.setEnabled(enabled);
+            aDivisionInfoLabel.setEnabled(enabled);
+        }
     }
 
     /**
      * Enable or disable all the components on the channel B panel
+     *
      * @param enabled boolean
      */
     protected void setEnabledChannelBControls(boolean enabled) {
-        horizontalOffsetBSpinner.setEnabled(enabled);
-        horizontalOffsetUnitBComboBox.setEnabled(enabled);
-        horizontalRangeBComboBox.setEnabled(enabled);
-        verticalOffsetBSpinner.setEnabled(enabled);
-        verticalOffsetUnitBComboBox.setEnabled(enabled);
-        verticalRangeBComboBox.setEnabled(enabled);
-        bDivisionInfoLabel.setEnabled(enabled);
+        if (rawXYSeries.containsKey(Constant.CHANNEL_B)) {
+            horizontalOffsetBSpinner.setEnabled(enabled);
+            horizontalOffsetUnitBComboBox.setEnabled(enabled);
+            horizontalRangeBComboBox.setEnabled(enabled);
+            verticalOffsetBSpinner.setEnabled(enabled);
+            verticalOffsetUnitBComboBox.setEnabled(enabled);
+            verticalRangeBComboBox.setEnabled(enabled);
+            bDivisionInfoLabel.setEnabled(enabled);
+        }
     }
-    
+
     /**
      * Add component (e.g. ChartPanel) to canvas panel
+     *
      * @param component Component
      */
     protected void addComponentToCanvasPanel(Component component) {
@@ -1587,7 +1628,7 @@ public class MainWindowUi extends JFrame {
         canvasPanel_.add(component, BorderLayout.CENTER);
         validate();
     }
-    
+
     /**
      * Remove all components from the canvas panel
      */
@@ -1596,5 +1637,5 @@ public class MainWindowUi extends JFrame {
         validate();
         repaint();
     }
-    
+
 }

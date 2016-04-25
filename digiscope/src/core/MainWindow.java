@@ -1,5 +1,7 @@
 package core;
 
+import gui.MainWindowUi;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -9,7 +11,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.event.ChangeEvent;
@@ -28,7 +29,6 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.ui.RectangleEdge;
 
 import data.Constant;
-import gui.MainWindowUi;
 
 /**
  *
@@ -43,7 +43,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private Crosshair timeCrosshair_;
 	private Crosshair voltageCrosshair_;
 	private int measuredChannelIndex_;
-	private Map<String, XYSeries> rawXYSeries_;
 
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
@@ -56,7 +55,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private void initialize() {
 		visualizer_ = new Visualizer();
 		chartPanel_ = createDefaultChartPanel(visualizer_.getChart());
-		rawXYSeries_ = new HashMap<String, XYSeries>();
 		
 		// test
 		// Channel A
@@ -64,21 +62,21 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		for(double i = -20; i <= 20; i = i + 0.1) {
 			aSeries.add(i, 1500 * Math.sin(i));
 		}
-		rawXYSeries_.put(Constant.CHANNEL_A, aSeries);
+		rawXYSeries.put(Constant.CHANNEL_A, aSeries);
 
 		// Channel B
 		XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
 		for(double i = -20; i <= 20; i = i + 0.1) {
 			bSeries.add(i, 70 * Math.sin(i));
 		}
-		rawXYSeries_.put(Constant.CHANNEL_B, bSeries);
+		rawXYSeries.put(Constant.CHANNEL_B, bSeries);
 
 		//Math Channel
 		XYSeries mathSeries = new XYSeries(Constant.MATH_CHANNEL);
 		for(double i = -20; i <= 20; i = i + 0.1) {
 			mathSeries.add(i, 800 * Math.sin(i));
 		}
-		rawXYSeries_.put(Constant.MATH_CHANNEL, mathSeries);
+		rawXYSeries.put(Constant.MATH_CHANNEL, mathSeries);
 		// endTest
 
 //		// Filter Channel
@@ -388,7 +386,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetASpinner.getValue(),
 				(String) verticalOffsetUnitAComboBox.getSelectedItem());
 		XYSeries aSeries = createXYSeriesWithOffsets(Constant.CHANNEL_A,
-				rawXYSeries_.get(Constant.CHANNEL_A), horizontalOffset, verticalOffset);
+				rawXYSeries.get(Constant.CHANNEL_A), horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.A_INDEX, aSeries);
 	}
 	
@@ -399,7 +397,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetBSpinner.getValue(),
 				(String) verticalOffsetUnitBComboBox.getSelectedItem());
 		XYSeries bSeries = createXYSeriesWithOffsets(Constant.CHANNEL_B,
-				rawXYSeries_.get(Constant.CHANNEL_B), horizontalOffset, verticalOffset);
+				rawXYSeries.get(Constant.CHANNEL_B), horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.B_INDEX, bSeries);
 	}
 
@@ -410,7 +408,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetMathSpinner.getValue(),
 				(String) verticalOffsetUnitMathComboBox.getSelectedItem());
 		XYSeries mathSeries = createXYSeriesWithOffsets(Constant.MATH_CHANNEL,
-				rawXYSeries_.get(Constant.MATH_CHANNEL),horizontalOffset, verticalOffset);
+				rawXYSeries.get(Constant.MATH_CHANNEL),horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.MATH_INDEX, mathSeries);
 	}
 
@@ -421,7 +419,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetFilterSpinner.getValue(),
 				(String) verticalOffsetUnitFilterComboBox.getSelectedItem());
 		XYSeries filterSeries = createXYSeriesWithOffsets(Constant.FILTER_CHANNEL,
-				rawXYSeries_.get(Constant.FILTER_CHANNEL), horizontalOffset, verticalOffset);
+				rawXYSeries.get(Constant.FILTER_CHANNEL), horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.FILTER_INDEX, filterSeries);
 	}
 
@@ -432,7 +430,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetASpinner.getValue(),
 				(String) verticalOffsetUnitAComboBox.getSelectedItem());
 		XYSeries aSeries = createXYSeriesWithOffsets(Constant.CHANNEL_A,
-				rawXYSeries_.get(Constant.CHANNEL_A), horizontalOffset, verticalOffset);
+				rawXYSeries.get(Constant.CHANNEL_A), horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.A_INDEX, aSeries);
 	}
 
@@ -443,7 +441,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetBSpinner.getValue(),
 				(String) verticalOffsetUnitBComboBox.getSelectedItem());
 		XYSeries bSeries = createXYSeriesWithOffsets(Constant.CHANNEL_B,
-				rawXYSeries_.get(Constant.CHANNEL_B), horizontalOffset, verticalOffset);
+				rawXYSeries.get(Constant.CHANNEL_B), horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.B_INDEX, bSeries);
 	}
 
@@ -454,7 +452,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetMathSpinner.getValue(),
 				(String) verticalOffsetUnitMathComboBox.getSelectedItem());
 		XYSeries mathSeries = createXYSeriesWithOffsets(Constant.MATH_CHANNEL,
-				rawXYSeries_.get(Constant.MATH_CHANNEL),horizontalOffset, verticalOffset);
+				rawXYSeries.get(Constant.MATH_CHANNEL),horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.MATH_INDEX, mathSeries);
 	}
 
@@ -465,7 +463,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetFilterSpinner.getValue(),
 				(String) verticalOffsetUnitFilterComboBox.getSelectedItem());
 		XYSeries filterSeries = createXYSeriesWithOffsets(Constant.FILTER_CHANNEL,
-				rawXYSeries_.get(Constant.FILTER_CHANNEL), horizontalOffset, verticalOffset);
+				rawXYSeries.get(Constant.FILTER_CHANNEL), horizontalOffset, verticalOffset);
 		visualizer_.addSeriesToDataset(Constant.FILTER_INDEX, filterSeries);
 	}
 
@@ -798,7 +796,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	}
 	
 	public Map<String, XYSeries> getRawXYSeries(){
-		return rawXYSeries_;
+		return rawXYSeries;
 	}
 	
 	/**
@@ -888,7 +886,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	 */
 	private void showChannelPlotOnChartPanel(String channelName, int channelIndex,
 			int horizontalOffset, int verticalOffset) {
-		XYSeries rawSeries = rawXYSeries_.get(channelName);
+		XYSeries rawSeries = rawXYSeries.get(channelName);
 		if(rawSeries != null) {
 			XYSeries xYSeries = createXYSeriesWithOffsets(channelName, rawSeries,
 					horizontalOffset, verticalOffset);

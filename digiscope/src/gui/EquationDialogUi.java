@@ -11,7 +11,6 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
@@ -19,6 +18,8 @@ import org.jfree.data.xy.XYSeries;
 
 import core.MainWindow;
 import data.Constant;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -29,10 +30,11 @@ public class EquationDialogUi extends JDialog {
 	private static final long serialVersionUID = 1L;
 	protected JButton[] buttons;
     protected JButton cancelButton;
-    protected JTextField equationTextField;
+    protected JTextArea equationTextField;
     private JPanel firstRowPanel_;
     private JPanel fourthRowPanel_;
     protected JButton okButton;
+    private JScrollPane scrollPane;
     private JPanel secondRowPanel_;
     private JLabel statusLabel_;
     private JPanel thirdRowPanel_;
@@ -72,7 +74,8 @@ public class EquationDialogUi extends JDialog {
     	};
     	buttons = new JButton[labelStrings.length];
         firstRowPanel_ = new JPanel();
-        equationTextField = new JTextField();
+        equationTextField = new JTextArea();
+        scrollPane = new JScrollPane();
         secondRowPanel_ = new JPanel();
         statusLabel_ = new JLabel();
         thirdRowPanel_ = new JPanel();
@@ -84,13 +87,18 @@ public class EquationDialogUi extends JDialog {
         setTitle("New Equation");
         getContentPane().setLayout(new FlowLayout());
 
-        firstRowPanel_.setPreferredSize(new Dimension(490, 45));
+        firstRowPanel_.setPreferredSize(new Dimension(490, 55));
         firstRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 8));
+        
+        equationTextField.setEditable(false);
+        equationTextField.setFont(new Font("Monospaced", 0, 18));
+        
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setPreferredSize(new Dimension(480, 40));
+        scrollPane.setViewportView(equationTextField);
 
-        equationTextField.setEnabled(false);
-        equationTextField.setPreferredSize(new Dimension(480, 33));
-		equationTextField.setFont(new Font("Courier New", 0, 18));
-        firstRowPanel_.add(equationTextField);
+        firstRowPanel_.add(scrollPane);
 
         getContentPane().add(firstRowPanel_);
 
@@ -121,7 +129,7 @@ public class EquationDialogUi extends JDialog {
         buttons[0].setEnabled(false); // button A
         buttons[1].setEnabled(false); // button B
         buttons[2].setEnabled(false); // button F
-		buttons[18].setFont(new Font("Courier New", 0, 16)); // button pi
+		buttons[18].setFont(new Font("Monospaced", 0, 16)); // button pi
 
         getContentPane().add(thirdRowPanel_);
 
