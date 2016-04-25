@@ -21,7 +21,7 @@ import data.Constant;
  *
  * @author ToanHo
  */
-public class EquationDialogUi extends JDialog {
+public class ExpressionDialogUi extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	protected JButton[] buttons;
@@ -39,7 +39,7 @@ public class EquationDialogUi extends JDialog {
 	/**
 	 * Creates new form EquationDialogUi
 	 */
-	public EquationDialogUi(MainWindow mainWindow) {
+	public ExpressionDialogUi(MainWindow mainWindow) {
 		super(mainWindow, true);
 		initializeComponents();
 		this.mainWindow = mainWindow;
@@ -50,9 +50,12 @@ public class EquationDialogUi extends JDialog {
 	 */
 	private void initializeComponents() {
 
-		String[] labelStrings = new String[] { "A", "B", "F", "Delete", "7", "8", "9", "*", "/", "4", "5", "6", "+",
-				"-", "1", "2", "3", "^", "\u03C0", // "\u03C0" is Pi
-				"e", "0", ".", "(", ")" };
+		String[] labelStrings = new String[] { //
+				"A", "B", "F", "Del", "AC", //
+				"7", "8", "9", "*", "/", //
+				"4", "5", "6", "+", "-", //
+				"1", "2", "3", "^", "\u03C0", // "\u03C0" is Pi
+				"e", "0", ".", "(", ")" }; //
 		buttons = new JButton[labelStrings.length];
 		firstRowPanel_ = new JPanel();
 		expressionTextArea = new JTextArea();
@@ -98,11 +101,7 @@ public class EquationDialogUi extends JDialog {
 
 		for (int i = 0; i < labelStrings.length; i++) {
 			buttons[i] = new JButton(labelStrings[i]);
-			if (i == 3) { // button Delete is bigger
-				buttons[i].setPreferredSize(new Dimension(120, 30));
-			} else {
-				buttons[i].setPreferredSize(new Dimension(55, 30));
-			}
+			buttons[i].setPreferredSize(new Dimension(55, 30));
 			thirdRowPanel_.add(buttons[i]);
 		}
 

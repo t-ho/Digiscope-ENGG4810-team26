@@ -325,18 +325,44 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 			}
 		});
 		
-		newEquationButton.addActionListener(new ActionListener() {
+		newExpressionButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				newEquationButtonActionPerformed(event);
 			}
 		});
+
+		editExpressionButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				editEquationButtonActionPerformed(event);
+			}
+		});
+
+		removeExpressionButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				removeEquationButtonActionPerformed(event);
+			}
+		});
+	}
+
+	protected void removeEquationButtonActionPerformed(ActionEvent event) {
+		// TODO
+		expressionTextArea.setText("");
+	}
+
+	protected void editEquationButtonActionPerformed(ActionEvent event) {
+		// TODO
+		String expression = expressionTextArea.getText();
+		ExpressionDialog expressionDialog = new ExpressionDialog(this, expression);
+		expressionDialog.setVisible(true);
 	}
 
 	protected void newEquationButtonActionPerformed(ActionEvent event) {
 		// TODO
-		EquationDialog equationDialog = new EquationDialog(this);
-		equationDialog.setVisible(true);
+		ExpressionDialog expressionDialog = new ExpressionDialog(this);
+		expressionDialog.setVisible(true);
 	}
 
 	protected void verticalOffsetUnitAComboBoxItemStateChanged(ItemEvent event) {
@@ -800,7 +826,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	}
 	
 	public void setExpressionForMathChannel(String expression) {
-		equationTextArea.setText(expression);
+		expressionTextArea.setText(expression);
 	}
 	
 	/**

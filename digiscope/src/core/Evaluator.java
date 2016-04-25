@@ -1,7 +1,5 @@
 package core;
 
-import org.omg.PortableServer.ServantRetentionPolicyValue;
-
 import com.fathzer.soft.javaluator.DoubleEvaluator;
 import com.fathzer.soft.javaluator.Parameters;
 import com.fathzer.soft.javaluator.StaticVariableSet;

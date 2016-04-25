@@ -7,17 +7,17 @@ import java.util.Map;
 import org.jfree.data.xy.XYSeries;
 
 import data.Constant;
-import gui.EquationDialogUi;
+import gui.ExpressionDialogUi;
 
 /**
  *
  * @author ToanHo
  */
-public class EquationDialog extends EquationDialogUi implements ActionListener{
+public class ExpressionDialog extends ExpressionDialogUi implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private Evaluator evaluator;
 
-	public EquationDialog(MainWindow mainWindow) {
+	public ExpressionDialog(MainWindow mainWindow) {
 		super(mainWindow);
 		evaluator = new Evaluator();
 		addListionersToComponents();
@@ -34,6 +34,16 @@ public class EquationDialog extends EquationDialogUi implements ActionListener{
 			buttons[2].setEnabled(true); // button F
 			evaluator.setVariableValue("F", 0.0);
 		}
+	}
+	
+	/**
+	 * Constructor for editing expression
+	 * @param mainWindow
+	 * @param expression
+	 */
+	public ExpressionDialog(MainWindow mainWindow, String expression) {
+		this(mainWindow);
+		expressionTextArea.setText(expression);
 	}
 
 	private void addListionersToComponents() {
@@ -66,6 +76,7 @@ public class EquationDialog extends EquationDialogUi implements ActionListener{
 				if(result != Double.POSITIVE_INFINITY && 
 						result != Double.NEGATIVE_INFINITY) {
 					mainWindow.setExpressionForMathChannel(expression);
+					mainWindow.setEnabledExpressionControls(true);
 					this.dispose();
 				} else {
 					setStatus("Infinity number", Constant.ERROR);
@@ -89,11 +100,13 @@ public class EquationDialog extends EquationDialogUi implements ActionListener{
 	public void actionPerformed(ActionEvent event) {
 		// TODO
 		String currentString = expressionTextArea.getText();
-		if(event.getActionCommand().equals("Delete")) {
+		if(event.getActionCommand().equals("Del")) {
 			if(currentString.length() > 0) {
 				expressionTextArea.setText(currentString.substring(0,
 						currentString.length() - 1));
 			}
+		} else if(event.getActionCommand().equals("AC")) {
+			expressionTextArea.setText("");
 		} else {
 			expressionTextArea.setText(currentString + event.getActionCommand());
 		}

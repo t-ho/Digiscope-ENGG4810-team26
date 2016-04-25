@@ -1,9 +1,6 @@
 package gui;
 
-import data.Constant;
-
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -31,12 +28,17 @@ import javax.swing.WindowConstants;
 
 import org.jfree.data.xy.XYSeries;
 
+import data.Constant;
+
 /**
  *
  * @author ToanHo
  */
 public class MainWindowUi extends JFrame {
 
+    /**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 	protected JComboBox<String> FunctionGeneratorOffsetUnitComboBox;
     protected JLabel aDivisionInfoLabel;
@@ -62,11 +64,11 @@ public class MainWindowUi extends JFrame {
     private JLabel cursorLabel_;
     protected JLabel cursorVerticalValueLabel;
     private JPanel divisionInfoPanel_;
-    protected JButton editEquationButton;
-    private JPanel equationBottomPanel_;
-    private JPanel equationPannel_;
-    protected JTextArea equationTextArea;
-    private JPanel equationTopPanel_;
+    protected JButton editExpressionButton;
+    private JPanel expressionBottomPanel_;
+    private JPanel expressionPannel_;
+    protected JTextArea expressionTextArea;
+    private JPanel expressionTopPanel_;
     protected JCheckBox filterChannelCheckBox;
     private JPanel filterChannelPanel_;
     protected JLabel filterDivisionInfoLabel;
@@ -189,7 +191,7 @@ public class MainWindowUi extends JFrame {
     private JLabel minVoltageFilterLabel_;
     protected JLabel minVoltageMathLabel;
     private JLabel minVoltageMathLabel_;
-    protected JButton newEquationButton;
+    protected JButton newExpressionButton;
     private JLabel noOfSamplesLabel_;
     protected JSpinner noOfSamplesSpinner;
     private JLabel outputLabel_;
@@ -197,6 +199,7 @@ public class MainWindowUi extends JFrame {
     private JLabel p2pVoltageLabel_;
     protected JTextField p2pVoltageTextField;
     protected JButton rearmTriggerButton;
+    protected JButton removeExpressionButton;
     private JPanel rightPanel_;
     private JScrollPane scrollPane;
     private JLabel spaceLabel_;
@@ -372,13 +375,14 @@ public class MainWindowUi extends JFrame {
         frequencyBLabel_ = new JLabel();
         frequencyBLabel = new JLabel();
         mathChannelPanel_ = new JPanel();
-        equationPannel_ = new JPanel();
-        equationTopPanel_ = new JPanel();
+        expressionPannel_ = new JPanel();
+        expressionTopPanel_ = new JPanel();
         scrollPane = new JScrollPane();
-        equationTextArea = new JTextArea();
-        equationBottomPanel_ = new JPanel();
-        newEquationButton = new JButton();
-        editEquationButton = new JButton();
+        expressionTextArea = new JTextArea();
+        expressionBottomPanel_ = new JPanel();
+        newExpressionButton = new JButton();
+        editExpressionButton = new JButton();
+        removeExpressionButton = new JButton();
         horizontalMathPanel_ = new JPanel();
         horizontalMathLeftPanel_ = new JPanel();
         horizontalRangeMathLabel1_ = new JLabel();
@@ -891,41 +895,46 @@ public class MainWindowUi extends JFrame {
 
         channelTabbedPane_.addTab("Channel B", channelBPanel_);
 
-        equationPannel_.setBorder(BorderFactory.createTitledBorder("Equation"));
-        equationPannel_.setPreferredSize(new Dimension(390, 95));
-        equationPannel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        expressionPannel_.setBorder(BorderFactory.createTitledBorder("Expression"));
+        expressionPannel_.setPreferredSize(new Dimension(390, 95));
+        expressionPannel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
 
-        equationTopPanel_.setPreferredSize(new Dimension(380, 40));
-        equationTopPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
+        expressionTopPanel_.setPreferredSize(new Dimension(380, 40));
+        expressionTopPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
 
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         scrollPane.setPreferredSize(new Dimension(350, 35));
 
-        equationTextArea.setEditable(false);
-        equationTextArea.setColumns(20);
-        equationTextArea.setRows(5);
-        scrollPane.setViewportView(equationTextArea);
+        expressionTextArea.setEditable(false);
+        expressionTextArea.setColumns(20);
+        expressionTextArea.setRows(5);
+        scrollPane.setViewportView(expressionTextArea);
 
-        equationTopPanel_.add(scrollPane);
+        expressionTopPanel_.add(scrollPane);
 
-        equationPannel_.add(equationTopPanel_);
+        expressionPannel_.add(expressionTopPanel_);
 
-        equationBottomPanel_.setPreferredSize(new Dimension(350, 30));
-        equationBottomPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 4));
+        expressionBottomPanel_.setPreferredSize(new Dimension(350, 30));
+        expressionBottomPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 4));
 
-        newEquationButton.setText("New");
-        newEquationButton.setEnabled(false);
-        newEquationButton.setPreferredSize(new Dimension(80, 23));
-        equationBottomPanel_.add(newEquationButton);
+        newExpressionButton.setText("New");
+        newExpressionButton.setEnabled(false);
+        newExpressionButton.setPreferredSize(new Dimension(85, 23));
+        expressionBottomPanel_.add(newExpressionButton);
 
-        editEquationButton.setText("Edit");
-        editEquationButton.setEnabled(false);
-        editEquationButton.setPreferredSize(new Dimension(80, 23));
-        equationBottomPanel_.add(editEquationButton);
+        editExpressionButton.setText("Edit");
+        editExpressionButton.setEnabled(false);
+        editExpressionButton.setPreferredSize(new Dimension(85, 23));
+        expressionBottomPanel_.add(editExpressionButton);
 
-        equationPannel_.add(equationBottomPanel_);
+        removeExpressionButton.setText("Remove");
+        removeExpressionButton.setEnabled(false);
+        removeExpressionButton.setPreferredSize(new Dimension(85, 23));
+        expressionBottomPanel_.add(removeExpressionButton);
 
-        mathChannelPanel_.add(equationPannel_);
+        expressionPannel_.add(expressionBottomPanel_);
+
+        mathChannelPanel_.add(expressionPannel_);
 
         horizontalMathPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
         horizontalMathPanel_.setPreferredSize(new Dimension(390, 55));
@@ -1314,7 +1323,6 @@ public class MainWindowUi extends JFrame {
         triggerStateLabel_.setText("State:");
         triggerTopPanel_.add(triggerStateLabel_);
 
-        triggerStateLabel.setForeground(Color.blue);
         triggerStateLabel.setHorizontalAlignment(SwingConstants.CENTER);
         triggerStateLabel.setText("Stop");
         triggerStateLabel.setBorder(BorderFactory.createTitledBorder(""));
@@ -1550,9 +1558,9 @@ public class MainWindowUi extends JFrame {
      * @param enabled boolean
      */
     protected void setEnabledMathChannelControls(boolean enabled) {
-        newEquationButton.setEnabled(enabled);
-        if (!equationTextArea.getText().equals("")) {
-            editEquationButton.setEnabled(enabled);
+        newExpressionButton.setEnabled(enabled);
+        if (!expressionTextArea.getText().equals("")) {
+            editExpressionButton.setEnabled(enabled);
         }
         if (rawXYSeries.containsKey(Constant.MATH_CHANNEL)) {
             horizontalOffsetMathSpinner.setEnabled(enabled);
@@ -1616,6 +1624,15 @@ public class MainWindowUi extends JFrame {
             verticalRangeBComboBox.setEnabled(enabled);
             bDivisionInfoLabel.setEnabled(enabled);
         }
+    }
+    
+    /**
+     * Enable or disable components on expression panel
+     * @param enabled true or false
+     */
+    public void setEnabledExpressionControls(boolean enabled) {
+        editExpressionButton.setEnabled(enabled);
+        removeExpressionButton.setEnabled(enabled);
     }
 
     /**
