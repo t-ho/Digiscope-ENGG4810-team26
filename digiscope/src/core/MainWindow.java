@@ -799,6 +799,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		return rawXYSeries;
 	}
 	
+	public void setExpressionForMathChannel(String expression) {
+		equationTextArea.setText(expression);
+	}
+	
 	/**
 	 * Show cursor measurement and set channel index which will be measured
 	 * @param channelIndex the index of the measured channel
