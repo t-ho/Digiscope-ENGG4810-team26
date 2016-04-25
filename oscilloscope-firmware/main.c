@@ -72,10 +72,13 @@
 #define TASKSTACKSIZE   512
 
 /* Touch screen calibration */
-#define PixSizeX	13.78f
-#define PixOffsX	411
-#define PixSizeY	11.01f
-#define PixOffsY	378
+#define X_MIN 200
+#define X_MAX 1850
+#define X_PX 320.0f
+#define Y_MIN 200
+#define Y_MAX 1900
+#define Y_PX 240.0f
+
 #define PREC_TOUCH_CONST 10
 
 Task_Struct task0Struct;
@@ -309,13 +312,34 @@ void Touch_Read(uint16_t *x_out, uint16_t *y_out)
 
 	GPIO_write(T_CS,1);
 
-	int16_t x_temp = ((tx / PREC_TOUCH_CONST) - PixOffsX) / PixSizeX;
-	int16_t y_temp = ((ty / PREC_TOUCH_CONST) - PixOffsY) / PixSizeY;
+	int16_t x_temp = ((tx / PREC_TOUCH_CONST) - X_MIN) * X_PX / (X_MAX - X_MIN);
+	int16_t y_temp = ((ty / PREC_TOUCH_CONST) - Y_MIN) * Y_PX / (Y_MAX - Y_MIN);
 
-	if (x_temp > 0) *x_out = x_temp;
-	else *x_out = 0;
-	if (y_temp > 0) *y_out = y_temp;
-	else *y_out = 0;
+	if (x_temp < 0)
+	{
+		*x_out = 0;
+	}
+	else if (x_temp > X_PX)
+	{
+		*x_out = (uint16_t) X_PX;
+	}
+	else
+	{
+		*x_out = x_temp;
+	}
+
+	if (y_temp < 0)
+	{
+		*y_out = 0;
+	}
+	else if (y_temp > Y_PX)
+	{
+		*y_out = (uint16_t) Y_PX;
+	}
+	else
+	{
+		*y_out = y_temp;
+	}
 }
 
 void touchCallback(unsigned int index)
