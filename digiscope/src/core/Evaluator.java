@@ -7,7 +7,7 @@ import com.fathzer.soft.javaluator.StaticVariableSet;
 public class Evaluator extends DoubleEvaluator {
 
 	private static final Parameters PARAMETERS;
-	private StaticVariableSet<Double> variables;
+	private final StaticVariableSet<Double> variables;
 
 	static {
 		PARAMETERS = DoubleEvaluator.getDefaultParameters();

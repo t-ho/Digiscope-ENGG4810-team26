@@ -71,12 +71,15 @@ public class ExpressionDialog extends ExpressionDialogUi implements ActionListen
 		// TODO
 		String expression = expressionTextArea.getText().trim();
 		if(!expression.equals("")) {
+			if(expression.contains("A") || expression.contains("B") || expression.contains("F")) {
 			try {
 				Double result = evaluator.evaluate(expression, evaluator.getVariables());
 				if(result != Double.POSITIVE_INFINITY && 
 						result != Double.NEGATIVE_INFINITY) {
 					mainWindow.setExpressionForMathChannel(expression);
 					mainWindow.setEnabledExpressionControls(true);
+					mainWindow.calculateMathChannel();
+					mainWindow.setEnabledMathChannelControls(true);
 					this.dispose();
 				} else {
 					setStatus("Infinity number", Constant.ERROR);
@@ -87,6 +90,9 @@ public class ExpressionDialog extends ExpressionDialogUi implements ActionListen
 				} else {
 					setStatus(iae.getMessage(), Constant.ERROR);
 				}
+			}
+			} else {
+				setStatus("The expression does not have any derived channels", Constant.ERROR);
 			}
 		}
 	}

@@ -11,6 +11,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.event.ChangeEvent;
@@ -25,6 +26,7 @@ import org.jfree.chart.panel.CrosshairOverlay;
 import org.jfree.chart.plot.Crosshair;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.general.DatasetUtilities;
+import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.ui.RectangleEdge;
 
@@ -60,23 +62,23 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
 		for(double i = -20; i <= 20; i = i + 0.1) {
-			aSeries.add(i, 1500 * Math.sin(i));
+			aSeries.add(i, 1000 * Math.sin(i));
 		}
 		rawXYSeries.put(Constant.CHANNEL_A, aSeries);
 
 		// Channel B
 		XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
 		for(double i = -20; i <= 20; i = i + 0.1) {
-			bSeries.add(i, 70 * Math.sin(i));
+			bSeries.add(i, 1500 * Math.sin(i));
 		}
 		rawXYSeries.put(Constant.CHANNEL_B, bSeries);
 
-		//Math Channel
-		XYSeries mathSeries = new XYSeries(Constant.MATH_CHANNEL);
-		for(double i = -20; i <= 20; i = i + 0.1) {
-			mathSeries.add(i, 800 * Math.sin(i));
-		}
-		rawXYSeries.put(Constant.MATH_CHANNEL, mathSeries);
+//		//Math Channel
+//		XYSeries mathSeries = new XYSeries(Constant.MATH_CHANNEL);
+//		for(double i = -20; i <= 20; i = i + 0.1) {
+//			mathSeries.add(i, 800 * Math.sin(i));
+//		}
+//		rawXYSeries.put(Constant.MATH_CHANNEL, mathSeries);
 		// endTest
 
 //		// Filter Channel
@@ -350,6 +352,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	protected void removeEquationButtonActionPerformed(ActionEvent event) {
 		// TODO
 		expressionTextArea.setText("");
+		setEnabledExpressionControls(false);
+		setEnabledMathChannelControls(false);
+		visualizer_.removeAllSeriesFromDataset(Constant.MATH_INDEX);
+		rawXYSeries.remove(Constant.MATH_CHANNEL);
 	}
 
 	protected void editEquationButtonActionPerformed(ActionEvent event) {
@@ -357,6 +363,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		String expression = expressionTextArea.getText();
 		ExpressionDialog expressionDialog = new ExpressionDialog(this, expression);
 		expressionDialog.setVisible(true);
+		calculateMathChannel();
 	}
 
 	protected void newEquationButtonActionPerformed(ActionEvent event) {
@@ -921,6 +928,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 			XYSeries xYSeries = createXYSeriesWithOffsets(channelName, rawSeries,
 					horizontalOffset, verticalOffset);
 			visualizer_.addSeriesToDataset(channelIndex, xYSeries);
+			// remove item if exist before adding
+			cursorComboBox.removeItem(channelName);
 			cursorComboBox.addItem(channelName);
 		}
 	}
@@ -975,6 +984,61 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		} else { // unit == Constant.ONE_MICROSECOND 
 			return offset;
 		}
+	}
+	
+	public void calculateMathChannel() {
+		String expression = expressionTextArea.getText().trim();
+		if (!expression.equals("")) {
+			Map<String, String> channelNames = new HashMap<String, String>();
+			if (expression.contains("A")) {
+				channelNames.put("A", Constant.CHANNEL_A);
+			}
+			if (expression.contains("B")) {
+				channelNames.put("B", Constant.CHANNEL_B);
+			}
+			if (expression.contains("F")) {
+				channelNames.put("F", Constant.FILTER_CHANNEL);
+			}
+			int noOfItems = getMinNoOfItems(channelNames);
+			if (noOfItems != Integer.MAX_VALUE) {
+				Evaluator evaluator = new Evaluator();
+				XYSeries filterSeries = new XYSeries(Constant.MATH_CHANNEL);
+				Double x = 0.0;
+				for (int i = 0; i < noOfItems; i++) {
+					for (Map.Entry<String, String> entry : channelNames.entrySet()) {
+						XYDataItem dataItem = rawXYSeries.get(entry.getValue()).getDataItem(i);
+						evaluator.setVariableValue(entry.getKey(), dataItem.getYValue());
+						x = dataItem.getXValue();
+					}
+					filterSeries.add(x, evaluator.evaluate(expression, evaluator.getVariables()));
+				}
+				rawXYSeries.put(Constant.MATH_CHANNEL, filterSeries);
+				int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetMathSpinner.getValue(),
+						(String) horizontalOffsetUnitMathComboBox.getSelectedItem());
+				int verticalOffset = getVerticalOffsetValue((int) verticalOffsetMathSpinner.getValue(),
+						(String) verticalOffsetUnitMathComboBox.getSelectedItem());
+				showChannelPlotOnChartPanel(Constant.MATH_CHANNEL, Constant.MATH_INDEX, horizontalOffset,
+						verticalOffset);
+			} else {
+				System.out.print("There is no input channels (A, B or Filter) in the expression");
+			}
+		}
+
+	}
+	
+	/**
+	 * get the minimum number of items 
+	 * @param channelNames
+	 * @return
+	 */
+	private int getMinNoOfItems(Map<String, String> channelNames) {
+		int min = Integer.MAX_VALUE;
+		for(String name: channelNames.values()) {
+			if(rawXYSeries.get(name).getItemCount() < min) {
+				min = rawXYSeries.get(name).getItemCount();
+			}
+		}
+		return min;
 	}
 
 	@Override

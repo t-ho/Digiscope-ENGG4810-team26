@@ -1557,7 +1557,7 @@ public class MainWindowUi extends JFrame {
      *
      * @param enabled boolean
      */
-    protected void setEnabledMathChannelControls(boolean enabled) {
+    public void setEnabledMathChannelControls(boolean enabled) {
         newExpressionButton.setEnabled(enabled);
         if (!expressionTextArea.getText().equals("")) {
             editExpressionButton.setEnabled(enabled);
@@ -1578,7 +1578,7 @@ public class MainWindowUi extends JFrame {
      *
      * @param enabled boolean
      */
-    protected void setEnabledFilterChannelControls(boolean enabled) {
+    public void setEnabledFilterChannelControls(boolean enabled) {
         inputChannelComboBox.setEnabled(enabled);
         browseButton.setEnabled(enabled);
         if (rawXYSeries.containsKey(Constant.FILTER_CHANNEL)) {
@@ -1597,7 +1597,7 @@ public class MainWindowUi extends JFrame {
      *
      * @param enabled boolean
      */
-    protected void setEnabledChannelAControls(boolean enabled) {
+    public void setEnabledChannelAControls(boolean enabled) {
         if (rawXYSeries.containsKey(Constant.CHANNEL_A)) {
             horizontalOffsetASpinner.setEnabled(enabled);
             horizontalOffsetUnitAComboBox.setEnabled(enabled);
@@ -1614,7 +1614,7 @@ public class MainWindowUi extends JFrame {
      *
      * @param enabled boolean
      */
-    protected void setEnabledChannelBControls(boolean enabled) {
+    public void setEnabledChannelBControls(boolean enabled) {
         if (rawXYSeries.containsKey(Constant.CHANNEL_B)) {
             horizontalOffsetBSpinner.setEnabled(enabled);
             horizontalOffsetUnitBComboBox.setEnabled(enabled);
