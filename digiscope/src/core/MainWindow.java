@@ -330,35 +330,36 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		newExpressionButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				newEquationButtonActionPerformed(event);
+				newExpressionButtonActionPerformed(event);
 			}
 		});
 
 		editExpressionButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				editEquationButtonActionPerformed(event);
+				editExpressionButtonActionPerformed(event);
 			}
 		});
 
 		removeExpressionButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				removeEquationButtonActionPerformed(event);
+				removeExpressionButtonActionPerformed(event);
 			}
 		});
 	}
 
-	protected void removeEquationButtonActionPerformed(ActionEvent event) {
+	protected void removeExpressionButtonActionPerformed(ActionEvent event) {
 		// TODO
 		expressionTextArea.setText("");
 		setEnabledExpressionControls(false);
 		setEnabledMathChannelControls(false);
+		newExpressionButton.setEnabled(true);
 		visualizer_.removeAllSeriesFromDataset(Constant.MATH_INDEX);
 		rawXYSeries.remove(Constant.MATH_CHANNEL);
 	}
 
-	protected void editEquationButtonActionPerformed(ActionEvent event) {
+	protected void editExpressionButtonActionPerformed(ActionEvent event) {
 		// TODO
 		String expression = expressionTextArea.getText();
 		ExpressionDialog expressionDialog = new ExpressionDialog(this, expression);
@@ -366,7 +367,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		calculateMathChannel();
 	}
 
-	protected void newEquationButtonActionPerformed(ActionEvent event) {
+	private void newExpressionButtonActionPerformed(ActionEvent event) {
 		// TODO
 		ExpressionDialog expressionDialog = new ExpressionDialog(this);
 		expressionDialog.setVisible(true);

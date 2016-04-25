@@ -1561,6 +1561,7 @@ public class MainWindowUi extends JFrame {
         newExpressionButton.setEnabled(enabled);
         if (!expressionTextArea.getText().equals("")) {
             editExpressionButton.setEnabled(enabled);
+            removeExpressionButton.setEnabled(enabled);
         }
         if (rawXYSeries.containsKey(Constant.MATH_CHANNEL)) {
             horizontalOffsetMathSpinner.setEnabled(enabled);
