@@ -67,7 +67,12 @@
 
 #include "driverlib/adc.h"
 #include "driverlib/sysctl.h"
+#include "driverlib/udma.h"
+#include "driverlib/interrupt.h"
 #include "inc/hw_memmap.h"
+#include "inc/hw_adc.h"
+#include "inc/hw_udma.h"
+
 
 #define TASKSTACKSIZE   512
 
@@ -81,6 +86,9 @@
 
 #define PREC_TOUCH_CONST 10
 
+#define ADC_SAMPLE_BUF_SIZE 8
+#define ADC_BUF_SIZE 1024
+
 Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
 Task_Struct task1Struct;
@@ -91,6 +99,10 @@ Clock_Handle TouchClkHandle;
 
 uint16_t x, y;
 
+uint16_t adc_pos = 0;
+uint16_t adc_buffer[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
+
+uint32_t udmaCtrlTable[1024/sizeof(uint32_t)] __attribute__(( aligned(1024) ));
 
 void gpio_out_data(uint16_t c)
 {
@@ -353,6 +365,31 @@ void touchCallback(unsigned int index)
 
 }
 
+void ADCprocess(uint32_t ch)
+{
+    if ((((tDMAControlTable *) udmaCtrlTable)[ch].ui32Control & UDMA_CHCTL_XFERMODE_M) != UDMA_MODE_STOP) return;
+
+    // store the next buffer in the uDMA transfer descriptor
+    // the ADC is read directly into the correct emacBufTx to be transmitted
+    uDMAChannelTransferSet(ch, UDMA_MODE_PINGPONG, (void *)(ADC0_BASE + ADC_O_SSFIFO0), &adc_buffer[adc_pos], ADC_SAMPLE_BUF_SIZE);
+}
+
+void
+adcDmaCallback(unsigned int arg)
+{
+	ADCIntClear(ADC0_BASE, 0);
+
+	adc_pos += ADC_SAMPLE_BUF_SIZE;
+
+    if (adc_pos >= ADC_BUF_SIZE)
+    {
+    	adc_pos = 0;
+    }
+
+    ADCprocess(UDMA_CHANNEL_ADC0 | UDMA_PRI_SELECT);
+    ADCprocess(UDMA_CHANNEL_ADC0 | UDMA_ALT_SELECT);
+}
+
 void clk0Fxn(UArg arg0)
 {
     GPIO_clearInt(T_IRQ);
@@ -369,19 +406,13 @@ void heartBeatFxn(UArg arg0, UArg arg1)
 {
     while (1) {
         Task_sleep((unsigned int)arg0);
-        GPIO_toggle(Board_LED0);
+        //GPIO_toggle(Board_LED0);
 
-//        if (!GPIO_read(T_IRQ))
-//        {
-//        	Touch_Read(&x, &y);
-//            System_printf("x: %d, y: %d\r", x, y);
-//        }
-
-        ADCProcessorTrigger(ADC0_BASE, 0);
-        while(!ADCIntStatus(ADC0_BASE, 0, false));
-        uint32_t result;
-        ADCSequenceDataGet(ADC0_BASE, 0, &result);
-        System_printf("%04lu\r", result);
+//        ADCProcessorTrigger(ADC0_BASE, 0);
+//        while(!ADCIntStatus(ADC0_BASE, 0, false));
+//        uint32_t result;
+//        ADCSequenceDataGet(ADC0_BASE, 0, &result);
+//        System_printf("%04lu\r", result);
         System_flush();
     }
 }
@@ -506,6 +537,60 @@ shutdown:
     }
 }
 
+void
+ADC_Init(void)
+{
+    memset(&adc_buffer, 0, sizeof(adc_buffer));
+
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UDMA);
+    while (!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC0));
+    while (!SysCtlPeripheralReady(SYSCTL_PERIPH_UDMA));
+
+//    ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_EIGHTH, 1);
+
+//    ADCSequenceConfigure(ADC0_BASE, 0 /*SS0*/, ADC_TRIGGER_PROCESSOR, 3 /*priority*/);  // SS0-SS3 priorities must always be different
+//    ADCSequenceConfigure(ADC0_BASE, 3 /*SS3*/, ADC_TRIGGER_PROCESSOR, 0 /*priority*/);  // so change SS3 to prio0 when SS0 gets set to prio3
+
+    ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_ALWAYS, 0);
+//    ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
+    // Pin set to AIN0 (PE3)
+    int i;
+
+    for (i = 0; i < 7; i++)
+    {
+        ADCSequenceStepConfigure(ADC0_BASE, 0, i, ADC_CTL_CH0);
+    }
+    ADCSequenceStepConfigure(ADC0_BASE, 0, 7,  ADC_CTL_CH0 | ADC_CTL_IE | ADC_CTL_END);
+
+    ADCSequenceEnable(ADC0_BASE, 0);
+
+    uDMAEnable();
+    uDMAControlBaseSet(udmaCtrlTable);
+    ADCSequenceDMAEnable(ADC0_BASE, 0);
+
+    // disable some bits
+    uDMAChannelAttributeDisable(UDMA_CHANNEL_ADC0, UDMA_ATTR_ALTSELECT /*start with ping-pong PRI side*/ |
+         UDMA_ATTR_REQMASK /*unmask*/);
+    // enable some bits
+    uDMAChannelAttributeEnable(UDMA_CHANNEL_ADC0, UDMA_ATTR_USEBURST /*only allow burst transfers*/ | UDMA_ATTR_HIGH_PRIORITY /*low priority*/);
+    // set dma params on PRI_ and ALT_SELECT
+    uDMAChannelControlSet(UDMA_CHANNEL_ADC0 | UDMA_PRI_SELECT, UDMA_SIZE_16 | UDMA_SRC_INC_NONE | UDMA_DST_INC_16 | UDMA_ARB_8);
+    uDMAChannelControlSet(UDMA_CHANNEL_ADC0 | UDMA_ALT_SELECT, UDMA_SIZE_16 | UDMA_SRC_INC_NONE | UDMA_DST_INC_16 | UDMA_ARB_8);
+
+
+    uDMAChannelTransferSet(UDMA_CHANNEL_ADC0 | UDMA_PRI_SELECT, UDMA_MODE_PINGPONG,
+    		(void *)(ADC0_BASE + ADC_O_SSFIFO0), adc_buffer, ADC_SAMPLE_BUF_SIZE);
+    uDMAChannelTransferSet(UDMA_CHANNEL_ADC0 | UDMA_ALT_SELECT, UDMA_MODE_PINGPONG,
+    		(void *)(ADC0_BASE + ADC_O_SSFIFO0), adc_buffer, ADC_SAMPLE_BUF_SIZE);
+
+	//ADCIntEnableEx(ADC0_BASE, ADC_INT_DMA_SS0);
+	uDMAChannelEnable(UDMA_CHANNEL_ADC0);
+
+	//ADCIntRegister(ADC0_BASE, 0, &adcDmaCallback);
+	ADCIntEnable(ADC0_BASE, 0);
+}
+
 /*
  *  ======== main ========
  */
@@ -540,27 +625,20 @@ int main(void)
     Lcd_Init();
     Touch_Init();
 
+    ADC_Init();
+
     GPIO_setCallback(T_IRQ, touchCallback);
     GPIO_enableInt(T_IRQ);
 
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
-
-    while (!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC0));
-
-    ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
-    // Pin set to AIN0 (PE3)
-    ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_IE | ADC_CTL_END | ADC_CTL_CH0);
-    ADCSequenceEnable(ADC0_BASE, 0);
-
     /* Construct heartBeat Task  thread */
     Task_Params_init(&taskParams);
-    taskParams.arg0 = 200;
+    taskParams.arg0 = 1000;
     taskParams.stackSize = TASKSTACKSIZE;
     taskParams.stack = &task0Stack;
     Task_construct(&task0Struct, (Task_FuncPtr)heartBeatFxn, &taskParams, NULL);
 
     taskParams.stack = &task1Stack;
-    Task_construct(&task1Struct, (Task_FuncPtr)screenDemo, &taskParams, NULL);
+//    Task_construct(&task1Struct, (Task_FuncPtr)screenDemo, &taskParams, NULL);
 
      /* Turn on user LED */
     GPIO_write(Board_LED0, Board_LED_ON);
