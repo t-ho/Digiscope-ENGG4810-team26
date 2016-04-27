@@ -73,10 +73,10 @@
 
 /* Touch screen calibration */
 #define X_MIN 200
-#define X_MAX 1850
+#define X_MAX 1900
 #define X_PX 320.0f
 #define Y_MIN 200
-#define Y_MAX 1900
+#define Y_MAX 1850
 #define Y_PX 240.0f
 
 #define PREC_TOUCH_CONST 10
@@ -91,25 +91,34 @@ Clock_Handle TouchClkHandle;
 
 uint16_t x, y;
 
+const uint16_t LCD_DATA[] =
+{
+	LCD_DATA_0,
+	LCD_DATA_1,
+	LCD_DATA_2,
+	LCD_DATA_3,
+	LCD_DATA_4,
+	LCD_DATA_5,
+	LCD_DATA_6,
+	LCD_DATA_7,
+	LCD_DATA_8,
+	LCD_DATA_9,
+	LCD_DATA_10,
+	LCD_DATA_11,
+	LCD_DATA_12,
+	LCD_DATA_13,
+	LCD_DATA_14,
+	LCD_DATA_15
+};
 
 void gpio_out_data(uint16_t c)
 {
-	GPIO_write(LCD_DATA_0, (c >> 0) & 1);
-	GPIO_write(LCD_DATA_1, (c >> 1) & 1);
-	GPIO_write(LCD_DATA_2, (c >> 2) & 1);
-	GPIO_write(LCD_DATA_3, (c >> 3) & 1);
-	GPIO_write(LCD_DATA_4, (c >> 4) & 1);
-	GPIO_write(LCD_DATA_5, (c >> 5) & 1);
-	GPIO_write(LCD_DATA_6, (c >> 6) & 1);
-	GPIO_write(LCD_DATA_7, (c >> 7) & 1);
-	GPIO_write(LCD_DATA_8, (c >> 8) & 1);
-	GPIO_write(LCD_DATA_9, (c >> 9) & 1);
-	GPIO_write(LCD_DATA_10, (c >> 10) & 1);
-	GPIO_write(LCD_DATA_11, (c >> 11) & 1);
-	GPIO_write(LCD_DATA_12, (c >> 12) & 1);
-	GPIO_write(LCD_DATA_13, (c >> 13) & 1);
-	GPIO_write(LCD_DATA_14, (c >> 14) & 1);
-	GPIO_write(LCD_DATA_15, (c >> 15) & 1);
+	int i;
+
+	for (i = 0; i < 16; i++)
+	{
+		GPIO_write(LCD_DATA[i], !!(c & (1 << i)));
+	}
 }
 
 void Write_Command(uint16_t c)
@@ -299,14 +308,14 @@ void Touch_Read(uint16_t *x_out, uint16_t *y_out)
 		SysCtlDelay(3);
 		GPIO_write(T_CLK,0);
 		SysCtlDelay(3);
-		ty += Touch_ReadData();
+		tx += Touch_ReadData();
 
 		Touch_WriteData(0xD0);
 		GPIO_write(T_CLK,1);
 		SysCtlDelay(3);
 		GPIO_write(T_CLK,0);
 		SysCtlDelay(3);
-		tx += Touch_ReadData();
+		ty += Touch_ReadData();
 
 	}
 
