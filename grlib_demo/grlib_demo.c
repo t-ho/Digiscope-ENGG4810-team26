@@ -47,7 +47,7 @@
 #include "grlib/slider.h"
 #include "utils/ustdlib.h"
 #include "drivers/SSD1289_driver.h"
-#include "drivers/touch.h"
+#include "drivers/XPT2046_driver.h"
 #include "images.h"
 
 //*****************************************************************************
@@ -1080,8 +1080,11 @@ main(void)
     // Initialize the touch screen driver and have it route its messages to the
     // widget tree.
     //
-    TouchScreenInit(g_ui32SysClock);
-    TouchScreenCallbackSet(WidgetPointerMessage);
+//    TouchScreenInit(g_ui32SysClock);
+//    TouchScreenCallbackSet(WidgetPointerMessage);
+
+    XPT2046_Init();
+    XPT2046_SetCallback(WidgetPointerMessage);
 
     //
     // Add the title block and the previous and next buttons to the widget
