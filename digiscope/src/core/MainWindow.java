@@ -355,7 +355,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		setEnabledExpressionControls(false);
 		setEnabledMathChannelControls(false);
 		newExpressionButton.setEnabled(true);
-		visualizer_.removeAllSeriesFromDataset(Constant.MATH_INDEX);
+		removeChannelPlotFromChartPanel(Constant.MATH_CHANNEL);
 		rawXYSeries.remove(Constant.MATH_CHANNEL);
 	}
 
@@ -415,46 +415,22 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 
 	private void verticalOffsetASpinnerStateChanged(ChangeEvent event) {
 		// TODO
-		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetASpinner.getValue(),
-				(String) horizontalOffsetUnitAComboBox.getSelectedItem());
-		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetASpinner.getValue(),
-				(String) verticalOffsetUnitAComboBox.getSelectedItem());
-		XYSeries aSeries = createXYSeriesWithOffsets(Constant.CHANNEL_A,
-				rawXYSeries.get(Constant.CHANNEL_A), horizontalOffset, verticalOffset);
-		visualizer_.addSeriesToDataset(Constant.A_INDEX, aSeries);
+		showChannelPlotOnChartPanel(Constant.CHANNEL_A);
 	}
 	
 	private void verticalOffsetBSpinnerStateChanged(ChangeEvent event) {
 		// TODO
-		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetBSpinner.getValue(),
-				(String) horizontalOffsetUnitBComboBox.getSelectedItem());
-		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetBSpinner.getValue(),
-				(String) verticalOffsetUnitBComboBox.getSelectedItem());
-		XYSeries bSeries = createXYSeriesWithOffsets(Constant.CHANNEL_B,
-				rawXYSeries.get(Constant.CHANNEL_B), horizontalOffset, verticalOffset);
-		visualizer_.addSeriesToDataset(Constant.B_INDEX, bSeries);
+		showChannelPlotOnChartPanel(Constant.CHANNEL_B);
 	}
 
 	private void verticalOffsetMathSpinnerStateChanged(ChangeEvent event) {
 		// TODO
-		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetMathSpinner.getValue(),
-				(String) horizontalOffsetUnitMathComboBox.getSelectedItem());
-		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetMathSpinner.getValue(),
-				(String) verticalOffsetUnitMathComboBox.getSelectedItem());
-		XYSeries mathSeries = createXYSeriesWithOffsets(Constant.MATH_CHANNEL,
-				rawXYSeries.get(Constant.MATH_CHANNEL),horizontalOffset, verticalOffset);
-		visualizer_.addSeriesToDataset(Constant.MATH_INDEX, mathSeries);
+		showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
 	}
 
 	private void verticalOffsetFilterSpinnerStateChanged(ChangeEvent event) {
 		// TODO
-		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetFilterSpinner.getValue(),
-				(String) horizontalOffsetUnitFilterComboBox.getSelectedItem());
-		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetFilterSpinner.getValue(),
-				(String) verticalOffsetUnitFilterComboBox.getSelectedItem());
-		XYSeries filterSeries = createXYSeriesWithOffsets(Constant.FILTER_CHANNEL,
-				rawXYSeries.get(Constant.FILTER_CHANNEL), horizontalOffset, verticalOffset);
-		visualizer_.addSeriesToDataset(Constant.FILTER_INDEX, filterSeries);
+		showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
 	}
 
 	private void horizontalOffsetASpinnerStateChanged(ChangeEvent event) {
@@ -632,30 +608,25 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 
 	private void channelACheckboxItemStateChanged(ItemEvent event) {
 		// TODO
-		if(channelACheckBox.isSelected()) {
+		if (channelACheckBox.isSelected()) {
 			setEnabledChannelAControls(true);
 			showTab(Constant.TAB.CHANNEL_A);
-			showChannelPlotOnChartPanel(Constant.CHANNEL_A, Constant.A_INDEX,
-					(int) horizontalOffsetASpinner.getValue(),
-					(int) verticalOffsetASpinner.getValue());
+			showChannelPlotOnChartPanel(Constant.CHANNEL_A);
 		} else {
 			setEnabledChannelAControls(false);
-			removeChannelPlotFromChartPanel(Constant.CHANNEL_A, Constant.A_INDEX);
+			removeChannelPlotFromChartPanel(Constant.CHANNEL_A);
 		}
-	}
-	
+	}	
 	
 	private void channelBCheckboxItemStateChanged(ItemEvent event) {
 		// TODO
 		if(channelBCheckBox.isSelected()) {
 			setEnabledChannelBControls(true);
 			showTab(Constant.TAB.CHANNEL_B);
-			showChannelPlotOnChartPanel(Constant.CHANNEL_B, Constant.B_INDEX,
-					(int) horizontalOffsetBSpinner.getValue(),
-					(int) verticalOffsetBSpinner.getValue());
+			showChannelPlotOnChartPanel(Constant.CHANNEL_B);
 		} else {
 			setEnabledChannelBControls(false);
-			removeChannelPlotFromChartPanel(Constant.CHANNEL_B, Constant.B_INDEX);
+			removeChannelPlotFromChartPanel(Constant.CHANNEL_B);
 		}
 	}
 
@@ -664,12 +635,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		if(mathChannelCheckBox.isSelected()) {
 			setEnabledMathChannelControls(true);
 			showTab(Constant.TAB.MATH_CHANNEL);
-			showChannelPlotOnChartPanel(Constant.MATH_CHANNEL, Constant.MATH_INDEX,
-					(int) horizontalOffsetMathSpinner.getValue(),
-					(int) verticalOffsetMathSpinner.getValue());
+			showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
 		} else {
 			setEnabledMathChannelControls(false);
-			removeChannelPlotFromChartPanel(Constant.MATH_CHANNEL, Constant.MATH_INDEX);
+			removeChannelPlotFromChartPanel(Constant.MATH_CHANNEL);
 		}
 	}
 	
@@ -678,12 +647,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		if(filterChannelCheckBox.isSelected()) {
 			setEnabledFilterChannelControls(true);
 			showTab(Constant.TAB.FILTER_CHANNEL);
-			showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL, Constant.FILTER_INDEX,
-					(int) horizontalOffsetFilterSpinner.getValue(),
-					(int) verticalOffsetFilterSpinner.getValue());
+			showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
 		} else {
 			setEnabledFilterChannelControls(false);
-			removeChannelPlotFromChartPanel(Constant.FILTER_CHANNEL, Constant.FILTER_INDEX);
+			removeChannelPlotFromChartPanel(Constant.FILTER_CHANNEL);
 		}
 	}
 
@@ -918,18 +885,41 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	/**
 	 * Show the plot of specified channel on the chart panel
 	 * @param channelName The channel's name
-	 * @param channelIndex The channel's index
-	 * @param horizontalOffset The horizontal offset of the channel
-	 * @param verticalOffset The vertical offset of the channel
 	 */
-	private void showChannelPlotOnChartPanel(String channelName, int channelIndex,
-			int horizontalOffset, int verticalOffset) {
+	private void showChannelPlotOnChartPanel(String channelName) {
 		XYSeries rawSeries = rawXYSeries.get(channelName);
-		if(rawSeries != null) {
-			XYSeries xYSeries = createXYSeriesWithOffsets(channelName, rawSeries,
-					horizontalOffset, verticalOffset);
+		if (rawSeries != null) {
+			int horizontalOffset = 0;
+			int verticalOffset = 0;
+			int channelIndex = 0;
+			if (channelName == Constant.CHANNEL_A) {
+				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetASpinner.getValue(),
+						(String) horizontalOffsetUnitAComboBox.getSelectedItem());
+				verticalOffset = getVerticalOffsetValue((int) verticalOffsetASpinner.getValue(),
+						(String) verticalOffsetUnitAComboBox.getSelectedItem());
+				channelIndex = Constant.A_INDEX;
+			} else if (channelName == Constant.CHANNEL_B) {
+				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetBSpinner.getValue(),
+						(String) horizontalOffsetUnitBComboBox.getSelectedItem());
+				verticalOffset = getVerticalOffsetValue((int) verticalOffsetBSpinner.getValue(),
+						(String) verticalOffsetUnitBComboBox.getSelectedItem());
+				channelIndex = Constant.B_INDEX;
+			} else if (channelName == Constant.MATH_CHANNEL) {
+				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetMathSpinner.getValue(),
+						(String) horizontalOffsetUnitMathComboBox.getSelectedItem());
+				verticalOffset = getVerticalOffsetValue((int) verticalOffsetMathSpinner.getValue(),
+						(String) verticalOffsetUnitMathComboBox.getSelectedItem());
+				channelIndex = Constant.MATH_INDEX;
+			} else if (channelName == Constant.FILTER_CHANNEL) {
+				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetFilterSpinner.getValue(),
+						(String) horizontalOffsetUnitFilterComboBox.getSelectedItem());
+				verticalOffset = getVerticalOffsetValue((int) verticalOffsetFilterSpinner.getValue(),
+						(String) verticalOffsetUnitFilterComboBox.getSelectedItem());
+				channelIndex = Constant.FILTER_INDEX;
+			}
+			XYSeries xYSeries = createXYSeriesWithOffsets(channelName, rawSeries, horizontalOffset, verticalOffset);
 			visualizer_.addSeriesToDataset(channelIndex, xYSeries);
-			// remove item if exist before adding
+			// remove item if it exists in the combo box before adding
 			cursorComboBox.removeItem(channelName);
 			cursorComboBox.addItem(channelName);
 		}
@@ -938,9 +928,18 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	/**
 	 * Remove the plot of specified channel from the chart panel
 	 * @param channelName The channel's name
-	 * @param channelIndex The channel's index
 	 */
-	private void removeChannelPlotFromChartPanel(String channelName, int channelIndex) {
+	private void removeChannelPlotFromChartPanel(String channelName) {
+		int channelIndex = 0;
+		if(channelName == Constant.CHANNEL_A) {
+			channelIndex = Constant.A_INDEX;
+		} else if(channelName == Constant.CHANNEL_B) {
+			channelIndex = Constant.B_INDEX;
+		} else if(channelName == Constant.MATH_CHANNEL) {
+			channelIndex = Constant.MATH_INDEX;
+		} else if(channelName == Constant.FILTER_CHANNEL) {
+			channelIndex = Constant.FILTER_INDEX;
+		}
 		visualizer_.removeAllSeriesFromDataset(channelIndex);
 		cursorComboBox.removeItem(channelName);
 	}
@@ -1014,12 +1013,9 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 					filterSeries.add(x, evaluator.evaluate(expression, evaluator.getVariables()));
 				}
 				rawXYSeries.put(Constant.MATH_CHANNEL, filterSeries);
-				int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetMathSpinner.getValue(),
-						(String) horizontalOffsetUnitMathComboBox.getSelectedItem());
-				int verticalOffset = getVerticalOffsetValue((int) verticalOffsetMathSpinner.getValue(),
-						(String) verticalOffsetUnitMathComboBox.getSelectedItem());
-				showChannelPlotOnChartPanel(Constant.MATH_CHANNEL, Constant.MATH_INDEX, horizontalOffset,
-						verticalOffset);
+				if(mathChannelCheckBox.isSelected()) {
+					showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
+				}
 			} else {
 				System.out.print("There is no input channels (A, B or Filter) in the expression");
 			}
