@@ -1,5 +1,6 @@
 package core;
 
+import gui.FileChooserUI;
 import gui.MainWindowUi;
 
 import java.awt.BasicStroke;
@@ -14,6 +15,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JFileChooser;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -347,6 +349,22 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				removeExpressionButtonActionPerformed(event);
 			}
 		});
+		
+		browseButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				browseButtonActionPerformed(event);
+			}
+		});
+	}
+
+	protected void browseButtonActionPerformed(ActionEvent event) {
+		// TODO
+		String iconPath = "/icons/csv_icon_16x16.png";
+		String decription = "Comma-separated-values file (*." + Constant.CSV_FILE_EXTENSION + ")";
+		FileChooserUI fileChooser = new FileChooserUI(JFileChooser.FILES_ONLY, Constant.CSV_FILE_EXTENSION,
+				iconPath, decription);
+		fileChooser.showOpenDialog(this);
 	}
 
 	protected void removeExpressionButtonActionPerformed(ActionEvent event) {

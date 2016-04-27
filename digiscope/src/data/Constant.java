@@ -15,6 +15,8 @@ import javax.swing.UIManager;
 public class Constant {
 
 	public static final String APPLICATION_TITLE = "Digiscope - Team 26";
+
+	public static final String CSV_FILE_EXTENSION = "csv";
 	
 	public static final String ONE_MILIVOLT = "1 mV";
 	public static final String TEN_MILIVOLTS = "10 mV";
