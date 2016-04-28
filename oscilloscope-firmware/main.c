@@ -70,166 +70,14 @@
 #include "inc/hw_memmap.h"
 
 #include "drivers/SSD1289_driver.h"
+#include "drivers/XPT2046_driver.h"
 
 #define TASKSTACKSIZE   1024
-
-/* Touch screen calibration */
-#define X_MIN 200
-#define X_MAX 1900
-#define X_PX 320.0f
-#define Y_MIN 200
-#define Y_MAX 1850
-#define Y_PX 240.0f
-
-#define PREC_TOUCH_CONST 10
 
 Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
 Task_Struct task1Struct;
 Char task1Stack[TASKSTACKSIZE];
-
-Clock_Struct TouchClkStruct;
-Clock_Handle TouchClkHandle;
-
-uint16_t x, y;
-
-void Touch_Init(void)
-{
-	GPIO_write(T_CS,  1);
-	SysCtlDelay(3);
-	GPIO_write(T_CLK, 1);
-	SysCtlDelay(3);
-	GPIO_write(T_DIN, 1);
-	SysCtlDelay(3);
-	GPIO_write(T_CLK, 1);
-	SysCtlDelay(3);
-
-	GPIO_write(T_CLK, 0);
-	SysCtlDelay(3);
-}
-
-
-void Touch_WriteData(uint8_t data)
-{
-	uint8_t temp;
-	uint8_t count;
-
-	temp=data;
-	GPIO_write(T_CLK,0);
-	SysCtlDelay(3);
-
-	for(count=0; count<8; count++)
-	{
-		if(temp & 0x80)
-			GPIO_write(T_DIN, 1);
-		else
-			GPIO_write(T_DIN, 0);
-		temp = temp << 1;
-		SysCtlDelay(3);
-		GPIO_write(T_CLK, 0);
-		SysCtlDelay(3);
-		GPIO_write(T_CLK, 1);
-//		SysCtlDelay(3);
-	}
-}
-
-uint16_t Touch_ReadData()
-{
-	uint16_t data = 0;
-	uint8_t count;
-
-	for(count=0; count<12; count++)
-	{
-		data <<= 1;
-		GPIO_write(T_CLK, 1);
-		SysCtlDelay(3);
-		if (GPIO_read(T_DOUT))
-		{
-			data++;
-		}
-		SysCtlDelay(3);
-		GPIO_write(T_CLK, 0);
-		SysCtlDelay(3);
-	}
-	return(data);
-}
-
-void Touch_Read(uint16_t *x_out, uint16_t *y_out)
-{
-	uint32_t tx=0;
-	uint32_t ty=0;
-
-	GPIO_write(T_CS,0);
-	SysCtlDelay(3);
-
-	int i;
-	for (i = 0; i < PREC_TOUCH_CONST; i++)
-	{
-		Touch_WriteData(0x90);
-		GPIO_write(T_CLK,1);
-		SysCtlDelay(3);
-		GPIO_write(T_CLK,0);
-		SysCtlDelay(3);
-		tx += Touch_ReadData();
-
-		Touch_WriteData(0xD0);
-		GPIO_write(T_CLK,1);
-		SysCtlDelay(3);
-		GPIO_write(T_CLK,0);
-		SysCtlDelay(3);
-		ty += Touch_ReadData();
-
-	}
-
-	GPIO_write(T_CS,1);
-
-	int16_t x_temp = ((tx / PREC_TOUCH_CONST) - X_MIN) * X_PX / (X_MAX - X_MIN);
-	int16_t y_temp = ((ty / PREC_TOUCH_CONST) - Y_MIN) * Y_PX / (Y_MAX - Y_MIN);
-
-	if (x_temp < 0)
-	{
-		*x_out = 0;
-	}
-	else if (x_temp > X_PX)
-	{
-		*x_out = (uint16_t) X_PX;
-	}
-	else
-	{
-		*x_out = x_temp;
-	}
-
-	if (y_temp < 0)
-	{
-		*y_out = 0;
-	}
-	else if (y_temp > Y_PX)
-	{
-		*y_out = (uint16_t) Y_PX;
-	}
-	else
-	{
-		*y_out = y_temp;
-	}
-}
-
-void touchCallback(unsigned int index)
-{
-	GPIO_disableInt(T_IRQ);
-
-	Touch_Read(&x, &y);
-    System_printf("x: %d, y: %d\r", x, y);
-
-    Clock_start(TouchClkHandle);
-
-}
-
-void clk0Fxn(UArg arg0)
-{
-    GPIO_clearInt(T_IRQ);
-    GPIO_enableInt(T_IRQ);
-}
-
 
 /*
  *  ======== heartBeatFxn ========
@@ -288,7 +136,6 @@ void screenDemo(UArg arg0, UArg arg1)
         Task_sleep(1000);
     }
 }
-
 
 #define TCPPACKETSIZE 256
 #define NUMTCPWORKERS 3
@@ -397,16 +244,16 @@ shutdown:
     }
 }
 
+int32_t TouchCallback(uint32_t message, int32_t x, int32_t y)
+{
+	return System_printf("m: %lu, x: %ld, y: %ld\n", message, x, y);
+}
+
 /*
  *  ======== main ========
  */
 int main(void)
 {
-
-    SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ |
-                    SYSCTL_OSC_MAIN | SYSCTL_USE_PLL |
-                    SYSCTL_CFG_VCO_480), 120000000);
-
     Task_Params taskParams;
     /* Call board init functions */
     Board_initGeneral();
@@ -421,18 +268,9 @@ int main(void)
     // Board_initWatchdog();
     // Board_initWiFi();
 
-    Clock_Params clkParams;
-    Clock_Params_init(&clkParams);
-    clkParams.period = 0;
-    clkParams.startFlag = FALSE;
-    Clock_construct(&TouchClkStruct, (Clock_FuncPtr)clk0Fxn, 200, &clkParams);
-    TouchClkHandle = Clock_handle(&TouchClkStruct);
-
     SSD1289_Init();
-    Touch_Init();
-
-    GPIO_setCallback(T_IRQ, touchCallback);
-    GPIO_enableInt(T_IRQ);
+    XPT2046_Init();
+    XPT2046_SetCallback(TouchCallback);
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 
