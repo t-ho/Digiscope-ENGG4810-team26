@@ -69,7 +69,9 @@
 #include "driverlib/sysctl.h"
 #include "inc/hw_memmap.h"
 
-#define TASKSTACKSIZE   512
+#include "drivers/SSD1289_driver.h"
+
+#define TASKSTACKSIZE   1024
 
 /* Touch screen calibration */
 #define X_MIN 200
@@ -90,146 +92,6 @@ Clock_Struct TouchClkStruct;
 Clock_Handle TouchClkHandle;
 
 uint16_t x, y;
-
-const uint16_t LCD_DATA[] =
-{
-	LCD_DATA_0,
-	LCD_DATA_1,
-	LCD_DATA_2,
-	LCD_DATA_3,
-	LCD_DATA_4,
-	LCD_DATA_5,
-	LCD_DATA_6,
-	LCD_DATA_7,
-	LCD_DATA_8,
-	LCD_DATA_9,
-	LCD_DATA_10,
-	LCD_DATA_11,
-	LCD_DATA_12,
-	LCD_DATA_13,
-	LCD_DATA_14,
-	LCD_DATA_15
-};
-
-void gpio_out_data(uint16_t c)
-{
-	int i;
-
-	for (i = 0; i < 16; i++)
-	{
-		GPIO_write(LCD_DATA[i], !!(c & (1 << i)));
-	}
-}
-
-void Write_Command(uint16_t c)
-{
-	GPIO_write(LCD_CS, 0);
-	GPIO_write(LCD_RS,0);
-	gpio_out_data(c);
-	GPIO_write(LCD_WR,0);
-	GPIO_write(LCD_WR,1);
-	GPIO_write(LCD_CS,1);
-}
-
-void Write_Data(uint16_t c)
-{
-	GPIO_write(LCD_CS, 0);
-	GPIO_write(LCD_RS,1);
-	gpio_out_data(c);
-	GPIO_write(LCD_WR,0);
-	GPIO_write(LCD_WR,1);
-	GPIO_write(LCD_CS,1);
-}
-
-void Write_Command_Data(uint16_t cmd, uint16_t dat)
-{
-	Write_Command(cmd);
-	Write_Data(dat);
-}
-
-
-void Lcd_Init()
-{
-	GPIO_write(LCD_LED,1);
-
-	GPIO_write(LCD_RST,0);
-	GPIO_write(LCD_CS,1);
-	GPIO_write(LCD_RS,1);
-	GPIO_write(LCD_WR,1);
-	GPIO_write(LCD_RD,1);
-
-	GPIO_write(LCD_RST,1);
-
-	SysCtlDelay(100);
-
-	Write_Command_Data(0x0000,0x0001);
-	Write_Command_Data(0x0003,0xA8A4);
-	Write_Command_Data(0x000C,0x0000);
-	Write_Command_Data(0x000D,0x080C);
-	Write_Command_Data(0x000E,0x2B00);
-	Write_Command_Data(0x001E,0x00B7);
-	Write_Command_Data(0x0001,0x2B3F);
-	Write_Command_Data(0x0002,0x0600);
-	Write_Command_Data(0x0010,0x0000);
-	Write_Command_Data(0x0011,0x6070);
-	Write_Command_Data(0x0005,0x0000);
-	Write_Command_Data(0x0006,0x0000);
-	Write_Command_Data(0x0016,0xEF1C);
-	Write_Command_Data(0x0017,0x0003);
-	Write_Command_Data(0x0007,0x0233);
-	Write_Command_Data(0x000B,0x0000);
-	Write_Command_Data(0x000F,0x0000);
-	Write_Command_Data(0x0041,0x0000);
-	Write_Command_Data(0x0042,0x0000);
-	Write_Command_Data(0x0048,0x0000);
-	Write_Command_Data(0x0049,0x013F);
-	Write_Command_Data(0x004A,0x0000);
-	Write_Command_Data(0x004B,0x0000);
-	Write_Command_Data(0x0044,0xEF00);
-	Write_Command_Data(0x0045,0x0000);
-	Write_Command_Data(0x0046,0x013F);
-	Write_Command_Data(0x0030,0x0707);
-	Write_Command_Data(0x0031,0x0204);
-	Write_Command_Data(0x0032,0x0204);
-	Write_Command_Data(0x0033,0x0502);
-	Write_Command_Data(0x0034,0x0507);
-	Write_Command_Data(0x0035,0x0204);
-	Write_Command_Data(0x0036,0x0204);
-	Write_Command_Data(0x0037,0x0502);
-	Write_Command_Data(0x003A,0x0302);
-	Write_Command_Data(0x003B,0x0302);
-	Write_Command_Data(0x0023,0x0000);
-	Write_Command_Data(0x0024,0x0000);
-	Write_Command_Data(0x0025,0x8000);
-	Write_Command_Data(0x004f,0x0000);
-	Write_Command_Data(0x004e,0x0000);
-	Write_Command(0x0022);
-}
-
-void SetXY(unsigned int x0,unsigned int y0,unsigned int x1,unsigned int y1)
-{
-	Write_Command_Data(0x0044,(x1<<8)+x0);
-	Write_Command_Data(0x0045,y0);
-	Write_Command_Data(0x0046,y1);
-	Write_Command_Data(0x004e,x0);
-	Write_Command_Data(0x004f,y0);
-	Write_Command (0x0022);//LCD_WriteCMD(GRAMWR);
-}
-
-void Pant(uint16_t color)
-{
-	int i,j;
-	SetXY(0,0,239,319);
-
-	for(i=0;i<320;i++)
-	{
-		for (j=0;j<240;j++)
-		{
-			Write_Data(color);
-		}
-        Task_sleep(1);
-	}
-}
 
 void Touch_Init(void)
 {
@@ -397,13 +259,33 @@ void heartBeatFxn(UArg arg0, UArg arg1)
 
 void screenDemo(UArg arg0, UArg arg1)
 {
+    tContext sContext;
+    tRectangle sRect;
+
+    GrContextInit(&sContext, &SSD1289_Display);
+
+    // Fill the top 24 rows of the screen with blue to create the banner.
+    sRect.i16XMin = 0;
+    sRect.i16YMin = 0;
+    sRect.i16XMax = GrContextDpyWidthGet(&sContext) - 1;
+    sRect.i16YMax = 23;
+
     while (1) {
-        Task_sleep(2000);
-    	Pant(0xF800);
-        Task_sleep(2000);
-    	Pant(0x001F);
-        Task_sleep(2000);
-    	Pant(0xFFE0);
+        GrContextForegroundSet(&sContext, ClrDarkBlue);
+        GrRectFill(&sContext, &sRect);
+        // Put a white box around the banner.
+        GrContextForegroundSet(&sContext, ClrWhite);
+        GrRectDraw(&sContext, &sRect);
+        // Put the application name in the middle of the banner.
+        GrContextFontSet(&sContext, &g_sFontCm20);
+        GrStringDrawCentered(&sContext, "grlib demo", -1, GrContextDpyWidthGet(&sContext) / 2, 8, 0);
+
+        Task_sleep(1000);
+
+        GrContextForegroundSet(&sContext, ClrCoral);
+        GrRectFill(&sContext, &sRect);
+
+        Task_sleep(1000);
     }
 }
 
@@ -546,7 +428,7 @@ int main(void)
     Clock_construct(&TouchClkStruct, (Clock_FuncPtr)clk0Fxn, 200, &clkParams);
     TouchClkHandle = Clock_handle(&TouchClkStruct);
 
-    Lcd_Init();
+    SSD1289_Init();
     Touch_Init();
 
     GPIO_setCallback(T_IRQ, touchCallback);
