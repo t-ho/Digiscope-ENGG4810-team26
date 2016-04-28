@@ -17,6 +17,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/timer.h"
 #include "driverlib/rom.h"
+#include "driverlib/rom_map.h"
 #include "grlib/grlib.h"
 
 #define SSD1289_ENTRY_MODE_REG        0x11
@@ -35,35 +36,8 @@
 #define MAPPED_X(x, y) (y)
 #define MAPPED_Y(x, y) (319 - x)
 
-//#define ENTRY_MODE_HORIZ 0x6800
-//#define ENTRY_MODE_VERT 0x6808
-
-/*
-#define LCD_DATA_0	GPIOTiva_PK_7
-#define LCD_DATA_1	GPIOTiva_PK_6
-#define LCD_DATA_2	GPIOTiva_PH_1
-#define LCD_DATA_3	GPIOTiva_PH_0
-#define LCD_DATA_4	GPIOTiva_PM_2
-#define LCD_DATA_5	GPIOTiva_PM_1
-#define LCD_DATA_6	GPIOTiva_PM_0
-#define LCD_DATA_7	GPIOTiva_PK_5
-#define LCD_DATA_8	GPIOTiva_PA_5
-#define LCD_DATA_9	GPIOTiva_PA_4
-#define LCD_DATA_10	GPIOTiva_PK_3
-#define LCD_DATA_11	GPIOTiva_PK_2
-#define LCD_DATA_12	GPIOTiva_PK_1
-#define LCD_DATA_13	GPIOTiva_PK_0
-#define LCD_DATA_14	GPIOTiva_PB_5
-#define LCD_DATA_15	GPIOTiva_PB_4
-
-#define LCD_RS	GPIOTiva_PA_7
-#define LCD_WR	GPIOTiva_PP_5
-#define LCD_RD	GPIOTiva_PM_7
-
-#define LCD_CS	GPIOTiva_PN_5
-#define LCD_RST	GPIOTiva_PP_4
-#define LCD_LED	GPIOTiva_PQ_0
-*/
+#define GPIO_SET_HIGH(pin) GPIOPinWrite(pin ## _B, pin ## _P, pin ## _P)
+#define GPIO_SET_LOW(pin) GPIOPinWrite(pin ## _B, pin ## _P, 0)
 
 //*****************************************************************************
 //
@@ -134,7 +108,7 @@
 #define LCD_RST_P		GPIO_PIN_4
 #define LCD_LED_P		GPIO_PIN_0
 
-const uint32_t LCD_BASES[] =
+static const uint32_t LCD_BASES[] =
 {
 	LCD_DATA_0_B,
 	LCD_DATA_1_B,
@@ -160,7 +134,7 @@ const uint32_t LCD_BASES[] =
 	LCD_LED_B
 };
 
-const uint8_t LCD_PINS[] =
+static const uint8_t LCD_PINS[] =
 {
 	LCD_DATA_0_P,
 	LCD_DATA_1_P,
@@ -194,39 +168,35 @@ gpio_out_data(uint16_t c)
 	{
 		if (c & (1 << i))
 		{
-			GPIOPinWrite(LCD_BASES[i], LCD_PINS[i], LCD_PINS[i]);
+			MAP_GPIOPinWrite(LCD_BASES[i], LCD_PINS[i], LCD_PINS[i]);
 		}
 		else
 		{
-			GPIOPinWrite(LCD_BASES[i], LCD_PINS[i], 0);
+			MAP_GPIOPinWrite(LCD_BASES[i], LCD_PINS[i], 0);
 		}
 	}
 }
 
-#define GPIO_SET_HIGH(pin) GPIOPinWrite(pin ## _B, pin ## _P, pin ## _P)
-#define GPIO_SET_LOW(pin) GPIOPinWrite(pin ## _B, pin ## _P, 0)
-
 static void
 Write_Command(uint16_t c)
 {
-	GPIO_SET_LOW(LCD_CS);
-	//GPIOPinWrite(LCD_CS_B, LCD_CS_P, 0);
-	GPIOPinWrite(LCD_RS_B, LCD_RS_P, 0);
+	MAP_GPIOPinWrite(LCD_CS_B, LCD_CS_P, 0);
+	MAP_GPIOPinWrite(LCD_RS_B, LCD_RS_P, 0);
 	gpio_out_data(c);
-	GPIOPinWrite(LCD_WR_B, LCD_WR_P, 0);
-	GPIOPinWrite(LCD_WR_B, LCD_WR_P, LCD_WR_P);
-	GPIOPinWrite(LCD_CS_B, LCD_CS_P, LCD_CS_P);
+	MAP_GPIOPinWrite(LCD_WR_B, LCD_WR_P, 0);
+	MAP_GPIOPinWrite(LCD_WR_B, LCD_WR_P, LCD_WR_P);
+	MAP_GPIOPinWrite(LCD_CS_B, LCD_CS_P, LCD_CS_P);
 }
 
 static void
 Write_Data(uint16_t c)
 {
-	GPIOPinWrite(LCD_CS_B, LCD_CS_P, 0);
-	GPIOPinWrite(LCD_RS_B, LCD_RS_P, LCD_RS_P);
+	MAP_GPIOPinWrite(LCD_CS_B, LCD_CS_P, 0);
+	MAP_GPIOPinWrite(LCD_RS_B, LCD_RS_P, LCD_RS_P);
 	gpio_out_data(c);
-	GPIOPinWrite(LCD_WR_B, LCD_WR_P, 0);
-	GPIOPinWrite(LCD_WR_B, LCD_WR_P, LCD_WR_P);
-	GPIOPinWrite(LCD_CS_B, LCD_CS_P, LCD_CS_P);
+	MAP_GPIOPinWrite(LCD_WR_B, LCD_WR_P, 0);
+	MAP_GPIOPinWrite(LCD_WR_B, LCD_WR_P, LCD_WR_P);
+	MAP_GPIOPinWrite(LCD_CS_B, LCD_CS_P, LCD_CS_P);
 }
 
 static void
@@ -264,17 +234,17 @@ void Pant(uint16_t color)
 static void
 SSD1289_Init_Magic()
 {
-	GPIOPinWrite(LCD_LED_B, LCD_LED_P, LCD_LED_P);
+	MAP_GPIOPinWrite(LCD_LED_B, LCD_LED_P, LCD_LED_P);
 
-	GPIOPinWrite(LCD_RST_B, LCD_RST_P, 0);
-	GPIOPinWrite(LCD_CS_B, LCD_CS_P, LCD_CS_P);
-	GPIOPinWrite(LCD_RS_B, LCD_RS_P, LCD_RS_P);
-	GPIOPinWrite(LCD_WR_B, LCD_WR_P, LCD_WR_P);
-	GPIOPinWrite(LCD_RD_B, LCD_RD_P, LCD_RD_P);
+	MAP_GPIOPinWrite(LCD_RST_B, LCD_RST_P, 0);
+	MAP_GPIOPinWrite(LCD_CS_B, LCD_CS_P, LCD_CS_P);
+	MAP_GPIOPinWrite(LCD_RS_B, LCD_RS_P, LCD_RS_P);
+	MAP_GPIOPinWrite(LCD_WR_B, LCD_WR_P, LCD_WR_P);
+	MAP_GPIOPinWrite(LCD_RD_B, LCD_RD_P, LCD_RD_P);
 
-	GPIOPinWrite(LCD_RST_B, LCD_RST_P, LCD_RST_P);
+	MAP_GPIOPinWrite(LCD_RST_B, LCD_RST_P, LCD_RST_P);
 
-	SysCtlDelay(100);
+	MAP_SysCtlDelay(100);
 
 	Write_Command_Data(0x0000,0x0001);
 	Write_Command_Data(0x0003,0xA8A4);
@@ -338,17 +308,17 @@ SSD1289_Init(void)
 	int i;
 	for (i = 0; i < sizeof(lcd_bs) / sizeof(uint32_t); i++)
 	{
-		SysCtlPeripheralEnable(lcd_bs[i]);
+		MAP_SysCtlPeripheralEnable(lcd_bs[i]);
 		SysCtlGPIOAHBEnable(lcd_bs[i]);
 	}
 
 	for (i = 0; i < 22; i++)
 	{
-		GPIOPinTypeGPIOOutput(LCD_BASES[i], LCD_PINS[i]);
-		GPIOPadConfigSet(LCD_BASES[i], LCD_PINS[i], GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
+		MAP_GPIOPinTypeGPIOOutput(LCD_BASES[i], LCD_PINS[i]);
+		MAP_GPIOPadConfigSet(LCD_BASES[i], LCD_PINS[i], GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
 	}
 
-	SysCtlDelay(100);
+	MAP_SysCtlDelay(100);
 
 	SSD1289_Init_Magic();
 
@@ -584,7 +554,3 @@ const tDisplay SSD1289_Display =
 	SSD1289_ColorTranslate,
 	SSD1289_Flush
 };
-
-
-
-
