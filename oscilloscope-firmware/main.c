@@ -87,7 +87,7 @@
 #define PREC_TOUCH_CONST 10
 
 #define ADC_SAMPLE_BUF_SIZE 8
-#define ADC_BUF_SIZE 1024
+#define ADC_BUF_SIZE 1024 * 25
 
 Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
@@ -362,12 +362,13 @@ void touchCallback(unsigned int index)
     System_printf("x: %d, y: %d\r", x, y);
 
     Clock_start(TouchClkHandle);
-
 }
 
 void ADCprocess(uint32_t ch)
 {
-    if ((((tDMAControlTable *) udmaCtrlTable)[ch].ui32Control & UDMA_CHCTL_XFERMODE_M) != UDMA_MODE_STOP) return;
+	if (uDMAChannelModeGet(ch) != UDMA_MODE_STOP) return;
+	// Faster way?
+    // if ((((tDMAControlTable *) udmaCtrlTable)[ch].ui32Control & UDMA_CHCTL_XFERMODE_M) != UDMA_MODE_STOP) return;
 
     // store the next buffer in the uDMA transfer descriptor
     // the ADC is read directly into the correct emacBufTx to be transmitted
@@ -388,6 +389,8 @@ adcDmaCallback(unsigned int arg)
 
     ADCprocess(UDMA_CHANNEL_ADC0 | UDMA_PRI_SELECT);
     ADCprocess(UDMA_CHANNEL_ADC0 | UDMA_ALT_SELECT);
+
+    uDMAChannelEnable(UDMA_CHANNEL_ADC0);
 }
 
 void clk0Fxn(UArg arg0)
@@ -547,7 +550,7 @@ ADC_Init(void)
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC0));
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_UDMA));
 
-//    ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_EIGHTH, 1);
+    ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 8);
 
 //    ADCSequenceConfigure(ADC0_BASE, 0 /*SS0*/, ADC_TRIGGER_PROCESSOR, 3 /*priority*/);  // SS0-SS3 priorities must always be different
 //    ADCSequenceConfigure(ADC0_BASE, 3 /*SS3*/, ADC_TRIGGER_PROCESSOR, 0 /*priority*/);  // so change SS3 to prio0 when SS0 gets set to prio3
