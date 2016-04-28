@@ -18,6 +18,9 @@ public class Constant {
 
 	public static final String CSV_FILE_EXTENSION = "csv";
 	
+	public static final int FIR = 1;
+	public static final int IIR = 2;
+	
 	public static final String ONE_MILIVOLT = "1 mV";
 	public static final String TEN_MILIVOLTS = "10 mV";
 	public static final String TWENTY_MILIVOLTS = "20 mV";

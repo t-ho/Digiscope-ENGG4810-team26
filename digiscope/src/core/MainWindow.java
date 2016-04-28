@@ -12,6 +12,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.ui.RectangleEdge;
 
 import data.Constant;
+import data.FilterFile;
 
 /**
  *
@@ -47,6 +49,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private Crosshair timeCrosshair_;
 	private Crosshair voltageCrosshair_;
 	private int measuredChannelIndex_;
+	private FilterFile filterFile_;
 
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
@@ -59,7 +62,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private void initialize() {
 		visualizer_ = new Visualizer();
 		chartPanel_ = createDefaultChartPanel(visualizer_.getChart());
-		
+		filterFile_ = new FilterFile();
 		// test
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
@@ -364,7 +367,19 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		String decription = "Comma-separated-values file (*." + Constant.CSV_FILE_EXTENSION + ")";
 		FileChooserUI fileChooser = new FileChooserUI(JFileChooser.FILES_ONLY, Constant.CSV_FILE_EXTENSION,
 				iconPath, decription);
-		fileChooser.showOpenDialog(this);
+		int status = fileChooser.showOpenDialog(this);
+		if(status == JFileChooser.APPROVE_OPTION) {
+			File csvFile = fileChooser.getSelectedFile();
+			if(filterFile_.loadCsvFile(csvFile.getAbsolutePath())) {
+				csvFilePathTextField.setForeground(Color.BLACK);
+				csvFilePathTextField.setText(csvFile.getName());
+				csvFilePathTextField.setToolTipText(csvFile.getAbsolutePath());
+			} else {
+				csvFilePathTextField.setForeground(Color.RED);
+				csvFilePathTextField.setText("The choosen file is not valid!");
+				csvFilePathTextField.setToolTipText("");
+			}
+		}
 	}
 
 	protected void removeExpressionButtonActionPerformed(ActionEvent event) {

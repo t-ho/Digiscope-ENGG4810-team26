@@ -1,10 +1,12 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -29,6 +31,7 @@ public class ExpressionDialogUi extends JDialog {
 	protected JTextArea expressionTextArea;
 	private JPanel firstRowPanel_;
 	private JPanel fourthRowPanel_;
+	private JPanel mainPanel_;
 	protected JButton okButton;
 	private JScrollPane scrollPane;
 	private JPanel secondRowPanel_;
@@ -62,6 +65,7 @@ public class ExpressionDialogUi extends JDialog {
 		scrollPane = new JScrollPane();
 		secondRowPanel_ = new JPanel();
 		statusLabel_ = new JLabel();
+		mainPanel_ = new JPanel();
 		thirdRowPanel_ = new JPanel();
 		fourthRowPanel_ = new JPanel();
 		cancelButton = new JButton();
@@ -69,7 +73,11 @@ public class ExpressionDialogUi extends JDialog {
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setTitle("New Expression");
-		getContentPane().setLayout(new FlowLayout());
+		getContentPane().setLayout(new BorderLayout());
+
+		mainPanel_.setPreferredSize(new Dimension(510, 370));
+		mainPanel_.setLayout(new FlowLayout());
+		mainPanel_.setBorder(BorderFactory.createTitledBorder(""));
 
 		firstRowPanel_.setPreferredSize(new Dimension(490, 55));
 		firstRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 8));
@@ -84,7 +92,7 @@ public class ExpressionDialogUi extends JDialog {
 
 		firstRowPanel_.add(scrollPane);
 
-		getContentPane().add(firstRowPanel_);
+		mainPanel_.add(firstRowPanel_);
 
 		secondRowPanel_.setPreferredSize(new Dimension(490, 25));
 		secondRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
@@ -94,7 +102,7 @@ public class ExpressionDialogUi extends JDialog {
 		statusLabel_.setFont(new Font("Tahoma", 0, 14));
 		secondRowPanel_.add(statusLabel_);
 
-		getContentPane().add(secondRowPanel_);
+		mainPanel_.add(secondRowPanel_);
 
 		thirdRowPanel_.setPreferredSize(new Dimension(335, 210));
 		thirdRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
@@ -111,7 +119,7 @@ public class ExpressionDialogUi extends JDialog {
 		buttons[2].setEnabled(false); // button F
 		buttons[18].setFont(new Font("Monospaced", 0, 16)); // button pi
 
-		getContentPane().add(thirdRowPanel_);
+		mainPanel_.add(thirdRowPanel_);
 
 		fourthRowPanel_.setPreferredSize(new Dimension(490, 45));
 		fourthRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
@@ -124,7 +132,9 @@ public class ExpressionDialogUi extends JDialog {
 		okButton.setPreferredSize(new Dimension(80, 30));
 		fourthRowPanel_.add(okButton);
 
-		getContentPane().add(fourthRowPanel_);
+		mainPanel_.add(fourthRowPanel_);
+		
+		getContentPane().add(mainPanel_, BorderLayout.CENTER);
 
 		setSize(new Dimension(520, 400));
 		setLocationRelativeTo(null);
