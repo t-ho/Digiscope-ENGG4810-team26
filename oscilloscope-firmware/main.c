@@ -72,13 +72,6 @@
 #include "drivers/SSD1289_driver.h"
 #include "drivers/XPT2046_driver.h"
 
-#define TASKSTACKSIZE   1024
-
-Task_Struct task0Struct;
-Char task0Stack[TASKSTACKSIZE];
-Task_Struct task1Struct;
-Char task1Stack[TASKSTACKSIZE];
-
 /*
  *  ======== heartBeatFxn ========
  *  Toggle the Board_LED0. The Task_sleep is determined by arg0 which
@@ -254,7 +247,6 @@ int32_t TouchCallback(uint32_t message, int32_t x, int32_t y)
  */
 int main(void)
 {
-    Task_Params taskParams;
     /* Call board init functions */
     Board_initGeneral();
     Board_initGPIO();
@@ -280,16 +272,6 @@ int main(void)
     // Pin set to AIN0 (PE3)
     ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_IE | ADC_CTL_END | ADC_CTL_CH0);
     ADCSequenceEnable(ADC0_BASE, 0);
-
-    /* Construct heartBeat Task  thread */
-    Task_Params_init(&taskParams);
-    taskParams.arg0 = 200;
-    taskParams.stackSize = TASKSTACKSIZE;
-    taskParams.stack = &task0Stack;
-    Task_construct(&task0Struct, (Task_FuncPtr)heartBeatFxn, &taskParams, NULL);
-
-    taskParams.stack = &task1Stack;
-    Task_construct(&task1Struct, (Task_FuncPtr)screenDemo, &taskParams, NULL);
 
      /* Turn on user LED */
     GPIO_write(Board_LED0, Board_LED_ON);
