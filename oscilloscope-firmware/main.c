@@ -69,6 +69,9 @@
 #include "driverlib/sysctl.h"
 #include "inc/hw_memmap.h"
 
+#include "grlib/grlib.h"
+#include "grlib/widget.h"
+
 #include "drivers/SSD1289_driver.h"
 #include "drivers/XPT2046_driver.h"
 
@@ -95,38 +98,6 @@ void heartBeatFxn(UArg arg0, UArg arg1)
         ADCSequenceDataGet(ADC0_BASE, 0, &result);
         System_printf("%04lu\r", result);
         System_flush();
-    }
-}
-
-void screenDemo(UArg arg0, UArg arg1)
-{
-    tContext sContext;
-    tRectangle sRect;
-
-    GrContextInit(&sContext, &SSD1289_Display);
-
-    // Fill the top 24 rows of the screen with blue to create the banner.
-    sRect.i16XMin = 0;
-    sRect.i16YMin = 0;
-    sRect.i16XMax = GrContextDpyWidthGet(&sContext) - 1;
-    sRect.i16YMax = 23;
-
-    while (1) {
-        GrContextForegroundSet(&sContext, ClrDarkBlue);
-        GrRectFill(&sContext, &sRect);
-        // Put a white box around the banner.
-        GrContextForegroundSet(&sContext, ClrWhite);
-        GrRectDraw(&sContext, &sRect);
-        // Put the application name in the middle of the banner.
-        GrContextFontSet(&sContext, &g_sFontCm20);
-        GrStringDrawCentered(&sContext, "grlib demo", -1, GrContextDpyWidthGet(&sContext) / 2, 8, 0);
-
-        Task_sleep(1000);
-
-        GrContextForegroundSet(&sContext, ClrCoral);
-        GrRectFill(&sContext, &sRect);
-
-        Task_sleep(1000);
     }
 }
 
@@ -262,7 +233,7 @@ int main(void)
 
     SSD1289_Init();
     XPT2046_Init();
-    XPT2046_SetCallback(TouchCallback);
+    XPT2046_SetCallback(WidgetPointerMessage);
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 
