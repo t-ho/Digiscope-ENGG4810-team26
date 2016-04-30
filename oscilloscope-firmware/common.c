@@ -9,6 +9,9 @@
 
 static Semaphore_Struct ip_update;
 static Semaphore_Struct widget_message;
+static Semaphore_Struct force_trigger;
+uint32_t IpAddrVal = 0;
+uint8_t ClientConnected = 0;
 
 void
 Init_Semaphores(void)
@@ -22,4 +25,7 @@ Init_Semaphores(void)
 
     Semaphore_construct(&widget_message, 0, &params);
     widget_message_h = Semaphore_handle(&widget_message);
+
+    Semaphore_construct(&force_trigger, 0, &params);
+    force_trigger_h = Semaphore_handle(&force_trigger);
 }

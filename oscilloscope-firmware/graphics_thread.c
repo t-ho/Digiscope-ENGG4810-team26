@@ -81,7 +81,7 @@ void HorRangeUp(tWidget *psWidget);
 void VertRangeUp(tWidget *psWidget);
 void HorRangeDown(tWidget *psWidget);
 void VertRangeDown(tWidget *psWidget);
-
+void ForceTrigger(tWidget *psWidget);
 
 Canvas(g_sTitle, 0, 0, 0, &SSD1289_Display, 50, 2, 220, 20,
        CANVAS_STYLE_TEXT | CANVAS_STYLE_TEXT_OPAQUE | CANVAS_STYLE_FILL, 0, 0, ClrWhite,
@@ -161,7 +161,7 @@ tPushButtonWidget trigger_menu_buttons[] =
 						  ClrWhite, &g_sFontCm18b, "Arm", 0, 0, 0, 0, OnPrevious),
 		RectangularButtonStruct(&menus[TRIGGER_MENU], trigger_menu_buttons + 3, 0, &SSD1289_Display, 220, 30,
 		                  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrRed, ClrGreen, ClrWhite,
-						  ClrWhite, &g_sFontCm18b, "Force", 0, 0, 0, 0, OnPrevious),
+						  ClrWhite, &g_sFontCm18b, "Force", 0, 0, 0, 0, ForceTrigger),
 		RectangularButtonStruct(&menus[TRIGGER_MENU], trigger_menu_buttons + 4, 0, &SSD1289_Display, 0, 120,
 						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
 						  ClrWhite, &g_sFontCm18b, "Mode", 0, 0, 0, 0, OnPrevious),
@@ -346,6 +346,12 @@ OnPrevious(tWidget *psWidget)
 }
 
 void
+ForceTrigger(tWidget *psWidget)
+{
+    Semaphore_post(force_trigger_h);
+}
+
+void
 screenDemo(UArg arg0, UArg arg1)
 {
     tContext sContext;
@@ -390,9 +396,9 @@ screenDemo(UArg arg0, UArg arg1)
 
         if (Semaphore_pend(ip_update_h, 0))
         {
-            sprintf(ipaddrstring, "%d.%d.%d.%d",
+            sprintf(ipaddrstring, "%d.%d.%d.%d %s",
                     (uint8_t)(IpAddrVal>>24)&0xFF, (uint8_t)(IpAddrVal>>16)&0xFF,
-                    (uint8_t)(IpAddrVal>>8)&0xFF, (uint8_t)IpAddrVal&0xFF);
+                    (uint8_t)(IpAddrVal>>8)&0xFF, (uint8_t)IpAddrVal&0xFF, ClientConnected?"Connected":"No Client");
             WidgetPaint((tWidget *)&g_sConnStatus);
             Semaphore_post(widget_message_h);
         }

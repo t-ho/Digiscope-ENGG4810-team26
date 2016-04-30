@@ -163,16 +163,50 @@ Void tcpWorker(UArg arg0, UArg arg1)
 
     System_printf("tcpWorker: start clientfd = 0x%x\n", clientfd);
 
-    while ((bytesRcvd = recv(clientfd, buffer, TCPPACKETSIZE, 0)) > 0) {
-        bytesSent = send(clientfd, buffer, bytesRcvd, 0);
-        if (bytesSent < 0 || bytesSent != bytesRcvd) {
-            System_printf("Error: send failed.\n");
-            break;
+    int count = 0;
+
+    ClientConnected++;
+    Semaphore_post(ip_update_h);
+
+    while (1) {
+    	bytesRcvd = recv(clientfd, buffer, TCPPACKETSIZE, MSG_DONTWAIT);
+
+    	if (count == 30)
+    	{
+            bytesSent = send(clientfd, "keepalive", 10, 0);
+            if (bytesSent < 0 || bytesSent != 10) {
+                System_printf("Error: keepalive send failed.\n");
+                break;
+            }
+
+            count = 0;
+    	}
+
+    	if (bytesRcvd > 0)
+    	{
+            bytesSent = send(clientfd, buffer, bytesRcvd, 0);
+            if (bytesSent < 0 || bytesSent != bytesRcvd) {
+                System_printf("Error: send failed.\n");
+                break;
+            }
+            count = 0;
+    	}
+
+        if (Semaphore_pend(force_trigger_h, 100))
+        {
+            System_printf("Force trigger event!\n");
+            bytesSent = send(clientfd, adc_buffer, ADC_BUF_SIZE, 0);
+            count = 0;
         }
+
+        count++;
     }
     System_printf("tcpWorker stop clientfd = 0x%x\n", clientfd);
 
     close(clientfd);
+
+    ClientConnected--;
+    Semaphore_post(ip_update_h);
 }
 
 /*
