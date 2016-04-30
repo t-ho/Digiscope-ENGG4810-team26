@@ -17,11 +17,8 @@
 #include "grlib/canvas.h"
 #include "grlib/pushbutton.h"
 
+#include "common.h"
 #include "drivers/SSD1289_driver.h"
-
-extern Semaphore_Handle ip_update_h;
-extern uint32_t IpAddrVal;
-static char ipaddrstring[32];
 
 static const char * const menu_titles[] = { "Team 26 Oscilloscope", "Range", "Trigger", "Wave Generator", "Brightness" };
 
@@ -90,6 +87,7 @@ Canvas(g_sTitle, 0, 0, 0, &SSD1289_Display, 50, 2, 220, 20,
        CANVAS_STYLE_TEXT | CANVAS_STYLE_TEXT_OPAQUE | CANVAS_STYLE_FILL, 0, 0, ClrWhite,
        &g_sFontCm20, 0, 0, 0);
 
+static char ipaddrstring[32];
 Canvas(g_sConnStatus, 0, 0, 0, &SSD1289_Display, 50, 220, 220, 20,
        CANVAS_STYLE_TEXT | CANVAS_STYLE_TEXT_OPAQUE | CANVAS_STYLE_FILL, 0, 0, ClrWhite,
        &g_sFontCm20, ipaddrstring, 0, 0);
@@ -381,8 +379,14 @@ screenDemo(UArg arg0, UArg arg1)
 
     WidgetPaint(WIDGET_ROOT);
 
-    while (1) {
-        WidgetMessageQueueProcess();
+    Semaphore_post(widget_message_h);
+
+    while (1)
+    {
+        if (Semaphore_pend(widget_message_h, 1000))
+        {
+        	WidgetMessageQueueProcess();
+        }
 
         if (Semaphore_pend(ip_update_h, 0))
         {
@@ -390,7 +394,7 @@ screenDemo(UArg arg0, UArg arg1)
                     (uint8_t)(IpAddrVal>>24)&0xFF, (uint8_t)(IpAddrVal>>16)&0xFF,
                     (uint8_t)(IpAddrVal>>8)&0xFF, (uint8_t)IpAddrVal&0xFF);
             WidgetPaint((tWidget *)&g_sConnStatus);
+            Semaphore_post(widget_message_h);
         }
-        Task_sleep(100);
     }
 }

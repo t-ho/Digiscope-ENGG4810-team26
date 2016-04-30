@@ -26,6 +26,8 @@
 #include "grlib/widget.h"
 #include "utils/uartstdio.h"
 
+#include "common.h"
+
 #define T_CLK_B		GPIO_PORTM_BASE
 #define T_CS_B		GPIO_PORTQ_BASE
 #define T_DIN_B		GPIO_PORTP_BASE
@@ -226,6 +228,7 @@ TouchReenable(void)
 	regTouchCallback(WIDGET_MSG_PTR_UP, x, y);
 	MAP_GPIOIntClear(T_IRQ_B, T_IRQ_P);
 	MAP_GPIOIntEnable(T_IRQ_B, T_IRQ_P);
+    Semaphore_post(widget_message_h);
 }
 
 static void
@@ -239,6 +242,7 @@ TouchCallback(unsigned int index)
 	if (regTouchCallback)
 	{
 		regTouchCallback(WIDGET_MSG_PTR_DOWN, x, y);
+	    Semaphore_post(widget_message_h);
 	}
 
 	Clock_start(TouchClkHandle);

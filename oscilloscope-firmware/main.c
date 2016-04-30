@@ -76,15 +76,12 @@
 #include "grlib/grlib.h"
 #include "grlib/widget.h"
 
+#include "common.h"
 #include "drivers/SSD1289_driver.h"
 #include "drivers/XPT2046_driver.h"
 
 #define ADC_SAMPLE_BUF_SIZE 8
 #define ADC_BUF_SIZE 1024 * 25
-
-uint32_t IpAddrVal = 0;
-Semaphore_Handle ip_update_h;
-static Semaphore_Struct ip_update;
 
 uint16_t adc_pos = 0;
 uint16_t adc_buffer[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
@@ -338,10 +335,7 @@ int main(void)
     XPT2046_Init();
     XPT2046_SetCallback(WidgetPointerMessage);
 
-    Semaphore_Params params;
-    Semaphore_Params_init(&params);
-    Semaphore_construct(&ip_update, 0, &params);
-    ip_update_h = Semaphore_handle(&ip_update);
+    Init_Semaphores();
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 
