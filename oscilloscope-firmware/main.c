@@ -45,6 +45,7 @@
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Task.h>
 #include <ti/sysbios/knl/Clock.h>
+#include <ti/sysbios/knl/Semaphore.h>
 
 /* TI-RTOS Header files */
 #include <ti/drivers/EMAC.h>
@@ -80,6 +81,10 @@
 
 #define ADC_SAMPLE_BUF_SIZE 8
 #define ADC_BUF_SIZE 1024 * 25
+
+uint32_t IpAddrVal = 0;
+Semaphore_Handle ip_update_h;
+static Semaphore_Struct ip_update;
 
 uint16_t adc_pos = 0;
 uint16_t adc_buffer[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
@@ -127,6 +132,21 @@ void heartBeatFxn(UArg arg0, UArg arg1)
         GPIO_toggle(Board_LED0);
         System_flush();
     }
+}
+
+void
+ipAddrHook(uint32_t IPAddr, uint32_t IfIdx, uint32_t fAdd)
+{
+//    System_printf("mynetworkIPAddrHook: enter\n");
+
+    IpAddrVal = ntohl(IPAddr);
+    Semaphore_post(ip_update_h);
+
+//    System_printf("mynetworkIPAddrHook:\tIf-%d:%d.%d.%d.%d\n", IfIdx,
+//            (uint8_t)(IpAddrVal>>24)&0xFF, (uint8_t)(IpAddrVal>>16)&0xFF,
+//            (uint8_t)(IpAddrVal>>8)&0xFF, (uint8_t)IpAddrVal&0xFF);
+//
+//    System_flush();
 }
 
 #define TCPPACKETSIZE 256
@@ -317,6 +337,11 @@ int main(void)
     SSD1289_Init();
     XPT2046_Init();
     XPT2046_SetCallback(WidgetPointerMessage);
+
+    Semaphore_Params params;
+    Semaphore_Params_init(&params);
+    Semaphore_construct(&ip_update, 0, &params);
+    ip_update_h = Semaphore_handle(&ip_update);
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 

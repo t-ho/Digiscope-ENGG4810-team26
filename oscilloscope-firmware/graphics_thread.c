@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 #include <ti/sysbios/knl/Task.h>
+#include <ti/sysbios/knl/Semaphore.h>
 
 #include "grlib/grlib.h"
 #include "grlib/widget.h"
@@ -17,6 +18,10 @@
 #include "grlib/pushbutton.h"
 
 #include "drivers/SSD1289_driver.h"
+
+extern Semaphore_Handle ip_update_h;
+extern uint32_t IpAddrVal;
+static char ipaddrstring[32];
 
 static const char * const menu_titles[] = { "Team 26 Oscilloscope", "Range", "Trigger", "Wave Generator", "Brightness" };
 
@@ -86,8 +91,8 @@ Canvas(g_sTitle, 0, 0, 0, &SSD1289_Display, 50, 2, 220, 20,
        &g_sFontCm20, 0, 0, 0);
 
 Canvas(g_sConnStatus, 0, 0, 0, &SSD1289_Display, 50, 220, 220, 20,
-       CANVAS_STYLE_TEXT | CANVAS_STYLE_TEXT_OPAQUE, 0, 0, ClrWhite,
-       &g_sFontCm20, 0, 0, 0);
+       CANVAS_STYLE_TEXT | CANVAS_STYLE_TEXT_OPAQUE | CANVAS_STYLE_FILL, 0, 0, ClrWhite,
+       &g_sFontCm20, ipaddrstring, 0, 0);
 
 tPushButtonWidget main_menu_buttons[] =
 {
@@ -372,12 +377,20 @@ screenDemo(UArg arg0, UArg arg1)
     WidgetAdd(WIDGET_ROOT, (tWidget *)&menus[MAIN_MENU]);
 
     CanvasTextSet(&g_sTitle, menu_titles[MAIN_MENU]);
-    CanvasTextSet(&g_sConnStatus, "No connection...");
+    sprintf(ipaddrstring, "No connection...");
 
     WidgetPaint(WIDGET_ROOT);
 
     while (1) {
         WidgetMessageQueueProcess();
+
+        if (Semaphore_pend(ip_update_h, 0))
+        {
+            sprintf(ipaddrstring, "%d.%d.%d.%d",
+                    (uint8_t)(IpAddrVal>>24)&0xFF, (uint8_t)(IpAddrVal>>16)&0xFF,
+                    (uint8_t)(IpAddrVal>>8)&0xFF, (uint8_t)IpAddrVal&0xFF);
+            WidgetPaint((tWidget *)&g_sConnStatus);
+        }
         Task_sleep(100);
     }
 }
