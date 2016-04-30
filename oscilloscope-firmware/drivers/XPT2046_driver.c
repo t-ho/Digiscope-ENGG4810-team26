@@ -217,9 +217,13 @@ Touch_Read(uint16_t *x_out, uint16_t *y_out)
 	}
 }
 
+static uint16_t x = 0;
+static uint16_t y = 0;
+
 static void
 TouchReenable(void)
 {
+	regTouchCallback(WIDGET_MSG_PTR_UP, x, y);
 	MAP_GPIOIntClear(T_IRQ_B, T_IRQ_P);
 	MAP_GPIOIntEnable(T_IRQ_B, T_IRQ_P);
 }
@@ -230,15 +234,11 @@ TouchCallback(unsigned int index)
 	MAP_GPIOIntClear(T_IRQ_B, T_IRQ_P);
 	MAP_GPIOIntDisable(T_IRQ_B, T_IRQ_P);
 
-	uint16_t x = 0;
-	uint16_t y = 0;
-
 	Touch_Read(&x, &y);
 
 	if (regTouchCallback)
 	{
 		regTouchCallback(WIDGET_MSG_PTR_DOWN, x, y);
-		regTouchCallback(WIDGET_MSG_PTR_UP, x, y);
 	}
 
 	Clock_start(TouchClkHandle);
