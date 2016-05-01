@@ -13,6 +13,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,6 +70,13 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		for(double i = -20; i <= 20; i = i + 0.1) {
 			aSeries.add(i, 1000 * Math.sin(i));
 		}
+// Test Filter 
+//		aSeries = new XYSeries(Constant.CHANNEL_A);
+//		aSeries.add(0, 3);
+//		aSeries.add(1, 4);
+//		aSeries.add(2, 5);
+//		aSeries.add(3, 6);
+
 		rawXYSeries.put(Constant.CHANNEL_A, aSeries);
 
 		// Channel B
@@ -365,8 +373,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		// TODO
 		String iconPath = "/icons/csv_icon_16x16.png";
 		String decription = "Comma-separated-values file (*." + Constant.CSV_FILE_EXTENSION + ")";
-		FileChooserUI fileChooser = new FileChooserUI(JFileChooser.FILES_ONLY, Constant.CSV_FILE_EXTENSION,
-				iconPath, decription);
+		FileChooserUI fileChooser = new FileChooserUI(JFileChooser.FILES_ONLY,
+				Constant.CSV_FILE_EXTENSION, iconPath, decription);
 		int status = fileChooser.showOpenDialog(this);
 		if(status == JFileChooser.APPROVE_OPTION) {
 			File csvFile = fileChooser.getSelectedFile();
@@ -374,6 +382,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				csvFilePathTextField.setForeground(Color.BLACK);
 				csvFilePathTextField.setText(csvFile.getName());
 				csvFilePathTextField.setToolTipText(csvFile.getAbsolutePath());
+				calculateFilterChannel();
 			} else {
 				csvFilePathTextField.setForeground(Color.RED);
 				csvFilePathTextField.setText("The choosen file is not valid!");
@@ -1019,6 +1028,9 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		}
 	}
 	
+	/**
+	 * Calculate the MATH channel
+	 */
 	public void calculateMathChannel() {
 		String expression = expressionTextArea.getText().trim();
 		if (!expression.equals("")) {
@@ -1035,7 +1047,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 			int noOfItems = getMinNoOfItems(channelNames);
 			if (noOfItems != Integer.MAX_VALUE) {
 				Evaluator evaluator = new Evaluator();
-				XYSeries filterSeries = new XYSeries(Constant.MATH_CHANNEL);
+				XYSeries mathSeries = new XYSeries(Constant.MATH_CHANNEL);
 				Double x = 0.0;
 				for (int i = 0; i < noOfItems; i++) {
 					for (Map.Entry<String, String> entry : channelNames.entrySet()) {
@@ -1043,9 +1055,9 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 						evaluator.setVariableValue(entry.getKey(), dataItem.getYValue());
 						x = dataItem.getXValue();
 					}
-					filterSeries.add(x, evaluator.evaluate(expression, evaluator.getVariables()));
+					mathSeries.add(x, evaluator.evaluate(expression, evaluator.getVariables()));
 				}
-				rawXYSeries.put(Constant.MATH_CHANNEL, filterSeries);
+				rawXYSeries.put(Constant.MATH_CHANNEL, mathSeries);
 				if(mathChannelCheckBox.isSelected()) {
 					showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
 				}
@@ -1054,6 +1066,55 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 			}
 		}
 
+	}
+	
+	public void calculateFilterChannel() {
+		if(filterFile_.isValid()) {
+			ArrayList<Double> firstColumn = filterFile_.getFirstColumn();
+			XYSeries derivedSeries = rawXYSeries.get(
+					(String) inputChannelComboBox.getSelectedItem());
+			XYSeries filterSeries = new XYSeries(Constant.FILTER_CHANNEL);
+			if(filterFile_.getType() == Constant.FIR) {
+				for(int n = 0; n < derivedSeries.getItemCount(); n++) {
+					Double result = 0.0;
+					for(int i = 0; i < firstColumn.size(); i++) {
+						Double x = 0.0;
+						if(n - i >= 0) {
+							x = derivedSeries.getDataItem(n - i).getYValue();
+						}
+						result = result + firstColumn.get(i) * x; 
+					}
+					filterSeries.add(derivedSeries.getDataItem(n).getX(), result);
+				}
+			} else if(filterFile_.getType() == Constant.IIR) {
+				//TODO:
+				ArrayList<Double> secondColumn = filterFile_.getSecondColumn();
+				for(int n = 0; n < derivedSeries.getItemCount(); n++) {
+					Double firstSum = 0.0;
+					Double secondSum = 0.0;
+					for(int i = 0; i < secondColumn.size(); i++) {
+						Double x = 0.0;
+						if(n - i >= 0) {
+							x = derivedSeries.getDataItem(n - i).getYValue();
+						}
+						firstSum += secondColumn.get(i) * x;
+					}
+					for(int j = 1; j < firstColumn.size(); j++) {
+						Double y = 0.0;
+						if(n -j >= 0) {
+							y = filterSeries.getDataItem(n - j).getYValue();
+						}
+						secondSum += firstColumn.get(j) * y; 
+					}
+					Double result = (1 / firstColumn.get(0)) * (firstSum - secondSum);
+					filterSeries.add(derivedSeries.getDataItem(n).getX(), result);
+				}
+			}
+			rawXYSeries.put(Constant.FILTER_CHANNEL, filterSeries);
+			if(filterChannelCheckBox.isSelected()) {
+				showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
+			}
+		}
 	}
 	
 	/**
