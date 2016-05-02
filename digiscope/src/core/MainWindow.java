@@ -1016,10 +1016,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	
 	private String miliVoltsToString(double voltage) {
 		String result = "";
-		if(voltage <= -100 || voltage >= 100) {
-			result = voltage / 1000 + " V";
+		if(voltage <= -1000 || voltage >= 1000) {
+			result = Constant.round(voltage / 1000, 4) + " V";
 		} else {
-			result = voltage + " mV";
+			result = Constant.round(voltage, 2) + " mV";
 		}
 		return result;
 	}
