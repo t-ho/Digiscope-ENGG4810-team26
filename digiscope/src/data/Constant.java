@@ -85,9 +85,6 @@ public class Constant {
 	public static final String MATH_CHANNEL = "Math Channel";
 	public static final String FILTER_CHANNEL = "Filter Channel";
 
-	public static final String[] INPUT_CHANNELS = new String[] { 
-		CHANNEL_A, CHANNEL_B, MATH_CHANNEL };
-
 	public static final String AUTO_MODE = "Auto";
 	public static final String NORMAL_MODE = "Normal";
 	public static final String SINGLE_MODE = "Single";

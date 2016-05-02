@@ -200,6 +200,7 @@ public class MainWindowUi extends JFrame {
     protected JTextField p2pVoltageTextField;
     protected JButton rearmTriggerButton;
     protected JButton removeExpressionButton;
+    protected JButton removeFilterButton;
     private JPanel rightPanel_;
     private JScrollPane scrollPane;
     private JLabel spaceLabel_;
@@ -427,6 +428,7 @@ public class MainWindowUi extends JFrame {
         inputTopPanel_ = new JPanel();
         jLabel4 = new JLabel();
         inputChannelComboBox = new JComboBox<String>();
+        removeFilterButton = new JButton();
         inputBottomPanel_ = new JPanel();
         csvFilePathTextField = new JTextField();
         browseButton = new JButton();
@@ -1110,16 +1112,21 @@ public class MainWindowUi extends JFrame {
         inputPanel_.setPreferredSize(new Dimension(390, 95));
         inputPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
-        inputTopPanel_.setPreferredSize(new Dimension(350, 35));
+        inputTopPanel_.setPreferredSize(new Dimension(380, 35));
         inputTopPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
 
         jLabel4.setText("Input:");
         inputTopPanel_.add(jLabel4);
 
-        inputChannelComboBox.setModel(new DefaultComboBoxModel<String>(Constant.INPUT_CHANNELS));
+        inputChannelComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "Select channel" }));
         inputChannelComboBox.setEnabled(false);
         inputChannelComboBox.setPreferredSize(new Dimension(230, 20));
         inputTopPanel_.add(inputChannelComboBox);
+        
+        removeFilterButton.setText("Remove");
+        removeFilterButton.setEnabled(false);
+        removeFilterButton.setPreferredSize(new Dimension(85, 23));
+        inputTopPanel_.add(removeFilterButton);
 
         inputPanel_.add(inputTopPanel_);
 
@@ -1134,7 +1141,7 @@ public class MainWindowUi extends JFrame {
 
         browseButton.setText("Browse");
         browseButton.setEnabled(false);
-        browseButton.setPreferredSize(new Dimension(80, 23));
+        browseButton.setPreferredSize(new Dimension(85, 23));
         inputBottomPanel_.add(browseButton);
 
         inputPanel_.add(inputBottomPanel_);
@@ -1590,6 +1597,7 @@ public class MainWindowUi extends JFrame {
             verticalOffsetUnitFilterComboBox.setEnabled(enabled);
             verticalRangeFilterComboBox.setEnabled(enabled);
             filterDivisionInfoLabel.setEnabled(enabled);
+            removeFilterButton.setEnabled(enabled);
         }
     }
 

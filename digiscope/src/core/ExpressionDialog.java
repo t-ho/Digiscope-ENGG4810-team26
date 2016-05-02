@@ -2,9 +2,7 @@ package core;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Map;
-
-import org.jfree.data.xy.XYSeries;
+import java.util.ArrayList;
 
 import data.Constant;
 import gui.ExpressionDialogUi;
@@ -21,16 +19,16 @@ public class ExpressionDialog extends ExpressionDialogUi implements ActionListen
 		super(mainWindow);
 		evaluator = new Evaluator();
 		addListionersToComponents();
-		Map<String, XYSeries> xYSeries = this.mainWindow.getRawXYSeries();
-		if (xYSeries.containsKey(Constant.CHANNEL_A)) {
+		ArrayList<String> availableChannels = this.mainWindow.getAvailableDerivedChannelForMath();
+		if (availableChannels.contains(Constant.CHANNEL_A)) {
 			buttons[0].setEnabled(true); // button A
 			evaluator.setVariableValue("A", 0.0);
 		}
-		if (xYSeries.containsKey(Constant.CHANNEL_B)) {
+		if (availableChannels.contains(Constant.CHANNEL_B)) {
 			buttons[1].setEnabled(true); // button B
 			evaluator.setVariableValue("B", 0.0);
 		}
-		if (xYSeries.containsKey(Constant.FILTER_CHANNEL)) {
+		if (availableChannels.contains(Constant.FILTER_CHANNEL)) {
 			buttons[2].setEnabled(true); // button F
 			evaluator.setVariableValue("F", 0.0);
 		}
@@ -80,6 +78,7 @@ public class ExpressionDialog extends ExpressionDialogUi implements ActionListen
 					mainWindow.setEnabledExpressionControls(true);
 					mainWindow.calculateMathChannel();
 					mainWindow.setEnabledMathChannelControls(true);
+					mainWindow.updateInputChannelComboBox();
 					this.dispose();
 				} else {
 					setStatus("Infinity number", Constant.ERROR);

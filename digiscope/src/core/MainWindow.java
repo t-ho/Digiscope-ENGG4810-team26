@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -78,6 +79,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 //		aSeries.add(3, 6);
 
 		rawXYSeries.put(Constant.CHANNEL_A, aSeries);
+		
 
 		// Channel B
 		XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
@@ -367,6 +369,59 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				browseButtonActionPerformed(event);
 			}
 		});
+		
+		inputChannelComboBox.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				// TODO Auto-generated method stub
+				inputChannelComboBoxActionPerformed(event);
+			}
+		});
+		
+		removeFilterButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				removeFilterButtonActionPerformed(event);
+			}
+		});
+	}
+
+	protected void removeFilterButtonActionPerformed(ActionEvent event) {
+		// TODO:
+		String expression = expressionTextArea.getText().trim();
+		if (expression.contains("F")) {
+			int response = JOptionPane.showConfirmDialog(this,
+					"The MATH channel is derived from this channel.\n"
+							+ "Removing this channel will also remove the MATH channel.\n" + 
+							"Do you want to continue?",
+							"Remove Filter Channel", JOptionPane.YES_NO_OPTION);
+			if (response == JOptionPane.YES_OPTION) {
+				expressionTextArea.setText("");
+				mathChannelCheckBox.setSelected(false);
+				rawXYSeries.remove(Constant.MATH_CHANNEL);
+			} else {
+				return;
+			}
+		}
+		setEnabledFilterChannelControls(false);
+		browseButton.setEnabled(true);
+		inputChannelComboBox.setEnabled(true);
+		rawXYSeries.remove(Constant.FILTER_CHANNEL);
+		inputChannelComboBox.setSelectedIndex(0);
+		filterFile_.setValid(false);
+		csvFilePathTextField.setText("Choose CSV file");
+	}
+
+	protected void inputChannelComboBoxActionPerformed(ActionEvent event) {
+		// TODO
+		calculateFilterChannel();
+		String inputChannel = (String) inputChannelComboBox.getSelectedItem();
+		if(inputChannel != null) {
+			if(filterFile_.isValid() && (!inputChannel.equals("Select channel"))) {
+				setEnabledFilterChannelControls(true);
+			}
+		}
 	}
 
 	protected void browseButtonActionPerformed(ActionEvent event) {
@@ -383,6 +438,12 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				csvFilePathTextField.setText(csvFile.getName());
 				csvFilePathTextField.setToolTipText(csvFile.getAbsolutePath());
 				calculateFilterChannel();
+				String inputChannel = (String) inputChannelComboBox.getSelectedItem();
+				if(inputChannel != null) {
+					if(filterFile_.isValid() && (!inputChannel.equals("Select channel"))) {
+						setEnabledFilterChannelControls(true);
+					}
+				}
 			} else {
 				csvFilePathTextField.setForeground(Color.RED);
 				csvFilePathTextField.setText("The choosen file is not valid!");
@@ -393,12 +454,29 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 
 	protected void removeExpressionButtonActionPerformed(ActionEvent event) {
 		// TODO
+		if(inputChannelComboBox.getSelectedItem().equals(Constant.MATH_CHANNEL)) {
+			int response = JOptionPane.showConfirmDialog(this, 
+					"The FILTER channel is derived from this channel.\n" + 
+					"Removing this channel will also remove the FILTER channel.\n" +
+					"Do you want to continue?", "Remove Math Channel", 
+					JOptionPane.YES_NO_OPTION);
+			if(response == JOptionPane.YES_OPTION) {
+				filterChannelCheckBox.setSelected(false);
+				rawXYSeries.remove(Constant.FILTER_CHANNEL);
+				inputChannelComboBox.setSelectedIndex(0);
+				filterFile_.setValid(false);
+				csvFilePathTextField.setText("Choose CSV file");
+			} else {
+				return;
+			}
+		}
 		expressionTextArea.setText("");
 		setEnabledExpressionControls(false);
 		setEnabledMathChannelControls(false);
 		newExpressionButton.setEnabled(true);
 		removeChannelPlotFromChartPanel(Constant.MATH_CHANNEL);
 		rawXYSeries.remove(Constant.MATH_CHANNEL);
+		updateInputChannelComboBox();
 	}
 
 	protected void editExpressionButtonActionPerformed(ActionEvent event) {
@@ -689,11 +767,56 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		if(filterChannelCheckBox.isSelected()) {
 			setEnabledFilterChannelControls(true);
 			showTab(Constant.TAB.FILTER_CHANNEL);
+			updateInputChannelComboBox();
 			showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
 		} else {
 			setEnabledFilterChannelControls(false);
 			removeChannelPlotFromChartPanel(Constant.FILTER_CHANNEL);
 		}
+	}
+	
+	/**
+	 * Update inputChannelCombox's items for filter channel by adding 
+	 * available channels and remove unavailable ones to/from the list.
+	 */
+	public void updateInputChannelComboBox() {
+			String selectedItem = (String) inputChannelComboBox.getSelectedItem();
+			inputChannelComboBox.removeAllItems();
+			inputChannelComboBox.addItem("Select channel");
+			if(rawXYSeries.containsKey(Constant.CHANNEL_A)) {
+				inputChannelComboBox.addItem(Constant.CHANNEL_A);
+			}
+			if(rawXYSeries.containsKey(Constant.CHANNEL_B)) {
+				inputChannelComboBox.addItem(Constant.CHANNEL_B);
+			}
+			if(rawXYSeries.containsKey(Constant.MATH_CHANNEL)) {
+				String expression = expressionTextArea.getText().trim();
+				if(! expression.contains("F")) {
+					inputChannelComboBox.addItem(Constant.MATH_CHANNEL);
+				}
+			}
+			inputChannelComboBox.setSelectedItem(selectedItem);
+	}
+	
+	/**
+	 * Get the available derived channel for Math channel
+	 * @return List of channels available for Math channel
+	 */
+	public ArrayList<String> getAvailableDerivedChannelForMath() {
+		ArrayList<String> result = new ArrayList<String>();
+		if (rawXYSeries.containsKey(Constant.CHANNEL_A)) {
+			result.add(Constant.CHANNEL_A);
+		}
+		if (rawXYSeries.containsKey(Constant.CHANNEL_B)) {
+			result.add(Constant.CHANNEL_B);
+		}
+		if (rawXYSeries.containsKey(Constant.FILTER_CHANNEL)) {
+			String inputChannelForMath = (String) inputChannelComboBox.getSelectedItem();
+			if(!inputChannelForMath.equals(Constant.MATH_CHANNEL)) {
+				result.add(Constant.FILTER_CHANNEL);
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -1069,50 +1192,52 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	}
 	
 	public void calculateFilterChannel() {
-		if(filterFile_.isValid()) {
-			ArrayList<Double> firstColumn = filterFile_.getFirstColumn();
-			XYSeries derivedSeries = rawXYSeries.get(
-					(String) inputChannelComboBox.getSelectedItem());
-			XYSeries filterSeries = new XYSeries(Constant.FILTER_CHANNEL);
-			if(filterFile_.getType() == Constant.FIR) {
-				for(int n = 0; n < derivedSeries.getItemCount(); n++) {
-					Double result = 0.0;
-					for(int i = 0; i < firstColumn.size(); i++) {
-						Double x = 0.0;
-						if(n - i >= 0) {
-							x = derivedSeries.getDataItem(n - i).getYValue();
+		String inputChannel = (String) inputChannelComboBox.getSelectedItem();
+		if (inputChannel != null) {
+			if (filterFile_.isValid() && (!inputChannel.equals("Select channel"))) {
+				ArrayList<Double> firstColumn = filterFile_.getFirstColumn();
+				XYSeries derivedSeries = rawXYSeries.get(inputChannel);
+				XYSeries filterSeries = new XYSeries(Constant.FILTER_CHANNEL);
+				if (filterFile_.getType() == Constant.FIR) {
+					for (int n = 0; n < derivedSeries.getItemCount(); n++) {
+						Double result = 0.0;
+						for (int i = 0; i < firstColumn.size(); i++) {
+							Double x = 0.0;
+							if (n - i >= 0) {
+								x = derivedSeries.getDataItem(n - i).getYValue();
+							}
+							result = result + firstColumn.get(i) * x;
 						}
-						result = result + firstColumn.get(i) * x; 
+						filterSeries.add(derivedSeries.getDataItem(n).getX(), result);
 					}
-					filterSeries.add(derivedSeries.getDataItem(n).getX(), result);
+				} else if (filterFile_.getType() == Constant.IIR) {
+					// TODO:
+					ArrayList<Double> secondColumn = filterFile_.getSecondColumn();
+					for (int n = 0; n < derivedSeries.getItemCount(); n++) {
+						Double firstSum = 0.0;
+						Double secondSum = 0.0;
+						for (int i = 0; i < secondColumn.size(); i++) {
+							Double x = 0.0;
+							if (n - i >= 0) {
+								x = derivedSeries.getDataItem(n - i).getYValue();
+							}
+							firstSum += secondColumn.get(i) * x;
+						}
+						for (int j = 1; j < firstColumn.size(); j++) {
+							Double y = 0.0;
+							if (n - j >= 0) {
+								y = filterSeries.getDataItem(n - j).getYValue();
+							}
+							secondSum += firstColumn.get(j) * y;
+						}
+						Double result = (1 / firstColumn.get(0)) * (firstSum - secondSum);
+						filterSeries.add(derivedSeries.getDataItem(n).getX(), result);
+					}
 				}
-			} else if(filterFile_.getType() == Constant.IIR) {
-				//TODO:
-				ArrayList<Double> secondColumn = filterFile_.getSecondColumn();
-				for(int n = 0; n < derivedSeries.getItemCount(); n++) {
-					Double firstSum = 0.0;
-					Double secondSum = 0.0;
-					for(int i = 0; i < secondColumn.size(); i++) {
-						Double x = 0.0;
-						if(n - i >= 0) {
-							x = derivedSeries.getDataItem(n - i).getYValue();
-						}
-						firstSum += secondColumn.get(i) * x;
-					}
-					for(int j = 1; j < firstColumn.size(); j++) {
-						Double y = 0.0;
-						if(n -j >= 0) {
-							y = filterSeries.getDataItem(n - j).getYValue();
-						}
-						secondSum += firstColumn.get(j) * y; 
-					}
-					Double result = (1 / firstColumn.get(0)) * (firstSum - secondSum);
-					filterSeries.add(derivedSeries.getDataItem(n).getX(), result);
+				rawXYSeries.put(Constant.FILTER_CHANNEL, filterSeries);
+				if (filterChannelCheckBox.isSelected()) {
+					showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
 				}
-			}
-			rawXYSeries.put(Constant.FILTER_CHANNEL, filterSeries);
-			if(filterChannelCheckBox.isSelected()) {
-				showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
 			}
 		}
 	}
