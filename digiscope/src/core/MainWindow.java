@@ -407,6 +407,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		setEnabledFilterChannelControls(false);
 		browseButton.setEnabled(true);
 		inputChannelComboBox.setEnabled(true);
+		removeChannelPlotFromChartPanel(Constant.FILTER_CHANNEL);
 		rawXYSeries.remove(Constant.FILTER_CHANNEL);
 		inputChannelComboBox.setSelectedIndex(0);
 		filterFile_.setValid(false);
