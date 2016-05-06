@@ -1272,8 +1272,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
         ValueAxis xAxis = plot.getDomainAxis();
         double x = xAxis.java2DToValue(event.getTrigger().getX(), dataArea, RectangleEdge.BOTTOM);
         double y = DatasetUtilities.findYValue(plot.getDataset(measuredChannelIndex_), 0, x);
-        this.timeCrosshair_.setValue(x);
-        this.voltageCrosshair_.setValue(y);
-        this.cursorVerticalValueLabel.setText(miliVoltsToString(y));
+        if(! Double.isNaN(y)) {
+        	this.timeCrosshair_.setValue(x);
+        	this.voltageCrosshair_.setValue(y);
+        	this.cursorVerticalValueLabel.setText(miliVoltsToString(y));
+        }
 	}
 }
