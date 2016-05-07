@@ -195,7 +195,7 @@ Void tcpWorker(UArg arg0, UArg arg1)
         if (Semaphore_pend(force_trigger_h, 100))
         {
             System_printf("Force trigger event!\n");
-            bytesSent = send(clientfd, adc_buffer, ADC_BUF_SIZE, 0);
+            bytesSent = send(clientfd, adc_buffer, 2 * ADC_BUF_SIZE, 0);
             count = 0;
         }
 
@@ -303,7 +303,7 @@ ADC_Init(void)
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC0));
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_UDMA));
 
-    ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 64);
+    ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 32);
 
 //    ADCSequenceConfigure(ADC0_BASE, 0 /*SS0*/, ADC_TRIGGER_PROCESSOR, 3 /*priority*/);  // SS0-SS3 priorities must always be different
 //    ADCSequenceConfigure(ADC0_BASE, 3 /*SS3*/, ADC_TRIGGER_PROCESSOR, 0 /*priority*/);  // so change SS3 to prio0 when SS0 gets set to prio3
