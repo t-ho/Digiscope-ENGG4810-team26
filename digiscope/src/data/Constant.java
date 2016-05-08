@@ -39,6 +39,9 @@ public class Constant {
 	
 	public static final String[] VERTICAL_OFFSET_UNITS = new String[] {
 		ONE_MILIVOLT, TEN_MILIVOLTS, ONE_HUNDRED_MILIVOLTS, ONE_VOLT};
+        
+        public static final String[] VOLTAGE_UNITS = new String[] { ONE_MILIVOLT,
+                ONE_VOLT };
 
 	public static final String ONE_MICROSECOND = "1 us";
 	public static final String TWO_MICROSECONDS = "2 us";
@@ -86,6 +89,7 @@ public class Constant {
 	public static final String CHANNEL_B = "Channel B";
 	public static final String MATH_CHANNEL = "Math Channel";
 	public static final String FILTER_CHANNEL = "Filter Channel";
+	public static final String GENERATOR_CHANNEL = "Generator Channel";
 
 	public static final String AUTO_MODE = "Auto";
 	public static final String NORMAL_MODE = "Normal";
@@ -111,7 +115,7 @@ public class Constant {
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
-	public static enum TAB {CHANNEL_A, CHANNEL_B, MATH_CHANNEL, FILTER_CHANNEL};
+	public static enum TAB {CHANNEL_A, CHANNEL_B, MATH_CHANNEL, FILTER_CHANNEL, GENERATOR_CHANNEL};
 	
 	public static int VERTICAL_GRID_SPACINGS = 10;
 	public static int HORIZONTAL_GRID_SPACINGS = 16;
@@ -119,21 +123,24 @@ public class Constant {
 	public static int DEFAULT_VERTICAL_RANGE = 20;
 	public static int DEFAULT_HORIZONTAL_RANGE = 1;
 	
-	public static final int NUMBER_OF_CHANNELS = 4;
+	public static final int NUMBER_OF_CHANNELS = 5;
 	public static final int A_INDEX = 0;
 	public static final int B_INDEX = 1;
 	public static final int MATH_INDEX = 2;
 	public static final int FILTER_INDEX = 3;
+	public static final int GENERATOR_INDEX = 4;
 	
 	public static final Color A_COLOR = new Color(255, 0, 0); // red
 	public static final Color B_COLOR = new Color(0, 0, 255); // blue
 	public static final Color MATH_COLOR = new Color(0, 152, 125); // green
 	public static final Color FILTER_COLOR = new Color(177, 75, 255); // purple
+	public static final Color GENERATOR_COLOR = new Color(120, 75, 75); // brown
 	
 	public static final Color A_LIGHT_COLOR = new Color(252, 73, 73); // light red
 	public static final Color B_LIGHT_COLOR = new Color(65, 114, 248); // light blue
 	public static final Color MATH_LIGHT_COLOR = new Color(0, 165, 135); // light green
 	public static final Color FILTER_LIGHT_COLOR = new Color(186, 100, 252); // light purple
+	public static final Color GENERATOR_LIGHT_COLOR = new Color(140, 115, 115); // light brown
 
 	/**
 	 * Set application's LookAndFeel based on operating system type.

@@ -64,6 +64,8 @@ public class Visualizer {
 				renderers[channelIndex].setSeriesPaint(0, Constant.MATH_COLOR);
 			} else if(channelIndex == Constant.FILTER_INDEX) {
 				renderers[channelIndex].setSeriesPaint(0, Constant.FILTER_COLOR);
+			} else if(channelIndex == Constant.GENERATOR_INDEX) {
+				renderers[channelIndex].setSeriesPaint(0, Constant.GENERATOR_COLOR);
 			}
 		}
 	}
@@ -100,7 +102,7 @@ public class Visualizer {
 			verticalAxes[i] = createDefaultVerticalAxis();
 			renderers[i] = new XYLineAndShapeRenderer(true, false);
 		}
-		/* Hide 4 vertical axes of 4 channels */
+		/* Hide 5 vertical axes of 5 channels */
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			verticalAxes[i].setTickLabelsVisible(false);
 			verticalAxes[i].setAxisLineVisible(false);

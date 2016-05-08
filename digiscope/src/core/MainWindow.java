@@ -1,6 +1,6 @@
 package core;
 
-import gui.FileChooserUI;
+import gui.FileChooserUi;
 import gui.MainWindowUi;
 
 import java.awt.BasicStroke;
@@ -102,292 +102,369 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 //			filterSeries.add(i, 280 * Math.sin(i));
 //		}
 //		rawXYSeries_.put(Constant.FILTER_CHANNEL, filterSeries);
+
+		//Math Channel
+		XYSeries generatorSeries = new XYSeries(Constant.GENERATOR_CHANNEL);
+		for(double i = -20; i <= 20; i = i + 0.1) {
+			generatorSeries.add(i, 800 * Math.sin(i));
+		}
+		rawXYSeries.put(Constant.GENERATOR_CHANNEL, generatorSeries);
 	}
 
 	private void addListenersToComponents() {
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent event) {
-				mainWindowClosed(event);
+				mainWindowClosed();
 			}
 		});
 		
 		channelACheckBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				channelACheckboxItemStateChanged(event);
+				channelACheckboxItemStateChanged();
 			}
 		});
 
 		channelBCheckBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				channelBCheckboxItemStateChanged(event);
+				channelBCheckboxItemStateChanged();
 			}
 		});
 		
 		mathChannelCheckBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				mathChannelCheckboxItemStateChanged(event);
+				mathChannelCheckboxItemStateChanged();
 			}
 		});
 		
 		filterChannelCheckBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				filterChannelCheckboxItemStateChanged(event);
+				filterChannelCheckboxItemStateChanged();
+			}
+		});
+
+		generatorCheckBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				generatorCheckboxItemStateChanged();
 			}
 		});
 
 		horizontalRangeAComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				horizontalRangeAComboBoxItemStateChanged(event);
+				horizontalRangeAComboBoxItemStateChanged();
 			}
 		});
 
 		horizontalRangeBComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				horizontalRangeBComboBoxItemStateChanged(event);
+				horizontalRangeBComboBoxItemStateChanged();
 			}
 		});
 
 		horizontalRangeMathComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				horizontalRangeMathComboBoxItemStateChanged(event);
+				horizontalRangeMathComboBoxItemStateChanged();
 			}
 		});
 
 		horizontalRangeFilterComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				horizontalRangeFilterComboBoxItemStateChanged(event);
+				horizontalRangeFilterComboBoxItemStateChanged();
+			}
+		});
+		
+		horizontalRangeGeneratorComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				horizontalRangeGeneratorComboBoxItemStateChanged();
 			}
 		});
 		
 		horizontalRangeAComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				horizontalRangeAComboBoxActionPerformed(event);
+				horizontalRangeAComboBoxActionPerformed();
 			}
 		});
 		
 		horizontalRangeBComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				horizontalRangeBComboBoxActionPerformed(event);
+				horizontalRangeBComboBoxActionPerformed();
 			}
 		});
 
 		horizontalRangeMathComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				horizontalRangeMathComboBoxActionPerformed(event);
+				horizontalRangeMathComboBoxActionPerformed();
 			}
 		});
 		
 		horizontalRangeFilterComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				horizontalRangeFilterComboBoxActionPerformed(event);
+				horizontalRangeFilterComboBoxActionPerformed();
+			}
+		});
+
+		horizontalRangeGeneratorComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				horizontalRangeGeneratorComboBoxActionPerformed();
 			}
 		});
 
 		verticalRangeAComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				verticalRangeAComboBoxItemStateChanged(event);
+				verticalRangeAComboBoxItemStateChanged();
 			}
 		});
 
 		verticalRangeBComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				verticalRangeBComboBoxItemStateChanged(event);
+				verticalRangeBComboBoxItemStateChanged();
 			}
 		});
 
 		verticalRangeMathComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				verticalRangeMathComboBoxItemStateChanged(event);
+				verticalRangeMathComboBoxItemStateChanged();
 			}
 		});
 
 		verticalRangeFilterComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				verticalRangeFilterComboBoxItemStateChanged(event);
+				verticalRangeFilterComboBoxItemStateChanged();
+			}
+		});
+
+		verticalRangeGeneratorComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				verticalRangeGeneratorComboBoxItemStateChanged();
 			}
 		});
 
 		cursorComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				cursorComboBoxItemStateChanged(event);
+				cursorComboBoxItemStateChanged();
 			}
 		});
 		
 		verticalOffsetASpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent event) {
-				verticalOffsetASpinnerStateChanged(event);
+				verticalOffsetASpinnerStateChanged();
 			}
 		});
 
 		verticalOffsetBSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent event) {
-				verticalOffsetBSpinnerStateChanged(event);
+				verticalOffsetBSpinnerStateChanged();
 			}
 		});
 
 		verticalOffsetMathSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent event) {
-				verticalOffsetMathSpinnerStateChanged(event);
+				verticalOffsetMathSpinnerStateChanged();
 			}
 		});
 
 		verticalOffsetFilterSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent event) {
-				verticalOffsetFilterSpinnerStateChanged(event);
+				verticalOffsetFilterSpinnerStateChanged();
+			}
+		});
+
+		verticalOffsetGeneratorSpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				verticalOffsetGeneratorSpinnerStateChanged();
 			}
 		});
 
 		horizontalOffsetASpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent event) {
-				horizontalOffsetASpinnerStateChanged(event);
+				horizontalOffsetASpinnerStateChanged();
 			}
 		});
 
 		horizontalOffsetBSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent event) {
-				horizontalOffsetBSpinnerStateChanged(event);
+				horizontalOffsetBSpinnerStateChanged();
 			}
 		});
 
 		horizontalOffsetMathSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent event) {
-				horizontalOffsetMathSpinnerStateChanged(event);
+				horizontalOffsetMathSpinnerStateChanged();
 			}
 		});
 
 		horizontalOffsetFilterSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent event) {
-				horizontalOffsetFilterSpinnerStateChanged(event);
+				horizontalOffsetFilterSpinnerStateChanged();
 			}
 		});
 		
+		horizontalOffsetGeneratorSpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				horizontalOffsetGeneratorSpinnerStateChanged();
+			}
+		});
+
 		verticalOffsetUnitAComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				verticalOffsetUnitAComboBoxItemStateChanged(event);
+				verticalOffsetUnitAComboBoxItemStateChanged();
 			}
 		});
 
 		verticalOffsetUnitBComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				verticalOffsetUnitBComboBoxItemStateChanged(event);
+				verticalOffsetUnitBComboBoxItemStateChanged();
 			}
 		});
 
 		verticalOffsetUnitMathComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				verticalOffsetUnitMathComboBoxItemStateChanged(event);
+				verticalOffsetUnitMathComboBoxItemStateChanged();
 			}
 		});
 
 		verticalOffsetUnitFilterComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				verticalOffsetUnitFilterComboBoxItemStateChanged(event);
+				verticalOffsetUnitFilterComboBoxItemStateChanged();
+			}
+		});
+		
+		verticalOffsetUnitGeneratorComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				verticalOffsetUnitGeneratorComboBoxItemStateChanged();
 			}
 		});
 		
 		horizontalOffsetUnitAComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				horizontalOffsetUnitAComboBoxItemStateChanged(event);
+				horizontalOffsetUnitAComboBoxItemStateChanged();
 			}
 		});
 
 		horizontalOffsetUnitBComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				horizontalOffsetUnitBComboBoxItemStateChanged(event);
+				horizontalOffsetUnitBComboBoxItemStateChanged();
 			}
 		});
 
 		horizontalOffsetUnitMathComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				horizontalOffsetUnitMathComboBoxItemStateChanged(event);
+				horizontalOffsetUnitMathComboBoxItemStateChanged();
 			}
 		});
 
 		horizontalOffsetUnitFilterComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				horizontalOffsetUnitFilterComboBoxItemStateChanged(event);
+				horizontalOffsetUnitFilterComboBoxItemStateChanged();
+			}
+		});
+		
+		horizontalOffsetUnitGeneratorComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				horizontalOffsetUnitGeneratorComboBoxItemStateChanged();
 			}
 		});
 		
 		newExpressionButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				newExpressionButtonActionPerformed(event);
+				newExpressionButtonActionPerformed();
 			}
 		});
 
 		editExpressionButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				editExpressionButtonActionPerformed(event);
+				editExpressionButtonActionPerformed();
 			}
 		});
 
 		removeExpressionButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				removeExpressionButtonActionPerformed(event);
+				removeExpressionButtonActionPerformed();
 			}
 		});
 		
 		browseButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				browseButtonActionPerformed(event);
+				browseButtonActionPerformed();
 			}
 		});
 		
 		inputChannelComboBox.addActionListener(new ActionListener() {
-			
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				// TODO Auto-generated method stub
-				inputChannelComboBoxActionPerformed(event);
+				inputChannelComboBoxActionPerformed();
 			}
 		});
 		
 		removeFilterButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				removeFilterButtonActionPerformed(event);
+				removeFilterButtonActionPerformed();
+			}
+		});
+		
+		channelCouplingToggleButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				channelCouplingToggleButtonActionPerformed();
 			}
 		});
 	}
 
-	protected void removeFilterButtonActionPerformed(ActionEvent event) {
+	protected void channelCouplingToggleButtonActionPerformed() {
+		// TODO
+		if(channelCouplingToggleButton.isSelected()) {
+			channelCouplingToggleButton.setText("DC");
+		} else {
+			channelCouplingToggleButton.setText("AC");
+		}
+	}
+
+	protected void removeFilterButtonActionPerformed() {
 		// TODO:
 		String expression = expressionTextArea.getText().trim();
 		if (expression.contains("F")) {
@@ -414,7 +491,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		csvFilePathTextField.setText("Choose CSV file");
 	}
 
-	protected void inputChannelComboBoxActionPerformed(ActionEvent event) {
+	protected void inputChannelComboBoxActionPerformed() {
 		// TODO
 		calculateFilterChannel();
 		String inputChannel = (String) inputChannelComboBox.getSelectedItem();
@@ -425,11 +502,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		}
 	}
 
-	protected void browseButtonActionPerformed(ActionEvent event) {
+	protected void browseButtonActionPerformed() {
 		// TODO
 		String iconPath = "/icons/csv_icon_16x16.png";
 		String decription = "Comma-separated-values file (*." + Constant.CSV_FILE_EXTENSION + ")";
-		FileChooserUI fileChooser = new FileChooserUI(JFileChooser.FILES_ONLY,
+		FileChooserUi fileChooser = new FileChooserUi(JFileChooser.FILES_ONLY,
 				Constant.CSV_FILE_EXTENSION, iconPath, decription);
 		int status = fileChooser.showOpenDialog(this);
 		if(status == JFileChooser.APPROVE_OPTION) {
@@ -453,7 +530,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		}
 	}
 
-	protected void removeExpressionButtonActionPerformed(ActionEvent event) {
+	protected void removeExpressionButtonActionPerformed() {
 		// TODO
 		if(inputChannelComboBox.getSelectedItem().equals(Constant.MATH_CHANNEL)) {
 			int response = JOptionPane.showConfirmDialog(this, 
@@ -480,7 +557,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		updateInputChannelComboBox();
 	}
 
-	protected void editExpressionButtonActionPerformed(ActionEvent event) {
+	protected void editExpressionButtonActionPerformed() {
 		// TODO
 		String expression = expressionTextArea.getText();
 		ExpressionDialog expressionDialog = new ExpressionDialog(this, expression);
@@ -488,73 +565,88 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		calculateMathChannel();
 	}
 
-	private void newExpressionButtonActionPerformed(ActionEvent event) {
+	private void newExpressionButtonActionPerformed() {
 		// TODO
 		ExpressionDialog expressionDialog = new ExpressionDialog(this);
 		expressionDialog.setVisible(true);
 	}
 
-	protected void verticalOffsetUnitAComboBoxItemStateChanged(ItemEvent event) {
+	protected void verticalOffsetUnitAComboBoxItemStateChanged() {
 		// TODO
 		verticalOffsetASpinner.setValue(0);
 	}
 
-	protected void verticalOffsetUnitBComboBoxItemStateChanged(ItemEvent event) {
+	protected void verticalOffsetUnitBComboBoxItemStateChanged() {
 		// TODO
 		verticalOffsetBSpinner.setValue(0);
 	}
 
-	protected void verticalOffsetUnitMathComboBoxItemStateChanged(ItemEvent event) {
+	protected void verticalOffsetUnitMathComboBoxItemStateChanged() {
 		// TODO
 		verticalOffsetMathSpinner.setValue(0);
 	}
 
-	protected void verticalOffsetUnitFilterComboBoxItemStateChanged(ItemEvent event) {
+	protected void verticalOffsetUnitFilterComboBoxItemStateChanged() {
 		// TODO
 		verticalOffsetFilterSpinner.setValue(0);
 	}
 
-	protected void horizontalOffsetUnitAComboBoxItemStateChanged(ItemEvent event) {
+	protected void verticalOffsetUnitGeneratorComboBoxItemStateChanged() {
+		// TODO
+		verticalOffsetGeneratorSpinner.setValue(0);
+	}
+
+	protected void horizontalOffsetUnitAComboBoxItemStateChanged() {
 		// TODO
 		horizontalOffsetASpinner.setValue(0);
 	}
 
-	protected void horizontalOffsetUnitBComboBoxItemStateChanged(ItemEvent event) {
+	protected void horizontalOffsetUnitBComboBoxItemStateChanged() {
 		// TODO
 		horizontalOffsetBSpinner.setValue(0);
 	}
 
-	protected void horizontalOffsetUnitMathComboBoxItemStateChanged(ItemEvent event) {
+	protected void horizontalOffsetUnitMathComboBoxItemStateChanged() {
 		// TODO
 		horizontalOffsetMathSpinner.setValue(0);
 	}
 
-	protected void horizontalOffsetUnitFilterComboBoxItemStateChanged(ItemEvent event) {
+	protected void horizontalOffsetUnitFilterComboBoxItemStateChanged() {
 		// TODO
 		horizontalOffsetFilterSpinner.setValue(0);
 	}
 
-	private void verticalOffsetASpinnerStateChanged(ChangeEvent event) {
+	protected void horizontalOffsetUnitGeneratorComboBoxItemStateChanged() {
+		// TODO
+		horizontalOffsetGeneratorSpinner.setValue(0);
+	}
+
+	private void verticalOffsetASpinnerStateChanged() {
 		// TODO
 		showChannelPlotOnChartPanel(Constant.CHANNEL_A);
 	}
 	
-	private void verticalOffsetBSpinnerStateChanged(ChangeEvent event) {
+	private void verticalOffsetBSpinnerStateChanged() {
 		// TODO
 		showChannelPlotOnChartPanel(Constant.CHANNEL_B);
 	}
 
-	private void verticalOffsetMathSpinnerStateChanged(ChangeEvent event) {
+	private void verticalOffsetMathSpinnerStateChanged() {
 		// TODO
 		showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
 	}
 
-	private void verticalOffsetFilterSpinnerStateChanged(ChangeEvent event) {
+	private void verticalOffsetFilterSpinnerStateChanged() {
 		// TODO
 		showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
 	}
 
-	private void horizontalOffsetASpinnerStateChanged(ChangeEvent event) {
+	private void verticalOffsetGeneratorSpinnerStateChanged() {
+		// TODO
+		showChannelPlotOnChartPanel(Constant.GENERATOR_CHANNEL);
+	}
+
+	private void horizontalOffsetASpinnerStateChanged() {
 		// TODO
 		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetASpinner.getValue(),
 				(String) horizontalOffsetUnitAComboBox.getSelectedItem());
@@ -565,7 +657,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		visualizer_.addSeriesToDataset(Constant.A_INDEX, aSeries);
 	}
 
-	private void horizontalOffsetBSpinnerStateChanged(ChangeEvent event) {
+	private void horizontalOffsetBSpinnerStateChanged() {
 		// TODO
 		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetBSpinner.getValue(),
 				(String) horizontalOffsetUnitBComboBox.getSelectedItem());
@@ -576,7 +668,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		visualizer_.addSeriesToDataset(Constant.B_INDEX, bSeries);
 	}
 
-	private void horizontalOffsetMathSpinnerStateChanged(ChangeEvent event) {
+	private void horizontalOffsetMathSpinnerStateChanged() {
 		// TODO
 		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetMathSpinner.getValue(),
 				(String) horizontalOffsetUnitMathComboBox.getSelectedItem());
@@ -587,7 +679,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		visualizer_.addSeriesToDataset(Constant.MATH_INDEX, mathSeries);
 	}
 
-	private void horizontalOffsetFilterSpinnerStateChanged(ChangeEvent event) {
+	private void horizontalOffsetFilterSpinnerStateChanged() {
 		// TODO
 		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetFilterSpinner.getValue(),
 				(String) horizontalOffsetUnitFilterComboBox.getSelectedItem());
@@ -598,7 +690,18 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		visualizer_.addSeriesToDataset(Constant.FILTER_INDEX, filterSeries);
 	}
 
-	private void cursorComboBoxItemStateChanged(ItemEvent event) {
+	private void horizontalOffsetGeneratorSpinnerStateChanged() {
+		// TODO
+		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetGeneratorSpinner.getValue(),
+				(String) horizontalOffsetUnitGeneratorComboBox.getSelectedItem());
+		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetGeneratorSpinner.getValue(),
+				(String) verticalOffsetUnitGeneratorComboBox.getSelectedItem());
+		XYSeries generatorSeries = createXYSeriesWithOffsets(Constant.GENERATOR_CHANNEL,
+				rawXYSeries.get(Constant.GENERATOR_CHANNEL), horizontalOffset, verticalOffset);
+		visualizer_.addSeriesToDataset(Constant.GENERATOR_INDEX, generatorSeries);
+	}
+
+	private void cursorComboBoxItemStateChanged() {
 		// TODO
 		String selectChannel = (String) cursorComboBox.getSelectedItem();
 		if(selectChannel == Constant.CHANNEL_A) {
@@ -613,45 +716,61 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		} else if(selectChannel == Constant.FILTER_CHANNEL) {
 			showCursorMeasurement(Constant.FILTER_INDEX);
 			cursorVerticalValueLabel.setForeground(Constant.FILTER_COLOR);
+		} else if(selectChannel == Constant.GENERATOR_CHANNEL) {
+			showCursorMeasurement(Constant.GENERATOR_INDEX);
+			cursorVerticalValueLabel.setForeground(Constant.GENERATOR_COLOR);
 		} else {
 			hideCursorMeasurement();
 			cursorVerticalValueLabel.setForeground(Color.BLACK);
 		}
 	}
 
-	private void horizontalRangeAComboBoxActionPerformed(ActionEvent event) {
+	private void horizontalRangeAComboBoxActionPerformed() {
 		// TODO 
 		int selectedIndex = horizontalRangeAComboBox.getSelectedIndex();
 		horizontalRangeBComboBox.setSelectedIndex(selectedIndex);
 		horizontalRangeMathComboBox.setSelectedIndex(selectedIndex);
 		horizontalRangeFilterComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeGeneratorComboBox.setSelectedIndex(selectedIndex);
 	}
 
-	private void horizontalRangeBComboBoxActionPerformed(ActionEvent event) {
+	private void horizontalRangeBComboBoxActionPerformed() {
 		// TODO 
 		int selectedIndex = horizontalRangeBComboBox.getSelectedIndex();
 		horizontalRangeAComboBox.setSelectedIndex(selectedIndex);
 		horizontalRangeMathComboBox.setSelectedIndex(selectedIndex);
 		horizontalRangeFilterComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeGeneratorComboBox.setSelectedIndex(selectedIndex);
 	}
 
-	private void horizontalRangeMathComboBoxActionPerformed(ActionEvent event) {
+	private void horizontalRangeMathComboBoxActionPerformed() {
 		// TODO
 		int selectedIndex = horizontalRangeMathComboBox.getSelectedIndex();
 		horizontalRangeAComboBox.setSelectedIndex(selectedIndex);
 		horizontalRangeBComboBox.setSelectedIndex(selectedIndex);
 		horizontalRangeFilterComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeGeneratorComboBox.setSelectedIndex(selectedIndex);
 	}
 
-	private void horizontalRangeFilterComboBoxActionPerformed(ActionEvent event) {
+	private void horizontalRangeFilterComboBoxActionPerformed() {
 		// TODO
 		int selectedIndex = horizontalRangeFilterComboBox.getSelectedIndex();
 		horizontalRangeAComboBox.setSelectedIndex(selectedIndex);
 		horizontalRangeBComboBox.setSelectedIndex(selectedIndex);
 		horizontalRangeMathComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeGeneratorComboBox.setSelectedIndex(selectedIndex);
 	}
 
-	private void horizontalRangeAComboBoxItemStateChanged(ItemEvent event) {
+	private void horizontalRangeGeneratorComboBoxActionPerformed() {
+		// TODO
+		int selectedIndex = horizontalRangeGeneratorComboBox.getSelectedIndex();
+		horizontalRangeAComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeBComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeMathComboBox.setSelectedIndex(selectedIndex);
+		horizontalRangeFilterComboBox.setSelectedIndex(selectedIndex);
+	}
+
+	private void horizontalRangeAComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) horizontalRangeAComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
@@ -659,7 +778,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
-	private void horizontalRangeBComboBoxItemStateChanged(ItemEvent event) {
+	private void horizontalRangeBComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) horizontalRangeBComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
@@ -667,7 +786,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
-	private void horizontalRangeMathComboBoxItemStateChanged(ItemEvent event) {
+	private void horizontalRangeMathComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) horizontalRangeMathComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
@@ -675,7 +794,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
-	private void horizontalRangeFilterComboBoxItemStateChanged(ItemEvent event) {
+	private void horizontalRangeFilterComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) horizontalRangeFilterComboBox.getSelectedItem();
 		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
@@ -683,7 +802,15 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
-	private void verticalRangeAComboBoxItemStateChanged(ItemEvent event) {
+	private void horizontalRangeGeneratorComboBoxItemStateChanged() {
+		// TODO
+		String selectedItem = (String) horizontalRangeGeneratorComboBox.getSelectedItem();
+		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
+		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
+	}
+
+	private void verticalRangeAComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
@@ -694,7 +821,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		aDivisionInfoLabel.setText("A: " + selectedItem + "/div");
 	}
 
-	private void verticalRangeBComboBoxItemStateChanged(ItemEvent event) {
+	private void verticalRangeBComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) verticalRangeBComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
@@ -705,7 +832,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		bDivisionInfoLabel.setText("B: " + selectedItem + "/div");
 	}
 
-	private void verticalRangeMathComboBoxItemStateChanged(ItemEvent event) {
+	private void verticalRangeMathComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
@@ -716,7 +843,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		mathDivisionInfoLabel.setText("Math: " + selectedItem + "/div");
 	}
 
-	private void verticalRangeFilterComboBoxItemStateChanged(ItemEvent event) {
+	private void verticalRangeFilterComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) verticalRangeFilterComboBox.getSelectedItem();
 		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
@@ -727,7 +854,18 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		filterDivisionInfoLabel.setText("Filter: " + selectedItem + "/div");
 	}
 
-	private void channelACheckboxItemStateChanged(ItemEvent event) {
+	private void verticalRangeGeneratorComboBoxItemStateChanged() {
+		// TODO
+		String selectedItem = (String) verticalRangeGeneratorComboBox.getSelectedItem();
+		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		visualizer_.setValueForVerticalGridSpacing(Constant.GENERATOR_INDEX, verticalRange);
+		if(measuredChannelIndex_ == Constant.GENERATOR_INDEX) {
+			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+		}
+		generatorDivisionInfoLabel.setText("Generator: " + selectedItem + "/div");
+	}
+
+	private void channelACheckboxItemStateChanged() {
 		// TODO
 		if (channelACheckBox.isSelected()) {
 			setEnabledChannelAControls(true);
@@ -739,7 +877,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		}
 	}	
 	
-	private void channelBCheckboxItemStateChanged(ItemEvent event) {
+	private void channelBCheckboxItemStateChanged() {
 		// TODO
 		if(channelBCheckBox.isSelected()) {
 			setEnabledChannelBControls(true);
@@ -751,7 +889,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		}
 	}
 
-	private void mathChannelCheckboxItemStateChanged(ItemEvent event) {
+	private void mathChannelCheckboxItemStateChanged() {
 		// TODO
 		if(mathChannelCheckBox.isSelected()) {
 			setEnabledMathChannelControls(true);
@@ -763,7 +901,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		}
 	}
 	
-	private void filterChannelCheckboxItemStateChanged(ItemEvent event) {
+	private void filterChannelCheckboxItemStateChanged() {
 		// TODO
 		if(filterChannelCheckBox.isSelected()) {
 			setEnabledFilterChannelControls(true);
@@ -773,6 +911,18 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		} else {
 			setEnabledFilterChannelControls(false);
 			removeChannelPlotFromChartPanel(Constant.FILTER_CHANNEL);
+		}
+	}
+
+	private void generatorCheckboxItemStateChanged() {
+		// TODO
+		if(generatorCheckBox.isSelected()) {
+			setEnabledGeneratorChannelControls(true);
+			showTab(Constant.TAB.GENERATOR_CHANNEL);
+			showChannelPlotOnChartPanel(Constant.GENERATOR_CHANNEL);
+		} else {
+			setEnabledGeneratorChannelControls(false);
+			removeChannelPlotFromChartPanel(Constant.GENERATOR_CHANNEL);
 		}
 	}
 	
@@ -949,7 +1099,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		return chartPanel;
 	}
 
-	private void mainWindowClosed(WindowEvent event) {
+	private void mainWindowClosed() {
 		getLaunchWindow().setStatus("To connect, please enter the IP address!", Constant.NORMAL);
 		getLaunchWindow().setVisible(true);
 	}
@@ -1001,6 +1151,12 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
 			timeCrosshair_.setLabelBackgroundPaint(Constant.FILTER_LIGHT_COLOR);
 			voltageCrosshair_.setLabelBackgroundPaint(Constant.FILTER_LIGHT_COLOR);
+		} else if(channelIndex == Constant.GENERATOR_INDEX) {
+			String seletectItem = (String) verticalRangeGeneratorComboBox.getSelectedItem();
+			int verticalRange = changeVoltStringToMiliVolts(seletectItem);
+			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+			timeCrosshair_.setLabelBackgroundPaint(Constant.GENERATOR_LIGHT_COLOR);
+			voltageCrosshair_.setLabelBackgroundPaint(Constant.GENERATOR_LIGHT_COLOR);
 		}
 		chartPanel_.addChartMouseListener(this);
 	}
@@ -1082,6 +1238,12 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				verticalOffset = getVerticalOffsetValue((int) verticalOffsetFilterSpinner.getValue(),
 						(String) verticalOffsetUnitFilterComboBox.getSelectedItem());
 				channelIndex = Constant.FILTER_INDEX;
+			} else if (channelName == Constant.GENERATOR_CHANNEL) {
+				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetGeneratorSpinner.getValue(),
+						(String) horizontalOffsetUnitGeneratorComboBox.getSelectedItem());
+				verticalOffset = getVerticalOffsetValue((int) verticalOffsetGeneratorSpinner.getValue(),
+						(String) verticalOffsetUnitGeneratorComboBox.getSelectedItem());
+				channelIndex = Constant.GENERATOR_INDEX;
 			}
 			XYSeries xYSeries = createXYSeriesWithOffsets(channelName, rawSeries, horizontalOffset, verticalOffset);
 			visualizer_.addSeriesToDataset(channelIndex, xYSeries);
@@ -1105,6 +1267,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 			channelIndex = Constant.MATH_INDEX;
 		} else if(channelName == Constant.FILTER_CHANNEL) {
 			channelIndex = Constant.FILTER_INDEX;
+		} else if(channelName == Constant.GENERATOR_CHANNEL) {
+			channelIndex = Constant.GENERATOR_INDEX;
 		}
 		visualizer_.removeAllSeriesFromDataset(channelIndex);
 		cursorComboBox.removeItem(channelName);

@@ -12,11 +12,11 @@ import javax.swing.filechooser.FileView;
  * @author ToanHo
  *
  */
-public class FileChooserUI extends JFileChooser {
+public class FileChooserUi extends JFileChooser {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Construct FileChooserUI
+	 * Construct FileChooserUi
 	 * 
 	 * @param fileSelectionMode
 	 *            (e.g. JFileChooser.FILES_AND_DIRECTORIES)
@@ -27,7 +27,7 @@ public class FileChooserUI extends JFileChooser {
 	 * @param decription
 	 *            File description (e.g. "Comma-separated values file (*.csv)")
 	 */
-	public FileChooserUI(int fileSelectionMode, final String fileExtension, final String iconPath,
+	public FileChooserUi(int fileSelectionMode, final String fileExtension, final String iconPath,
 			final String decription) {
 		super();
 		this.setFileSelectionMode(fileSelectionMode);
