@@ -58,7 +58,6 @@
 // #include <ti/drivers/Watchdog.h>
 // #include <ti/drivers/WiFi.h>
 
-#include <sys/socket.h>
 
 #include <stdbool.h>
 
@@ -80,11 +79,7 @@
 #include "drivers/SSD1289_driver.h"
 #include "drivers/XPT2046_driver.h"
 
-#define ADC_SAMPLE_BUF_SIZE 8
-#define ADC_BUF_SIZE 1024 * 25
 
-uint16_t adc_pos = 0;
-uint16_t adc_buffer[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
 
 uint32_t udmaCtrlTable[1024/sizeof(uint32_t)] __attribute__(( aligned(1024) ));
 
@@ -128,162 +123,6 @@ void heartBeatFxn(UArg arg0, UArg arg1)
         Task_sleep((unsigned int)arg0);
         GPIO_toggle(Board_LED0);
         System_flush();
-    }
-}
-
-void
-ipAddrHook(uint32_t IPAddr, uint32_t IfIdx, uint32_t fAdd)
-{
-//    System_printf("mynetworkIPAddrHook: enter\n");
-
-    IpAddrVal = ntohl(IPAddr);
-    Semaphore_post(ip_update_h);
-
-//    System_printf("mynetworkIPAddrHook:\tIf-%d:%d.%d.%d.%d\n", IfIdx,
-//            (uint8_t)(IpAddrVal>>24)&0xFF, (uint8_t)(IpAddrVal>>16)&0xFF,
-//            (uint8_t)(IpAddrVal>>8)&0xFF, (uint8_t)IpAddrVal&0xFF);
-//
-//    System_flush();
-}
-
-#define TCPPACKETSIZE 256
-#define NUMTCPWORKERS 3
-
-/*
- *  ======== tcpWorker ========
- *  Task to handle TCP connection. Can be multiple Tasks running
- *  this function.
- */
-Void tcpWorker(UArg arg0, UArg arg1)
-{
-    int  clientfd = (int)arg0;
-    int  bytesRcvd;
-    int  bytesSent;
-    char buffer[TCPPACKETSIZE];
-
-    System_printf("tcpWorker: start clientfd = 0x%x\n", clientfd);
-
-    int count = 0;
-
-    ClientConnected++;
-    Semaphore_post(ip_update_h);
-
-    while (1) {
-    	bytesRcvd = recv(clientfd, buffer, TCPPACKETSIZE, MSG_DONTWAIT);
-
-    	if (count == 30)
-    	{
-            bytesSent = send(clientfd, "keepalive", 10, 0);
-            if (bytesSent < 0 || bytesSent != 10) {
-                System_printf("Error: keepalive send failed.\n");
-                break;
-            }
-
-            count = 0;
-    	}
-
-    	if (bytesRcvd > 0)
-    	{
-            bytesSent = send(clientfd, buffer, bytesRcvd, 0);
-            if (bytesSent < 0 || bytesSent != bytesRcvd) {
-                System_printf("Error: send failed.\n");
-                break;
-            }
-            count = 0;
-    	}
-
-        if (Semaphore_pend(force_trigger_h, 100))
-        {
-            System_printf("Force trigger event!\n");
-            bytesSent = send(clientfd, adc_buffer, 2 * ADC_BUF_SIZE, 0);
-            count = 0;
-        }
-
-        count++;
-    }
-    System_printf("tcpWorker stop clientfd = 0x%x\n", clientfd);
-
-    close(clientfd);
-
-    ClientConnected--;
-    Semaphore_post(ip_update_h);
-}
-
-/*
- *  ======== tcpHandler ========
- *  Creates new Task to handle new TCP connections.
- */
-Void tcpHandler(UArg arg0, UArg arg1)
-{
-    int                status;
-    int                clientfd;
-    int                server;
-    struct sockaddr_in localAddr;
-    struct sockaddr_in clientAddr;
-    int                optval;
-    int                optlen = sizeof(optval);
-    socklen_t          addrlen = sizeof(clientAddr);
-    Task_Handle        taskHandle;
-    Task_Params        taskParams;
-    Error_Block        eb;
-
-    server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (server == -1) {
-        System_printf("Error: socket not created.\n");
-        goto shutdown;
-    }
-
-
-    memset(&localAddr, 0, sizeof(localAddr));
-    localAddr.sin_family = AF_INET;
-    localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    localAddr.sin_port = htons(arg0);
-
-    status = bind(server, (struct sockaddr *)&localAddr, sizeof(localAddr));
-    if (status == -1) {
-        System_printf("Error: bind failed.\n");
-        goto shutdown;
-    }
-
-    status = listen(server, NUMTCPWORKERS);
-    if (status == -1) {
-        System_printf("Error: listen failed.\n");
-        goto shutdown;
-    }
-
-    optval = 1;
-    if (setsockopt(server, SOL_SOCKET, SO_KEEPALIVE, &optval, optlen) < 0) {
-        System_printf("Error: setsockopt failed\n");
-        goto shutdown;
-    }
-
-    while ((clientfd =
-            accept(server, (struct sockaddr *)&clientAddr, &addrlen)) != -1) {
-
-        System_printf("tcpHandler: Creating thread clientfd = %d\n", clientfd);
-
-        /* Init the Error_Block */
-        Error_init(&eb);
-
-        /* Initialize the defaults and set the parameters. */
-        Task_Params_init(&taskParams);
-        taskParams.arg0 = (UArg)clientfd;
-        taskParams.stackSize = 1280;
-        taskHandle = Task_create((Task_FuncPtr)tcpWorker, &taskParams, &eb);
-        if (taskHandle == NULL) {
-            System_printf("Error: Failed to create new Task\n");
-            close(clientfd);
-        }
-
-        /* addrlen is a value-result param, must reset for next accept call */
-        addrlen = sizeof(clientAddr);
-    }
-
-    System_printf("Error: accept failed.\n");
-
-shutdown:
-    if (server > 0) {
-        close(server);
     }
 }
 
