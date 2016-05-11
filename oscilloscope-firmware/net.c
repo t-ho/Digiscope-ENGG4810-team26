@@ -49,6 +49,8 @@
 
 #define TCPHANDLERSTACK 1024
 
+#define SOCKET_TIMEOUT 500000
+
 /* Prototypes */
 void tcpHandler(UArg arg0, UArg arg1);
 
@@ -69,50 +71,52 @@ Void tcpWorker(UArg arg0, UArg arg1)
 
     System_printf("tcpWorker: start clientfd = 0x%x\n", clientfd);
 
-    int count = 0;
-
     ClientConnected++;
     Semaphore_post(ip_update_h);
+
+	NetPacket keepalive;
+	keepalive.data = "keepalive\n";
+	keepalive.len = strlen(keepalive.data);
+
 
     while (1) {
     	bytesRcvd = recv(clientfd, buffer, TCPPACKETSIZE, 0);
 
-    	if (count == 30)
-    	{
-            bytesSent = send(clientfd, "keepalive", 10, 0);
-            if (bytesSent < 0 || bytesSent != 10) {
-                System_printf("Error: keepalive send failed.\n");
-                break;
-            }
-
-            count = 0;
-    	}
-
     	if (bytesRcvd > 0)
     	{
-            bytesSent = send(clientfd, buffer, bytesRcvd, 0);
-            if (bytesSent < 0 || bytesSent != bytesRcvd) {
-                System_printf("Error: send failed.\n");
-                break;
-            }
-            count = 0;
+    		NetPacket sendpacket;
+    		sendpacket.data = buffer;
+    		sendpacket.len = bytesRcvd;
+
+			Queue_enqueue(NetSendQueue, &sendpacket);
     	}
 
-        if (Semaphore_pend(force_trigger_h, 0))
-        {
-            System_printf("Force trigger event!\n");
-            bytesSent = send(clientfd, adc_buffer, 2 * ADC_BUF_SIZE, 0);
-            count = 0;
-        }
+    	if (Queue_empty(NetSendQueue)) {
+    		if (ClientConnected) {
+    			Queue_enqueue(NetSendQueue, &keepalive);
+    		}
+    	}
 
-        count++;
+    	NetPacket *np;
+    	while(!Queue_empty(NetSendQueue)) {
+
+    		np = Queue_dequeue(NetSendQueue);
+
+            bytesSent = send(clientfd, np->data, np->len, 0);
+
+            if (bytesSent < 0 || bytesSent != np->len) {
+                System_printf("Error: send failed.\n");
+                System_printf("tcpWorker stop clientfd = 0x%x\n", clientfd);
+
+                close(clientfd);
+
+                ClientConnected--;
+                Semaphore_post(ip_update_h);
+
+                return;
+            }
+    	}
     }
-    System_printf("tcpWorker stop clientfd = 0x%x\n", clientfd);
-
-    close(clientfd);
-
-    ClientConnected--;
-    Semaphore_post(ip_update_h);
 }
 
 /*
@@ -165,7 +169,7 @@ Void tcpHandler(UArg arg0, UArg arg1)
 
     struct timeval timeout;
     timeout.tv_sec = 0;
-    timeout.tv_usec = 200000;
+    timeout.tv_usec = SOCKET_TIMEOUT;
 
     if (setsockopt(server, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
         System_printf("Error: setsockopt timeout failed\n");

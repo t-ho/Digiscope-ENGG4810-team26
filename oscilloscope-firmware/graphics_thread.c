@@ -348,7 +348,11 @@ OnPrevious(tWidget *psWidget)
 void
 ForceTrigger(tWidget *psWidget)
 {
-    Semaphore_post(force_trigger_h);
+    static NetPacket np;
+    np.data = (char *) adc_buffer;
+    np.len = 2 * ADC_BUF_SIZE;
+
+    Queue_enqueue(NetSendQueue, &np);
 }
 
 void

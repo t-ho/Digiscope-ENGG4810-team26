@@ -123,6 +123,8 @@ void heartBeatFxn(UArg arg0, UArg arg1)
         Task_sleep((unsigned int)arg0);
         GPIO_toggle(Board_LED0);
         System_flush();
+
+
     }
 }
 
@@ -199,6 +201,7 @@ int main(void)
     // Board_initWiFi();
 
     Init_Semaphores();
+    Init_SendQueue();
 
     SSD1289_Init();
     XPT2046_Init();

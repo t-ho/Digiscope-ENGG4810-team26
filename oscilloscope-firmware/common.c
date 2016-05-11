@@ -20,6 +20,14 @@ static Semaphore_Struct force_trigger;
 uint32_t IpAddrVal = 0;
 uint8_t ClientConnected = 0;
 
+Queue_Handle NetSendQueue;
+
+void
+Init_SendQueue(void)
+{
+	NetSendQueue = Queue_create(NULL, NULL);
+}
+
 void
 Init_Semaphores(void)
 {
