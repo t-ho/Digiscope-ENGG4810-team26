@@ -226,6 +226,7 @@ TouchCallback(unsigned int index)
 	if (regTouchCallback)
 	{
 		regTouchCallback(WIDGET_MSG_PTR_DOWN, x, y);
+	    Semaphore_post(widget_message_h);
 	}
 
 	Clock_start(TouchClkHandle);

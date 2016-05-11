@@ -23,6 +23,7 @@ Init_Semaphores(void)
     // Initialise semaphores
     Semaphore_Params params;
     Semaphore_Params_init(&params);
+    params.mode = Semaphore_Mode_BINARY;
 
     Semaphore_construct(&ip_update, 0, &params);
     ip_update_h = Semaphore_handle(&ip_update);
