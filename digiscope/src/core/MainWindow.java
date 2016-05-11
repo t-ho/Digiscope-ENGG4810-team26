@@ -69,7 +69,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
 		for(double i = -20; i <= 20; i = i + 0.1) {
-			aSeries.add(i, 1000 * Math.sin(i));
+			aSeries.add(i, 1 * Math.sin(i));
 		}
 // Test Filter 
 //		aSeries = new XYSeries(Constant.CHANNEL_A);
@@ -84,7 +84,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		// Channel B
 		XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
 		for(double i = -20; i <= 20; i = i + 0.1) {
-			bSeries.add(i, 1500 * Math.sin(i));
+			bSeries.add(i, 1.5 * Math.sin(i));
 		}
 		rawXYSeries.put(Constant.CHANNEL_B, bSeries);
 
@@ -106,7 +106,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		//Math Channel
 		XYSeries generatorSeries = new XYSeries(Constant.GENERATOR_CHANNEL);
 		for(double i = -20; i <= 20; i = i + 0.1) {
-			generatorSeries.add(i, 800 * Math.sin(i));
+			generatorSeries.add(i, 0.8 * Math.sin(i));
 		}
 		rawXYSeries.put(Constant.GENERATOR_CHANNEL, generatorSeries);
 	}
@@ -813,7 +813,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private void verticalRangeAComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
-		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		double verticalRange = convertVoltageStringToVolts(selectedItem);
 		visualizer_.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
 		if(measuredChannelIndex_ == Constant.A_INDEX) {
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
@@ -824,7 +824,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private void verticalRangeBComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) verticalRangeBComboBox.getSelectedItem();
-		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		double verticalRange = convertVoltageStringToVolts(selectedItem);
 		visualizer_.setValueForVerticalGridSpacing(Constant.B_INDEX, verticalRange);
 		if(measuredChannelIndex_ == Constant.B_INDEX) {
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
@@ -835,7 +835,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private void verticalRangeMathComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();
-		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		double verticalRange = convertVoltageStringToVolts(selectedItem);
 		visualizer_.setValueForVerticalGridSpacing(Constant.MATH_INDEX, verticalRange);
 		if(measuredChannelIndex_ == Constant.MATH_INDEX) {
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
@@ -846,7 +846,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private void verticalRangeFilterComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) verticalRangeFilterComboBox.getSelectedItem();
-		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		double verticalRange = convertVoltageStringToVolts(selectedItem);
 		visualizer_.setValueForVerticalGridSpacing(Constant.FILTER_INDEX, verticalRange);
 		if(measuredChannelIndex_ == Constant.FILTER_INDEX) {
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
@@ -857,7 +857,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private void verticalRangeGeneratorComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) verticalRangeGeneratorComboBox.getSelectedItem();
-		int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+		double verticalRange = convertVoltageStringToVolts(selectedItem);
 		visualizer_.setValueForVerticalGridSpacing(Constant.GENERATOR_INDEX, verticalRange);
 		if(measuredChannelIndex_ == Constant.GENERATOR_INDEX) {
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
@@ -971,11 +971,47 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	}
 
 	/**
-	 * Change the voltage string to milivolts
+	 * Convert the voltage string to volts
+	 * @param voltString The voltage string. e.g. 200 mV, 1 V,...
+	 * @return the voltage in volts
+	 */
+	private double convertVoltageStringToVolts(String voltString) {
+		double value = 0;
+		switch(voltString) {
+			case Constant.TWENTY_MILIVOLTS:
+				value = 0.02;
+				break;
+			case Constant.FIFTY_MILIVOLTS:
+				value = 0.05;
+				break;
+			case Constant.ONE_HUNDRED_MILIVOLTS:
+				value = 0.1;
+				break;
+			case Constant.TWO_HUNDRED_MILIVOLTS:
+				value = 0.2;
+				break;
+			case Constant.FIVE_HUNDRED_MILIVOLTS:
+				value = 0.5;
+				break;
+			case Constant.ONE_VOLT:
+				value = 1;
+				break;
+			case Constant.TWO_VOLTS:
+				value = 2;
+				break;
+			default:
+				// Cannot reach here
+				value = 0.02;
+		}
+		return value;
+	}
+
+	/**
+	 * Convert the voltage string to milivolts
 	 * @param voltString The voltage string. e.g. 200 mV, 1 V,...
 	 * @return the voltage in milivolts
 	 */
-	private int changeVoltStringToMiliVolts(String voltString) {
+	private int convertVoltageStringToMilivolts(String voltString) {
 		int value = 0;
 		switch(voltString) {
 			case Constant.TWENTY_MILIVOLTS:
@@ -1129,31 +1165,31 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		measuredChannelIndex_ = channelIndex;
 		if(channelIndex == Constant.A_INDEX) {
 			String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
-			int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+			double verticalRange = convertVoltageStringToVolts(selectedItem);
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
 			timeCrosshair_.setLabelBackgroundPaint(Constant.A_LIGHT_COLOR);
 			voltageCrosshair_.setLabelBackgroundPaint(Constant.A_LIGHT_COLOR);
 		} else if(channelIndex == Constant.B_INDEX) {
 			String selectedItem = (String) verticalRangeBComboBox.getSelectedItem();
-			int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+			double verticalRange = convertVoltageStringToVolts(selectedItem);
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
 			timeCrosshair_.setLabelBackgroundPaint(Constant.B_LIGHT_COLOR);
 			voltageCrosshair_.setLabelBackgroundPaint(Constant.B_LIGHT_COLOR);
 		} else if(channelIndex == Constant.MATH_INDEX) {
 			String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();
-			int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+			double verticalRange = convertVoltageStringToVolts(selectedItem);
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
 			timeCrosshair_.setLabelBackgroundPaint(Constant.MATH_LIGHT_COLOR);
 			voltageCrosshair_.setLabelBackgroundPaint(Constant.MATH_LIGHT_COLOR);
 		} else if(channelIndex == Constant.FILTER_INDEX) {
 			String selectedItem = (String) verticalRangeFilterComboBox.getSelectedItem();
-			int verticalRange = changeVoltStringToMiliVolts(selectedItem);
+			double verticalRange = convertVoltageStringToVolts(selectedItem);
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
 			timeCrosshair_.setLabelBackgroundPaint(Constant.FILTER_LIGHT_COLOR);
 			voltageCrosshair_.setLabelBackgroundPaint(Constant.FILTER_LIGHT_COLOR);
 		} else if(channelIndex == Constant.GENERATOR_INDEX) {
 			String seletectItem = (String) verticalRangeGeneratorComboBox.getSelectedItem();
-			int verticalRange = changeVoltStringToMiliVolts(seletectItem);
+			double verticalRange = convertVoltageStringToVolts(seletectItem);
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
 			timeCrosshair_.setLabelBackgroundPaint(Constant.GENERATOR_LIGHT_COLOR);
 			voltageCrosshair_.setLabelBackgroundPaint(Constant.GENERATOR_LIGHT_COLOR);
@@ -1173,10 +1209,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	
 	private String miliVoltsToString(double voltage) {
 		String result = "";
-		if(voltage <= -1000 || voltage >= 1000) {
-			result = Constant.round(voltage / 1000, 4) + " V";
+		if(voltage <= -1 || voltage >= 1) {
+			result = Constant.round(voltage, 4) + " V";
 		} else {
-			result = Constant.round(voltage, 2) + " mV";
+			result = Constant.round(voltage * 1000, 2) + " mV";
 		}
 		return result;
 	}

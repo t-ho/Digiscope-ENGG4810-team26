@@ -134,7 +134,7 @@ public class Visualizer {
 	 * The horizontal axis has Constant.HORIZONTAL_GRID_SPACINGS.
 	 * @param value The value in microseconds
 	 */
-	public void setValueForHorizontalGridSpacing(int value) {
+	public void setValueForHorizontalGridSpacing(double value) {
 		NumberTickUnit tickUnit = new NumberTickUnit(value);
 		double lower = 0;
 		double upper = Constant.HORIZONTAL_GRID_SPACINGS * value;
@@ -148,7 +148,7 @@ public class Visualizer {
 	 * @param channelIndex The index of channel
 	 * @param value The value in milivolts
 	 */
-	public void setValueForVerticalGridSpacing(int channelIndex, int value) {
+	public void setValueForVerticalGridSpacing(int channelIndex, double value) {
 		double lower = -((Constant.VERTICAL_GRID_SPACINGS / 2) * value);
 		double upper = ((Constant.VERTICAL_GRID_SPACINGS / 2) * value);
 		verticalAxes[channelIndex].setTickUnit(new NumberTickUnit(value));
@@ -160,7 +160,7 @@ public class Visualizer {
 	 * The common vertical axis has Constant.VERTICAL_GRID_SPACINGS.
 	 * @param value The value in milivolts
 	 */
-	public void setValueForCommonVerticalGridSpacing(int value) {
+	public void setValueForCommonVerticalGridSpacing(double value) {
 		double lower = -((Constant.VERTICAL_GRID_SPACINGS / 2) * value);
 		double upper = ((Constant.VERTICAL_GRID_SPACINGS / 2) * value);
 		commonVerticalAxis.setTickUnit(new NumberTickUnit(value));
@@ -197,13 +197,5 @@ public class Visualizer {
 		axis.setTickUnit(new NumberTickUnit(Constant.DEFAULT_HORIZONTAL_RANGE));
 		axis.setRange(lower, upper);
 		return axis;
-	}
-
-	public void changeVerticalOffset(int channelIndex, double offset) {
-		//TODO
-		//TEST
-		System.out.println("\n" + xYPlot.getAxisOffset());
-		xYPlot.setAxisOffset(new RectangleInsets(0, 0, 0, 0));
-		System.out.println(xYPlot.getAxisOffset());
 	}
 }
