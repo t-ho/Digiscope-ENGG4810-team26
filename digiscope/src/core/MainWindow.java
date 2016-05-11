@@ -1356,6 +1356,9 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 
 	}
 	
+	/**
+	 * Calculate the FILTER channel
+	 */
 	public void calculateFilterChannel() {
 		String inputChannel = (String) inputChannelComboBox.getSelectedItem();
 		if (inputChannel != null) {

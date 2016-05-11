@@ -40,10 +40,9 @@ public class FilterFile {
 						this.type = Constant.FIR;
 						nOfColumns = 1;
 						try {
-							Double number = Double.parseDouble(line[0].trim());
+							Double number = parseDouble(line[0].trim());
 							firstColumn.add(number);
 						} catch(NumberFormatException nfe) {
-							//nfe.printStackTrace();
 							isValid = false;
 							return false;
 						}
@@ -51,12 +50,11 @@ public class FilterFile {
 						this.type = Constant.IIR;
 						nOfColumns = 2;
 						try {
-							Double number = Double.parseDouble(line[0].trim());
+							Double number = parseDouble(line[0].trim());
 							firstColumn.add(number);
-							number = Double.parseDouble(line[1].trim());
+							number = parseDouble(line[1].trim());
 							secondColumn.add(number);
 						} catch(NumberFormatException nfe) {
-							//nfe.printStackTrace();
 							isValid = false;
 							return false;
 						}
@@ -73,21 +71,19 @@ public class FilterFile {
 					if (line.length == nOfColumns) {
 						if (type == Constant.FIR) {
 							try {
-								Double number = Double.parseDouble(line[0]);
+								Double number = parseDouble(line[0].trim());
 								firstColumn.add(number);
 							} catch (NumberFormatException nfe) {
-								//nfe.printStackTrace();
 								isValid = false;
 								return false;
 							}
 						} else { // type == Constant.IIR
 							try {
-								Double number = Double.parseDouble(line[0]);
+								Double number = parseDouble(line[0].trim());
 								firstColumn.add(number);
-								number = Double.parseDouble(line[1]);
+								number = parseDouble(line[1].trim());
 								secondColumn.add(number);
 							} catch (NumberFormatException nfe) {
-								//nfe.printStackTrace();
 								isValid = false;
 								return false;
 							}
@@ -112,6 +108,23 @@ public class FilterFile {
 			isValid = false;
 			return false;
 		}
+	}
+	
+	/**
+	 * Return a new double represented by the specified string
+	 * @param numberString the string to be parsed
+	 * @return double value represented by the string argument
+	 */
+	private Double parseDouble(String numberString) throws NumberFormatException {
+		Double result = Double.NaN;
+		if (numberString.equals("e")) {
+			result = Math.E;
+		} else if (numberString.equals("pi")) {
+			result =  Math.PI;
+		} else {
+				result = Double.parseDouble(numberString);
+		}
+		return result;
 	}
 	
 	public int getType() {

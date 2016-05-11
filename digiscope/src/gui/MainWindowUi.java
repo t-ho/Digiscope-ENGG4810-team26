@@ -576,6 +576,7 @@ public class MainWindowUi extends JFrame {
         channelCouplingPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 8, 0));
 
         channelCouplingToggleButton.setText("AC");
+        channelCouplingToggleButton.setFocusable(false);
         channelCouplingToggleButton.setPreferredSize(new Dimension(80, 23));
         channelCouplingPanel_.add(channelCouplingToggleButton);
 
@@ -1608,7 +1609,7 @@ public class MainWindowUi extends JFrame {
         rightPanel_.setLayout(new BorderLayout());
 
         divisionInfoPanel_.setPreferredSize(new Dimension(776, 30));
-        divisionInfoPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 5));
+        divisionInfoPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 5));
 
         aDivisionInfoLabel.setForeground(Constant.A_COLOR);
         aDivisionInfoLabel.setText("A: 20 mV/div");
