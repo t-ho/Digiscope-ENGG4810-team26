@@ -293,25 +293,7 @@ SSD1289_Init_Magic()
 void
 SSD1289_Init(void)
 {
-	uint32_t lcd_bs[] =
-	{
-		SYSCTL_PERIPH_GPIOA,
-		SYSCTL_PERIPH_GPIOB,
-		SYSCTL_PERIPH_GPIOH,
-		SYSCTL_PERIPH_GPIOK,
-		SYSCTL_PERIPH_GPIOM,
-		SYSCTL_PERIPH_GPION,
-		SYSCTL_PERIPH_GPIOP,
-		SYSCTL_PERIPH_GPIOQ
-	};
-
 	int i;
-	for (i = 0; i < sizeof(lcd_bs) / sizeof(uint32_t); i++)
-	{
-		MAP_SysCtlPeripheralEnable(lcd_bs[i]);
-		SysCtlGPIOAHBEnable(lcd_bs[i]);
-	}
-
 	for (i = 0; i < 22; i++)
 	{
 		MAP_GPIOPinTypeGPIOOutput(LCD_BASES[i], LCD_PINS[i]);

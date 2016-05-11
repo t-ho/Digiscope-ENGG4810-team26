@@ -57,12 +57,12 @@
 #define DEBOUNCE_PERIOD 200
 
 static void TouchReenable(void);
-static void TouchCallback(unsigned int);
+void TouchCallback(unsigned int);
 
 static int32_t (*regTouchCallback)(uint32_t message, int32_t x, int32_t y);
 
-static Clock_Struct TouchClkStruct;
-static Clock_Handle TouchClkHandle;
+Clock_Struct TouchClkStruct;
+Clock_Handle TouchClkHandle;
 
 void
 XPT2046_SetCallback(int32_t (*pfnCallback)(uint32_t message, int32_t x, int32_t y))
@@ -74,21 +74,6 @@ XPT2046_SetCallback(int32_t (*pfnCallback)(uint32_t message, int32_t x, int32_t 
 void
 XPT2046_Init(void)
 {
-	uint32_t touch_bs[] =
-	{
-		SYSCTL_PERIPH_GPIOM,
-		SYSCTL_PERIPH_GPION,
-		SYSCTL_PERIPH_GPIOP,
-		SYSCTL_PERIPH_GPIOQ
-	};
-
-	int i;
-	for (i = 0; i < sizeof(touch_bs) / sizeof(uint32_t); i++)
-	{
-		MAP_SysCtlPeripheralEnable(touch_bs[i]);
-		SysCtlGPIOAHBEnable(touch_bs[i]);
-	}
-
 	MAP_GPIOPinTypeGPIOOutput(T_CLK_B, T_CLK_P);
 	MAP_GPIOPinTypeGPIOOutput(T_CS_B, T_CS_P);
 	MAP_GPIOPinTypeGPIOOutput(T_DIN_B, T_DIN_P);
@@ -114,8 +99,7 @@ XPT2046_Init(void)
 
 	MAP_GPIOIntTypeSet(T_IRQ_B, T_IRQ_P, GPIO_FALLING_EDGE);
 
-	GPIO_setCallback(T_IRQ, TouchCallback);
-	GPIO_enableInt(T_IRQ);
+	GPIOIntEnable(T_IRQ_B, T_IRQ_P);
 
 	MAP_GPIOPinWrite(T_CS_B, T_CS_P, T_CS_P);
 	MAP_GPIOPinWrite(T_CLK_B, T_CLK_P, T_CLK_P);
@@ -231,7 +215,7 @@ TouchReenable(void)
     Semaphore_post(widget_message_h);
 }
 
-static void
+void
 TouchCallback(unsigned int index)
 {
 	MAP_GPIOIntClear(T_IRQ_B, T_IRQ_P);
@@ -242,7 +226,6 @@ TouchCallback(unsigned int index)
 	if (regTouchCallback)
 	{
 		regTouchCallback(WIDGET_MSG_PTR_DOWN, x, y);
-	    Semaphore_post(widget_message_h);
 	}
 
 	Clock_start(TouchClkHandle);

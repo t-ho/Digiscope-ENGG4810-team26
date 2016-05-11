@@ -287,12 +287,6 @@ shutdown:
     }
 }
 
-int32_t 
-TouchCallback(uint32_t message, int32_t x, int32_t y)
-{
-	return System_printf("m: %lu, x: %ld, y: %ld\n", message, x, y);
-}
-
 void
 ADC_Init(void)
 {
@@ -354,7 +348,7 @@ int main(void)
 {
     /* Call board init functions */
     Board_initGeneral();
-    Board_initGPIO();
+    //Board_initGPIO();
     Board_initEMAC();
     // Board_initI2C();
     // Board_initSDSPI();
@@ -365,13 +359,11 @@ int main(void)
     // Board_initWatchdog();
     // Board_initWiFi();
 
+    Init_Semaphores();
+
     SSD1289_Init();
     XPT2046_Init();
     XPT2046_SetCallback(WidgetPointerMessage);
-
-    Init_Semaphores();
-
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 
     ADC_Init();
 

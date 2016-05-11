@@ -14,9 +14,9 @@
 
 extern void Init_Semaphores(void);
 
-Semaphore_Handle widget_message_h;
-Semaphore_Handle ip_update_h;
-Semaphore_Handle force_trigger_h;
+extern Semaphore_Handle widget_message_h;
+extern Semaphore_Handle ip_update_h;
+extern Semaphore_Handle force_trigger_h;
 extern uint32_t IpAddrVal;
 extern uint8_t ClientConnected;
 

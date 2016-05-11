@@ -7,6 +7,10 @@
 
 #include "common.h"
 
+Semaphore_Handle widget_message_h;
+Semaphore_Handle ip_update_h;
+Semaphore_Handle force_trigger_h;
+
 static Semaphore_Struct ip_update;
 static Semaphore_Struct widget_message;
 static Semaphore_Struct force_trigger;

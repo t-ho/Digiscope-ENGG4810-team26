@@ -49,6 +49,8 @@
 #include <inc/hw_types.h>
 #include <inc/hw_gpio.h>
 
+#include "driverlib/rom.h"
+#include "driverlib/rom_map.h"
 #include <driverlib/flash.h>
 #include <driverlib/gpio.h>
 #include <driverlib/i2c.h>
@@ -148,24 +150,35 @@ void EK_TM4C129EXL_initDMA(void)
  */
 void EK_TM4C129EXL_initGeneral(void)
 {
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOG);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOJ);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOK);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOL);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOM);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOP);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOQ);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOR);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOS);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOT);
+
+	uint32_t ports[] =
+	{
+		    SYSCTL_PERIPH_GPIOA,
+		    SYSCTL_PERIPH_GPIOB,
+		    SYSCTL_PERIPH_GPIOC,
+		    SYSCTL_PERIPH_GPIOD,
+		    SYSCTL_PERIPH_GPIOE,
+		    SYSCTL_PERIPH_GPIOF,
+		    SYSCTL_PERIPH_GPIOG,
+		    SYSCTL_PERIPH_GPIOH,
+		    SYSCTL_PERIPH_GPIOJ,
+		    SYSCTL_PERIPH_GPIOK,
+		    SYSCTL_PERIPH_GPIOL,
+		    SYSCTL_PERIPH_GPIOM,
+		    SYSCTL_PERIPH_GPION,
+		    SYSCTL_PERIPH_GPIOP,
+		    SYSCTL_PERIPH_GPIOQ,
+		    SYSCTL_PERIPH_GPIOR,
+		    SYSCTL_PERIPH_GPIOS,
+		    SYSCTL_PERIPH_GPIOT,
+	};
+
+	int i;
+	for (i = 0; i < sizeof(ports) / sizeof(uint32_t); i++)
+	{
+		MAP_SysCtlPeripheralEnable(ports[i]);
+		SysCtlGPIOAHBEnable(ports[i]);
+	}
 }
 
 /*
@@ -370,7 +383,7 @@ GPIO_PinConfig gpioPinConfigs[] = {
  */
 GPIO_CallbackFxn gpioCallbackFunctions[] = {
     NULL,  /* EK_TM4C129EXL_USR_SW1 */
-    NULL   /* EK_TM4C129EXL_USR_SW2 */
+    NULL,   /* EK_TM4C129EXL_USR_SW2 */
 };
 
 /* The device-specific GPIO_config structure */
