@@ -75,7 +75,7 @@ Void tcpWorker(UArg arg0, UArg arg1)
     Semaphore_post(ip_update_h);
 
     while (1) {
-    	bytesRcvd = recv(clientfd, buffer, TCPPACKETSIZE, MSG_DONTWAIT);
+    	bytesRcvd = recv(clientfd, buffer, TCPPACKETSIZE, 0);
 
     	if (count == 30)
     	{
@@ -98,7 +98,7 @@ Void tcpWorker(UArg arg0, UArg arg1)
             count = 0;
     	}
 
-        if (Semaphore_pend(force_trigger_h, 100))
+        if (Semaphore_pend(force_trigger_h, 0))
         {
             System_printf("Force trigger event!\n");
             bytesSent = send(clientfd, adc_buffer, 2 * ADC_BUF_SIZE, 0);
@@ -160,6 +160,15 @@ Void tcpHandler(UArg arg0, UArg arg1)
     optval = 1;
     if (setsockopt(server, SOL_SOCKET, SO_KEEPALIVE, &optval, optlen) < 0) {
         System_printf("Error: setsockopt failed\n");
+        goto shutdown;
+    }
+
+    struct timeval timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 200000;
+
+    if (setsockopt(server, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        System_printf("Error: setsockopt timeout failed\n");
         goto shutdown;
     }
 
