@@ -12,14 +12,13 @@ uint16_t adc_buffer[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
 
 Semaphore_Handle widget_message_h;
 Semaphore_Handle ip_update_h;
-Semaphore_Handle force_trigger_h;
+Semaphore_Handle clients_connected_h;
 
 static Semaphore_Struct ip_update;
 static Semaphore_Struct widget_message;
-static Semaphore_Struct force_trigger;
+static Semaphore_Struct clients_connected;
 
 uint32_t IpAddrVal = 0;
-uint8_t ClientConnected = 0;
 
 void
 SI_Micro_Print(char* line1, char* line2, int32_t val, char* suffix)
@@ -116,6 +115,7 @@ Init_Semaphores(void)
     Semaphore_construct(&widget_message, 0, &params);
     widget_message_h = Semaphore_handle(&widget_message);
 
-    Semaphore_construct(&force_trigger, 0, &params);
-    force_trigger_h = Semaphore_handle(&force_trigger);
+    params.mode = Semaphore_Mode_COUNTING;
+    Semaphore_construct(&clients_connected, 0, &params);
+    clients_connected_h = Semaphore_handle(&clients_connected);
 }

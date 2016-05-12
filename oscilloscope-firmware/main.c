@@ -76,6 +76,7 @@
 #include "grlib/widget.h"
 
 #include "common.h"
+#include "net.h"
 #include "drivers/SSD1289_driver.h"
 #include "drivers/XPT2046_driver.h"
 

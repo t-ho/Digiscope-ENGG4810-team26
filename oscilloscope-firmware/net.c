@@ -87,8 +87,6 @@ Init_SendQueue(void)
     NetSendLock_h = Semaphore_handle(&NetSendLock);
 
 	NetSendQueue = Queue_create(NULL, NULL);
-
-	Semaphore_post(NetSendLock_h);
 }
 
 int
@@ -155,8 +153,9 @@ Void tcpWorker(UArg arg0, UArg arg1)
 
     System_printf("tcpWorker: start clientfd = 0x%x\n", clientfd);
 
-    ClientConnected++;
+    Semaphore_post(clients_connected_h);
     Semaphore_post(ip_update_h);
+	Semaphore_post(NetSendLock_h);
 
 	NetPacket keepalive;
 	keepalive.data = "keepalive\n";
@@ -180,9 +179,9 @@ Void tcpWorker(UArg arg0, UArg arg1)
     	if (Semaphore_pend(NetSendLock_h, BIOS_WAIT_FOREVER))
     	{
 
-			if (Queue_empty(NetSendQueue) && ClientConnected)
+			if (Queue_empty(NetSendQueue))
 			{
-				Queue_enqueue(NetSendQueue, &keepalive);
+				Queue_enqueue(NetSendQueue, (Queue_Elem*) &keepalive);
 			}
 
 			NetPacket *np;
@@ -197,9 +196,12 @@ Void tcpWorker(UArg arg0, UArg arg1)
 					System_printf("tcpWorker stop clientfd = 0x%x\n", clientfd);
 
 					close(clientfd);
-			    	Semaphore_post(NetSendLock_h);
 
-					ClientConnected--;
+					if (!Semaphore_pend(clients_connected_h, 0))
+					{
+						System_printf("Unable to decrement client count\n");
+					}
+
 					Semaphore_post(ip_update_h);
 
 					return;

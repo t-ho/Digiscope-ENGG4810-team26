@@ -380,7 +380,8 @@ screenDemo(UArg arg0, UArg arg1)
         {
             sprintf(ipaddrstring, "%d.%d.%d.%d %s",
                     (uint8_t)(IpAddrVal>>24)&0xFF, (uint8_t)(IpAddrVal>>16)&0xFF,
-                    (uint8_t)(IpAddrVal>>8)&0xFF, (uint8_t)IpAddrVal&0xFF, ClientConnected?"Connected":"No Client");
+                    (uint8_t)(IpAddrVal>>8)&0xFF, (uint8_t)IpAddrVal&0xFF,
+					Semaphore_getCount(clients_connected_h)?"Connected":"No Client");
             WidgetPaint((tWidget *)&g_sConnStatus);
             Semaphore_post(widget_message_h);
         }
