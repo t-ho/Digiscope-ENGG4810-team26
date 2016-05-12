@@ -154,7 +154,6 @@ Void tcpWorker(UArg arg0, UArg arg1)
     System_printf("tcpWorker: start clientfd = 0x%x\n", clientfd);
 
     Semaphore_post(clients_connected_h);
-    Semaphore_post(ip_update_h);
 	Semaphore_post(NetSendLock_h);
 
 	NetPacket keepalive;
@@ -162,6 +161,10 @@ Void tcpWorker(UArg arg0, UArg arg1)
 	keepalive.len = strlen(keepalive.data);
 
 	NetPacket echopacket;
+
+	GraphicsMessage msg;
+	msg.type = GM_CONN_UPDATE;
+	Mailbox_post(GraphicsMailbox, &msg, 0);
 
     while (1) {
     	bytesRcvd = recv(clientfd, buffer, TCPPACKETSIZE, 0);
@@ -202,7 +205,9 @@ Void tcpWorker(UArg arg0, UArg arg1)
 						System_printf("Unable to decrement client count\n");
 					}
 
-					Semaphore_post(ip_update_h);
+					GraphicsMessage msg;
+					msg.type = GM_CONN_UPDATE;
+					Mailbox_post(GraphicsMailbox, &msg, 0);
 
 					return;
 				}
@@ -332,8 +337,11 @@ ipAddrHook(uint32_t IPAddr, uint32_t IfIdx, uint32_t fAdd)
 {
 //    System_printf("mynetworkIPAddrHook: enter\n");
 
-    IpAddrVal = ntohl(IPAddr);
-    Semaphore_post(ip_update_h);
+	GraphicsMessage msg;
+	msg.type = GM_IP_UPDATE;
+	msg.data[0] = ntohl(IPAddr);
+
+	Mailbox_post(GraphicsMailbox, &msg, 0);
 
 //    System_printf("mynetworkIPAddrHook:\tIf-%d:%d.%d.%d.%d\n", IfIdx,
 //            (uint8_t)(IpAddrVal>>24)&0xFF, (uint8_t)(IpAddrVal>>16)&0xFF,

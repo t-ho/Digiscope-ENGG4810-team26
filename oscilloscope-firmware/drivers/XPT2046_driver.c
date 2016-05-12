@@ -22,8 +22,6 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
-#include "grlib/grlib.h"
-#include "grlib/widget.h"
 #include "utils/uartstdio.h"
 
 #include "common.h"
@@ -59,17 +57,8 @@
 static void TouchReenable(void);
 void TouchCallback(unsigned int);
 
-static int32_t (*regTouchCallback)(uint32_t message, int32_t x, int32_t y);
-
 Clock_Struct TouchClkStruct;
 Clock_Handle TouchClkHandle;
-
-void
-XPT2046_SetCallback(int32_t (*pfnCallback)(uint32_t message, int32_t x, int32_t y))
-{
-    // Save the pointer to the callback function.
-    regTouchCallback = pfnCallback;
-}
 
 void
 XPT2046_Init(void)
@@ -149,7 +138,7 @@ Touch_ReadData()
 }
 
 static void
-Touch_Read(uint16_t *x_out, uint16_t *y_out)
+Touch_Read(uint32_t *x_out, uint32_t *y_out)
 {
 	uint32_t tx=0;
 	uint32_t ty=0;
@@ -182,7 +171,7 @@ Touch_Read(uint16_t *x_out, uint16_t *y_out)
 	}
 	else if (x_temp > X_PX)
 	{
-		*x_out = (uint16_t) X_PX;
+		*x_out = (uint32_t) X_PX;
 	}
 	else
 	{
@@ -195,7 +184,7 @@ Touch_Read(uint16_t *x_out, uint16_t *y_out)
 	}
 	else if (y_temp > Y_PX)
 	{
-		*y_out = (uint16_t) Y_PX;
+		*y_out = (uint32_t) Y_PX;
 	}
 	else
 	{
@@ -203,16 +192,15 @@ Touch_Read(uint16_t *x_out, uint16_t *y_out)
 	}
 }
 
-static uint16_t x = 0;
-static uint16_t y = 0;
+static GraphicsMessage msg;
 
 static void
 TouchReenable(void)
 {
-	regTouchCallback(WIDGET_MSG_PTR_UP, x, y);
+	msg.type = GM_PTR_UP;
+	Mailbox_post(GraphicsMailbox, &msg, 0);
 	MAP_GPIOIntClear(T_IRQ_B, T_IRQ_P);
 	MAP_GPIOIntEnable(T_IRQ_B, T_IRQ_P);
-    Semaphore_post(widget_message_h);
 }
 
 void
@@ -221,13 +209,10 @@ TouchCallback(unsigned int index)
 	MAP_GPIOIntClear(T_IRQ_B, T_IRQ_P);
 	MAP_GPIOIntDisable(T_IRQ_B, T_IRQ_P);
 
-	Touch_Read(&x, &y);
+	msg.type = GM_PTR_DOWN;
+	Touch_Read(&(msg.data[0]), &(msg.data[1]));
 
-	if (regTouchCallback)
-	{
-		regTouchCallback(WIDGET_MSG_PTR_DOWN, x, y);
-	    Semaphore_post(widget_message_h);
-	}
+	Mailbox_post(GraphicsMailbox, &msg, 0);
 
 	Clock_start(TouchClkHandle);
 }

@@ -11,6 +11,7 @@
 
 #include <ti/sysbios/knl/Task.h>
 #include <ti/sysbios/knl/Semaphore.h>
+#include <ti/sysbios/knl/Mailbox.h>
 
 #include "grlib/grlib.h"
 #include "grlib/widget.h"
@@ -80,6 +81,7 @@ MENU_NAV(TRIGGER)
 MENU_NAV(WAVEGEN)
 MENU_NAV(BRIGHTNESS)
 
+void EnterSleep(tWidget *psWidget);
 void OnPrevious(tWidget *psWidget);
 void OnNext(tWidget *psWidget);
 void BrightnessUp(tWidget *psWidget);
@@ -114,8 +116,8 @@ tPushButtonWidget main_menu_buttons[] =
 						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrBlue, ClrYellow, ClrWhite,
 						  ClrWhite, &g_sFontCm18b, "Brightness", 0, 0, 0, 0, OnBRIGHTNESS),
 		RectangularButtonStruct(&menus[MAIN_MENU], 0, 0, &SSD1289_Display, 110, 120,
-						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
-						  ClrWhite, &g_sFontCm18b, "Sleep", 0, 0, 0, 0, OnPrevious),
+						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrBlue, ClrYellow, ClrWhite,
+						  ClrWhite, &g_sFontCm18b, "Sleep", 0, 0, 0, 0, EnterSleep),
 };
 
 char vert_div_text1[] = "500";
@@ -322,6 +324,12 @@ HorRangeDown(tWidget *psWidget)
 }
 
 void
+EnterSleep(tWidget *psWidget)
+{
+	SSD1289_Set_Backlight_On(false);
+}
+
+void
 OnPrevious(tWidget *psWidget)
 {
 }
@@ -370,23 +378,50 @@ screenDemo(UArg arg0, UArg arg1)
 
     WidgetPaint(WIDGET_ROOT);
 
-    Semaphore_post(widget_message_h);
+	GraphicsMessage msg;
+	msg.type = GM_REFRESH;
+
+	Mailbox_post(GraphicsMailbox, &msg, 0);
+
+	uint32_t ipaddr = 0;
 
     while (1)
     {
-        if (Semaphore_pend(widget_message_h, 1000))
-        {
-        	WidgetMessageQueueProcess();
-        }
+    	if (Mailbox_pend(GraphicsMailbox, &msg, BIOS_WAIT_FOREVER))
+    	{
+    		switch(msg.type)
+    		{
 
-        if (Semaphore_pend(ip_update_h, 0))
-        {
-            sprintf(ipaddrstring, "%d.%d.%d.%d %s",
-                    (uint8_t)(IpAddrVal>>24)&0xFF, (uint8_t)(IpAddrVal>>16)&0xFF,
-                    (uint8_t)(IpAddrVal>>8)&0xFF, (uint8_t)IpAddrVal&0xFF,
-					Semaphore_getCount(clients_connected_h)?"Connected":"No Client");
-            WidgetPaint((tWidget *)&g_sConnStatus);
-            Semaphore_post(widget_message_h);
-        }
+    		case GM_IP_UPDATE:
+    			ipaddr = msg.data[0];
+    			/* Fallthrough */
+    		case GM_CONN_UPDATE:
+                sprintf(ipaddrstring, "%d.%d.%d.%d %s",
+                        (uint8_t)(ipaddr>>24)&0xFF, (uint8_t)(ipaddr>>16)&0xFF,
+                        (uint8_t)(ipaddr>>8)&0xFF, (uint8_t)ipaddr&0xFF,
+    					Semaphore_getCount(clients_connected_h)?"Connected":"No Client");
+                WidgetPaint((tWidget *)&g_sConnStatus);
+    			break;
+    		case GM_PTR_DOWN:
+    			if (!SSD1289_Get_Backlight_On())
+				{
+    				break;
+				}
+    			WidgetPointerMessage(WIDGET_MSG_PTR_DOWN, msg.data[0], msg.data[1]);
+    			break;
+    		case GM_PTR_UP:
+    			if (!SSD1289_Get_Backlight_On())
+    			{
+        			SSD1289_Set_Backlight_On(true);
+    				break;
+    			}
+    			WidgetPointerMessage(WIDGET_MSG_PTR_UP, msg.data[0], msg.data[1]);
+    			break;
+    		case GM_REFRESH:
+    			/* Fallthrough */
+    		}
+
+        	WidgetMessageQueueProcess();
+    	}
     }
 }

@@ -92,6 +92,8 @@ void heartBeatFxn(UArg arg0, UArg arg1)
     }
 }
 
+
+
 /*
  *  ======== main ========
  */
@@ -115,7 +117,6 @@ int main(void)
 
     SSD1289_Init();
     XPT2046_Init();
-    XPT2046_SetCallback(WidgetPointerMessage);
 
     ADC_Init();
 

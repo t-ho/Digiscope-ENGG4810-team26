@@ -6,16 +6,13 @@
  */
 
 #include "common.h"
+#include <xdc/runtime/Error.h>
 
-Semaphore_Handle widget_message_h;
-Semaphore_Handle ip_update_h;
 Semaphore_Handle clients_connected_h;
 
-static Semaphore_Struct ip_update;
-static Semaphore_Struct widget_message;
 static Semaphore_Struct clients_connected;
 
-uint32_t IpAddrVal = 0;
+Mailbox_Handle GraphicsMailbox;
 
 void
 SI_Micro_Print(char* line1, char* line2, int32_t val, char* suffix)
@@ -101,16 +98,15 @@ Standard_Step(uint32_t val, int8_t dir)
 void
 Init_Semaphores(void)
 {
+	Mailbox_Params mbparams;
+	Mailbox_Params_init(&mbparams);
+	static Error_Block eb;
+
+	GraphicsMailbox = Mailbox_create(12,10,&mbparams,&eb);
+
     // Initialise semaphores
     Semaphore_Params params;
     Semaphore_Params_init(&params);
-    params.mode = Semaphore_Mode_BINARY;
-
-    Semaphore_construct(&ip_update, 0, &params);
-    ip_update_h = Semaphore_handle(&ip_update);
-
-    Semaphore_construct(&widget_message, 0, &params);
-    widget_message_h = Semaphore_handle(&widget_message);
 
     params.mode = Semaphore_Mode_COUNTING;
     Semaphore_construct(&clients_connected, 0, &params);

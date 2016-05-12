@@ -160,6 +160,8 @@ static const uint8_t LCD_PINS[] =
 	LCD_RST_P,
 };
 
+static bool backlight_state = true;
+
 #define LCDOUTB(pin,bit) ((c >> (bit - pin)) & LCD_DATA_##bit##_P)
 #define LCDOUTP(pin,bit) ((c << (pin - bit)) & LCD_DATA_##bit##_P)
 
@@ -379,10 +381,23 @@ Backlight_Init(void)
 }
 
 void
+SSD1289_Set_Backlight_On(bool state)
+{
+	backlight_state = state;
+	MAP_PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, backlight_state);
+}
+
+bool
+SSD1289_Get_Backlight_On(void)
+{
+	return backlight_state;
+}
+
+void
 SSD1289_Init(void)
 {
 	int i;
-	for (i = 0; i < 22; i++)
+	for (i = 0; i < 21; i++)
 	{
 		MAP_GPIOPinTypeGPIOOutput(LCD_BASES[i], LCD_PINS[i]);
 		MAP_GPIOPadConfigSet(LCD_BASES[i], LCD_PINS[i], GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
