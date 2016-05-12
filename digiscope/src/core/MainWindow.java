@@ -30,6 +30,7 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.panel.CrosshairOverlay;
 import org.jfree.chart.plot.Crosshair;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.Range;
 import org.jfree.data.general.DatasetUtilities;
 import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
@@ -50,7 +51,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private ChartPanel chartPanel_;
 	private Crosshair timeCrosshair_;
 	private Crosshair voltageCrosshair_;
-	private int measuredChannelIndex_;
+	private int measuredChannelIndex_; // used for cursor measurement
 	private FilterFile filterFile_;
 
 	public MainWindow(LaunchWindow launchWindow) {
@@ -68,7 +69,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		// test
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
-		for(double i = -20; i <= 20; i = i + 0.1) {
+		for(double i = -25000; i <= 25000; i = i + 0.1) {
 			aSeries.add(i, 1 * Math.sin(i));
 		}
 // Test Filter 
@@ -83,7 +84,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 
 		// Channel B
 		XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
-		for(double i = -20; i <= 20; i = i + 0.1) {
+		for(double i = -25000; i <= 25000; i = i + 0.1) {
 			bSeries.add(i, 1.5 * Math.sin(i));
 		}
 		rawXYSeries.put(Constant.CHANNEL_B, bSeries);
@@ -572,129 +573,93 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	}
 
 	protected void verticalOffsetUnitAComboBoxItemStateChanged() {
-		// TODO
 		verticalOffsetASpinner.setValue(0);
 	}
 
 	protected void verticalOffsetUnitBComboBoxItemStateChanged() {
-		// TODO
 		verticalOffsetBSpinner.setValue(0);
 	}
 
 	protected void verticalOffsetUnitMathComboBoxItemStateChanged() {
-		// TODO
 		verticalOffsetMathSpinner.setValue(0);
 	}
 
 	protected void verticalOffsetUnitFilterComboBoxItemStateChanged() {
-		// TODO
 		verticalOffsetFilterSpinner.setValue(0);
 	}
 
 	protected void verticalOffsetUnitGeneratorComboBoxItemStateChanged() {
-		// TODO
 		verticalOffsetGeneratorSpinner.setValue(0);
 	}
 
 	protected void horizontalOffsetUnitAComboBoxItemStateChanged() {
-		// TODO
 		horizontalOffsetASpinner.setValue(0);
 	}
 
 	protected void horizontalOffsetUnitBComboBoxItemStateChanged() {
-		// TODO
 		horizontalOffsetBSpinner.setValue(0);
 	}
 
 	protected void horizontalOffsetUnitMathComboBoxItemStateChanged() {
-		// TODO
 		horizontalOffsetMathSpinner.setValue(0);
 	}
 
 	protected void horizontalOffsetUnitFilterComboBoxItemStateChanged() {
-		// TODO
 		horizontalOffsetFilterSpinner.setValue(0);
 	}
 
 	protected void horizontalOffsetUnitGeneratorComboBoxItemStateChanged() {
-		// TODO
 		horizontalOffsetGeneratorSpinner.setValue(0);
 	}
 
 	private void verticalOffsetASpinnerStateChanged() {
-		// TODO
-		showChannelPlotOnChartPanel(Constant.CHANNEL_A);
+		refreshChannelPlotOnChartPanel(Constant.CHANNEL_A);
 	}
 	
 	private void verticalOffsetBSpinnerStateChanged() {
-		// TODO
-		showChannelPlotOnChartPanel(Constant.CHANNEL_B);
+		refreshChannelPlotOnChartPanel(Constant.CHANNEL_B);
 	}
 
 	private void verticalOffsetMathSpinnerStateChanged() {
-		// TODO
-		showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
+		refreshChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
 	}
 
 	private void verticalOffsetFilterSpinnerStateChanged() {
-		// TODO
-		showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
+		refreshChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
 	}
 
 	private void verticalOffsetGeneratorSpinnerStateChanged() {
 		// TODO
-		showChannelPlotOnChartPanel(Constant.GENERATOR_CHANNEL);
+		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetGeneratorSpinner.getValue(),
+				(String) horizontalOffsetUnitGeneratorComboBox.getSelectedItem());
+		double verticalOffset = getVerticalOffsetValue((int) verticalOffsetGeneratorSpinner.getValue(),
+				(String) verticalOffsetUnitGeneratorComboBox.getSelectedItem());
+		XYSeries generatorSeries = createXYSeriesWithOffsets(Constant.GENERATOR_CHANNEL,
+				rawXYSeries.get(Constant.GENERATOR_CHANNEL), horizontalOffset, verticalOffset);
+		visualizer_.addSeriesToDataset(Constant.GENERATOR_INDEX, generatorSeries);
 	}
 
 	private void horizontalOffsetASpinnerStateChanged() {
-		// TODO
-		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetASpinner.getValue(),
-				(String) horizontalOffsetUnitAComboBox.getSelectedItem());
-		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetASpinner.getValue(),
-				(String) verticalOffsetUnitAComboBox.getSelectedItem());
-		XYSeries aSeries = createXYSeriesWithOffsets(Constant.CHANNEL_A,
-				rawXYSeries.get(Constant.CHANNEL_A), horizontalOffset, verticalOffset);
-		visualizer_.addSeriesToDataset(Constant.A_INDEX, aSeries);
+		refreshChannelPlotOnChartPanel(Constant.CHANNEL_A);
 	}
 
 	private void horizontalOffsetBSpinnerStateChanged() {
-		// TODO
-		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetBSpinner.getValue(),
-				(String) horizontalOffsetUnitBComboBox.getSelectedItem());
-		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetBSpinner.getValue(),
-				(String) verticalOffsetUnitBComboBox.getSelectedItem());
-		XYSeries bSeries = createXYSeriesWithOffsets(Constant.CHANNEL_B,
-				rawXYSeries.get(Constant.CHANNEL_B), horizontalOffset, verticalOffset);
-		visualizer_.addSeriesToDataset(Constant.B_INDEX, bSeries);
+		refreshChannelPlotOnChartPanel(Constant.CHANNEL_B);
 	}
 
 	private void horizontalOffsetMathSpinnerStateChanged() {
-		// TODO
-		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetMathSpinner.getValue(),
-				(String) horizontalOffsetUnitMathComboBox.getSelectedItem());
-		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetMathSpinner.getValue(),
-				(String) verticalOffsetUnitMathComboBox.getSelectedItem());
-		XYSeries mathSeries = createXYSeriesWithOffsets(Constant.MATH_CHANNEL,
-				rawXYSeries.get(Constant.MATH_CHANNEL),horizontalOffset, verticalOffset);
-		visualizer_.addSeriesToDataset(Constant.MATH_INDEX, mathSeries);
+		refreshChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
 	}
 
 	private void horizontalOffsetFilterSpinnerStateChanged() {
-		// TODO
-		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetFilterSpinner.getValue(),
-				(String) horizontalOffsetUnitFilterComboBox.getSelectedItem());
-		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetFilterSpinner.getValue(),
-				(String) verticalOffsetUnitFilterComboBox.getSelectedItem());
-		XYSeries filterSeries = createXYSeriesWithOffsets(Constant.FILTER_CHANNEL,
-				rawXYSeries.get(Constant.FILTER_CHANNEL), horizontalOffset, verticalOffset);
-		visualizer_.addSeriesToDataset(Constant.FILTER_INDEX, filterSeries);
+		refreshChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
 	}
 
 	private void horizontalOffsetGeneratorSpinnerStateChanged() {
 		// TODO
 		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetGeneratorSpinner.getValue(),
 				(String) horizontalOffsetUnitGeneratorComboBox.getSelectedItem());
-		int verticalOffset = getVerticalOffsetValue((int) verticalOffsetGeneratorSpinner.getValue(),
+		double verticalOffset = getVerticalOffsetValue((int) verticalOffsetGeneratorSpinner.getValue(),
 				(String) verticalOffsetUnitGeneratorComboBox.getSelectedItem());
 		XYSeries generatorSeries = createXYSeriesWithOffsets(Constant.GENERATOR_CHANNEL,
 				rawXYSeries.get(Constant.GENERATOR_CHANNEL), horizontalOffset, verticalOffset);
@@ -773,39 +738,43 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private void horizontalRangeAComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) horizontalRangeAComboBox.getSelectedItem();
-		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		int horizontalRange = convertTimeStringToMicroSeconds(selectedItem);
 		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
+		showMeasurementResults(Constant.A_INDEX);
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
 	private void horizontalRangeBComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) horizontalRangeBComboBox.getSelectedItem();
-		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		int horizontalRange = convertTimeStringToMicroSeconds(selectedItem);
 		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
+		showMeasurementResults(Constant.B_INDEX);
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
 	private void horizontalRangeMathComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) horizontalRangeMathComboBox.getSelectedItem();
-		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		int horizontalRange = convertTimeStringToMicroSeconds(selectedItem);
 		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
+		showMeasurementResults(Constant.MATH_INDEX);
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
 	private void horizontalRangeFilterComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) horizontalRangeFilterComboBox.getSelectedItem();
-		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		int horizontalRange = convertTimeStringToMicroSeconds(selectedItem);
 		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
+		showMeasurementResults(Constant.FILTER_INDEX);
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
 
 	private void horizontalRangeGeneratorComboBoxItemStateChanged() {
 		// TODO
 		String selectedItem = (String) horizontalRangeGeneratorComboBox.getSelectedItem();
-		int horizontalRange = changeTimeStringToMicroSeconds(selectedItem);
+		int horizontalRange = convertTimeStringToMicroSeconds(selectedItem);
 		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
 		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
 	}
@@ -815,6 +784,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
 		double verticalRange = convertVoltageStringToVolts(selectedItem);
 		visualizer_.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
+		showMeasurementResults(Constant.A_INDEX);
 		if(measuredChannelIndex_ == Constant.A_INDEX) {
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
 		}
@@ -826,6 +796,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		String selectedItem = (String) verticalRangeBComboBox.getSelectedItem();
 		double verticalRange = convertVoltageStringToVolts(selectedItem);
 		visualizer_.setValueForVerticalGridSpacing(Constant.B_INDEX, verticalRange);
+		showMeasurementResults(Constant.B_INDEX);
 		if(measuredChannelIndex_ == Constant.B_INDEX) {
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
 		}
@@ -837,6 +808,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();
 		double verticalRange = convertVoltageStringToVolts(selectedItem);
 		visualizer_.setValueForVerticalGridSpacing(Constant.MATH_INDEX, verticalRange);
+		showMeasurementResults(Constant.MATH_INDEX);
 		if(measuredChannelIndex_ == Constant.MATH_INDEX) {
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
 		}
@@ -848,6 +820,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		String selectedItem = (String) verticalRangeFilterComboBox.getSelectedItem();
 		double verticalRange = convertVoltageStringToVolts(selectedItem);
 		visualizer_.setValueForVerticalGridSpacing(Constant.FILTER_INDEX, verticalRange);
+		showMeasurementResults(Constant.FILTER_INDEX);
 		if(measuredChannelIndex_ == Constant.FILTER_INDEX) {
 			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
 		}
@@ -1007,47 +980,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	}
 
 	/**
-	 * Convert the voltage string to milivolts
-	 * @param voltString The voltage string. e.g. 200 mV, 1 V,...
-	 * @return the voltage in milivolts
-	 */
-	private int convertVoltageStringToMilivolts(String voltString) {
-		int value = 0;
-		switch(voltString) {
-			case Constant.TWENTY_MILIVOLTS:
-				value = 20;
-				break;
-			case Constant.FIFTY_MILIVOLTS:
-				value = 50;
-				break;
-			case Constant.ONE_HUNDRED_MILIVOLTS:
-				value = 100;
-				break;
-			case Constant.TWO_HUNDRED_MILIVOLTS:
-				value = 200;
-				break;
-			case Constant.FIVE_HUNDRED_MILIVOLTS:
-				value = 500;
-				break;
-			case Constant.ONE_VOLT:
-				value = 1000;
-				break;
-			case Constant.TWO_VOLTS:
-				value = 2000;
-				break;
-			default:
-				// Cannot reach here
-				value = 20;
-		}
-		return value;
-	}
-	
-	/**
 	 * Change time string to micro seconds
 	 * @param timeString The time string. e.g. 1 us, 500 ms
 	 * @return the microseconds
 	 */
-	private int changeTimeStringToMicroSeconds(String timeString) {
+	private int convertTimeStringToMicroSeconds(String timeString) {
 		int value = 0;
 		switch(timeString) {
 			case Constant.ONE_MICROSECOND:
@@ -1204,16 +1141,21 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		this.chartPanel_.removeChartMouseListener(this);
 		timeCrosshair_.setValue(Double.NaN);
 		voltageCrosshair_.setValue(Double.NaN);
-		cursorVerticalValueLabel.setText("0 mV");
+		cursorVerticalValueLabel.setText("N/A");
 	}
 	
-	private String miliVoltsToString(double voltage) {
-		String result = "";
-		if(voltage <= -1 || voltage >= 1) {
-			result = Constant.round(voltage, 4) + " V";
-		} else {
-			result = Constant.round(voltage * 1000, 2) + " mV";
-		}
+	/**
+	 * Convert voltage value to string
+	 * @param voltage the value to be converted
+	 * @return voltage string
+	 */
+	private String convertVoltsToVoltageString(double voltage) {
+		String result = Constant.round(voltage, 4) + " V";
+//		if (voltage <= -0.9999 || voltage >= 0.9999) {
+//			result = Constant.round(voltage, 4) + " V";
+//		} else {
+//			result = Constant.round(voltage * 1000, 2) + " mV";
+//		}
 		return result;
 	}
 
@@ -1226,7 +1168,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	 * @return a XYSeries with given offset or null if the given xYSeries is null.
 	 */
 	private XYSeries createXYSeriesWithOffsets(String channelName, XYSeries xYSeries,
-			int horizontalOffset, int verticalOffset) {
+			int horizontalOffset, double verticalOffset) {
 		XYSeries result = new XYSeries(channelName);
 		if(xYSeries != null) {
 			for(int i = 0; i < xYSeries.getItemCount(); i++) {
@@ -1245,10 +1187,21 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	 * @param channelName The channel's name
 	 */
 	private void showChannelPlotOnChartPanel(String channelName) {
+		refreshChannelPlotOnChartPanel(channelName);
+		// remove item if it exists in the combo box before adding
+		cursorComboBox.removeItem(channelName);
+		cursorComboBox.addItem(channelName);
+	}
+	
+	/**
+	 * Refresh the plot of specified channel on the chart panel
+	 * @param channelName The channel's name
+	 */
+	private void refreshChannelPlotOnChartPanel(String channelName) {
 		XYSeries rawSeries = rawXYSeries.get(channelName);
 		if (rawSeries != null) {
 			int horizontalOffset = 0;
-			int verticalOffset = 0;
+			double verticalOffset = 0;
 			int channelIndex = 0;
 			if (channelName == Constant.CHANNEL_A) {
 				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetASpinner.getValue(),
@@ -1283,9 +1236,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 			}
 			XYSeries xYSeries = createXYSeriesWithOffsets(channelName, rawSeries, horizontalOffset, verticalOffset);
 			visualizer_.addSeriesToDataset(channelIndex, xYSeries);
-			// remove item if it exists in the combo box before adding
-			cursorComboBox.removeItem(channelName);
-			cursorComboBox.addItem(channelName);
+			showMeasurementResults(channelIndex);
 		}
 	}
 	
@@ -1307,6 +1258,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 			channelIndex = Constant.GENERATOR_INDEX;
 		}
 		visualizer_.removeAllSeriesFromDataset(channelIndex);
+		hideMeasurementResults(channelIndex);
 		cursorComboBox.removeItem(channelName);
 	}
 
@@ -1316,15 +1268,15 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	 * @param unit the selected unit from verticalOffsetUnit combobox
 	 * @return vertical offset value in milivolts
 	 */
-	private int getVerticalOffsetValue(int offset, String unit) {
+	private double getVerticalOffsetValue(int offset, String unit) {
 		if(unit.equals(Constant.TEN_MILIVOLTS)) {
-			return offset * 10;
+			return offset * 0.01;
 		} else if(unit.equals(Constant.ONE_HUNDRED_MILIVOLTS)) {
-			return offset * 100;
+			return offset * 0.1;
 		} else if(unit.equals(Constant.ONE_VOLT)) {
-			return offset * 1000;
+			return offset * 1;
 		}else { // unit == Constant.ONE_MILIVOLT
-			return offset;
+			return offset * 0.001;
 		}
 	}
 	
@@ -1420,21 +1372,21 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 					for (int n = 0; n < derivedSeries.getItemCount(); n++) {
 						Double firstSum = 0.0;
 						Double secondSum = 0.0;
-						for (int i = 0; i < secondColumn.size(); i++) {
+						for (int i = 0; i < firstColumn.size(); i++) {
 							Double x = 0.0;
 							if (n - i >= 0) {
 								x = derivedSeries.getDataItem(n - i).getYValue();
 							}
-							firstSum += secondColumn.get(i) * x;
+							firstSum += firstColumn.get(i) * x;
 						}
-						for (int j = 1; j < firstColumn.size(); j++) {
+						for (int j = 1; j < secondColumn.size(); j++) {
 							Double y = 0.0;
 							if (n - j >= 0) {
 								y = filterSeries.getDataItem(n - j).getYValue();
 							}
-							secondSum += firstColumn.get(j) * y;
+							secondSum += secondColumn.get(j) * y;
 						}
-						Double result = (1 / firstColumn.get(0)) * (firstSum - secondSum);
+						Double result = (1 / secondColumn.get(0)) * (firstSum - secondSum);
 						filterSeries.add(derivedSeries.getDataItem(n).getX(), result);
 					}
 				}
@@ -1460,6 +1412,136 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		}
 		return min;
 	}
+	
+	/**
+	 * Determine the max voltage, min voltage, max peak to peak,
+	 * average voltage, standard deviation of the specified channel.
+	 * @param channelIndex the index of specified channel
+	 * @return Map<String, Double> containing results or null
+	 */
+	private Map<String, Double> measureChannel(int channelIndex) {
+		// TODO:
+		Map<String, Double> result = new HashMap<String, Double>();
+		XYSeries xYSeries = visualizer_.getSeries(channelIndex);
+		if (xYSeries != null) {
+			Range horizontalRange = visualizer_.getHorizontalRange();
+			Range verticalRange = visualizer_.getVerticalRange(channelIndex);
+			double maxVoltage = Double.MIN_VALUE;
+			double minVoltage = Double.MAX_VALUE;
+			double totalVoltage = 0;
+			int nSamples = 0;
+			for (int i = 0; i < xYSeries.getItemCount(); i++) {
+				double time = xYSeries.getDataItem(i).getXValue();
+				double voltage = xYSeries.getDataItem(i).getYValue();
+				if (time <= horizontalRange.getUpperBound()) {
+					if ((voltage <= verticalRange.getUpperBound()) && (voltage >= verticalRange.getLowerBound())) {
+						if (maxVoltage < voltage) {
+							maxVoltage = voltage;
+						}
+						if (minVoltage > voltage) {
+							minVoltage = voltage;
+						}
+						totalVoltage += voltage;
+						nSamples++;
+					}
+				} else {
+					break;
+				}
+			}
+			if (nSamples > 0) {
+				double averageVoltage = totalVoltage / nSamples;
+				double sumOfSquare = 0;
+				for (int i = 0; i < nSamples; i++) {
+					double voltage = xYSeries.getDataItem(i).getYValue();
+					sumOfSquare += Math.pow((voltage - averageVoltage), 2);
+				}
+				double deviation = Math.sqrt(sumOfSquare / (nSamples - 1));
+				result.put(Constant.MAX_VOLTAGE, maxVoltage);
+				result.put(Constant.MIN_VOLTAGE, minVoltage);
+				result.put(Constant.AVERAGE_VOLTAGE, averageVoltage);
+				result.put(Constant.MAX_P2P_VOLTAGE, maxVoltage - minVoltage);
+				result.put(Constant.STANDARD_DEVIATION_VOLTAGE, deviation);
+			} else {
+				result = null;
+			}
+		} else {
+			result = null;
+		}
+		return result;
+	}
+	
+	/**
+	 * Show measurement results of the specified channel
+	 * @param channelIndex the index of specified channel
+	 */
+	private void showMeasurementResults(int channelIndex) {
+		Map<String, Double> results = measureChannel(channelIndex);
+		if (results != null) {
+			if (channelIndex == Constant.A_INDEX) {
+				maxVoltageALabel.setText(convertVoltsToVoltageString(results.get(Constant.MAX_VOLTAGE)));
+				minVoltageALabel.setText(convertVoltsToVoltageString(results.get(Constant.MIN_VOLTAGE)));
+				maxP2pVoltageALabel.setText(convertVoltsToVoltageString(results.get(Constant.MAX_P2P_VOLTAGE)));
+				averageVoltageALabel.setText(convertVoltsToVoltageString(results.get(Constant.AVERAGE_VOLTAGE)));
+				Double deviation = Constant.round(results.get(Constant.STANDARD_DEVIATION_VOLTAGE), 4);
+				standardDeviationVoltageALabel.setText(deviation.toString());
+			} else if (channelIndex == Constant.B_INDEX) {
+				maxVoltageBLabel.setText(convertVoltsToVoltageString(results.get(Constant.MAX_VOLTAGE)));
+				minVoltageBLabel.setText(convertVoltsToVoltageString(results.get(Constant.MIN_VOLTAGE)));
+				maxP2pVoltageBLabel.setText(convertVoltsToVoltageString(results.get(Constant.MAX_P2P_VOLTAGE)));
+				averageVoltageBLabel.setText(convertVoltsToVoltageString(results.get(Constant.AVERAGE_VOLTAGE)));
+				Double deviation = Constant.round(results.get(Constant.STANDARD_DEVIATION_VOLTAGE), 4);
+				standardDeviationVoltageBLabel.setText(deviation.toString());
+			} else if (channelIndex == Constant.MATH_INDEX) {
+				maxVoltageMathLabel.setText(convertVoltsToVoltageString(results.get(Constant.MAX_VOLTAGE)));
+				minVoltageMathLabel.setText(convertVoltsToVoltageString(results.get(Constant.MIN_VOLTAGE)));
+				maxP2pVoltageMathLabel.setText(convertVoltsToVoltageString(results.get(Constant.MAX_P2P_VOLTAGE)));
+				averageVoltageMathLabel.setText(convertVoltsToVoltageString(results.get(Constant.AVERAGE_VOLTAGE)));
+				Double deviation = Constant.round(results.get(Constant.STANDARD_DEVIATION_VOLTAGE), 4);
+				standardDeviationVoltageMathLabel.setText(deviation.toString());
+			} else if (channelIndex == Constant.FILTER_INDEX) {
+				maxVoltageFilterLabel.setText(convertVoltsToVoltageString(results.get(Constant.MAX_VOLTAGE)));
+				minVoltageFilterLabel.setText(convertVoltsToVoltageString(results.get(Constant.MIN_VOLTAGE)));
+				maxP2pVoltageFilterLabel.setText(convertVoltsToVoltageString(results.get(Constant.MAX_P2P_VOLTAGE)));
+				averageVoltageFilterLabel.setText(convertVoltsToVoltageString(results.get(Constant.AVERAGE_VOLTAGE)));
+				Double deviation = Constant.round(results.get(Constant.STANDARD_DEVIATION_VOLTAGE), 4);
+				standardDeviationVoltageFilterLabel.setText(deviation.toString());
+			}
+		} else {
+			hideMeasurementResults(channelIndex);
+		}
+	}
+
+	/**
+	 * Hide measurement results of the specified channel
+	 * @param channelIndex The index of specified channel
+	 */
+	private void hideMeasurementResults(int channelIndex) {
+		if(channelIndex == Constant.A_INDEX) {
+			maxVoltageALabel.setText("N/A");
+			minVoltageALabel.setText("N/A");
+			maxP2pVoltageALabel.setText("N/A");
+			averageVoltageALabel.setText("N/A");
+			standardDeviationVoltageALabel.setText("N/A");
+		} else if(channelIndex == Constant.B_INDEX) {
+			maxVoltageBLabel.setText("N/A");
+			minVoltageBLabel.setText("N/A");
+			maxP2pVoltageBLabel.setText("N/A");
+			averageVoltageBLabel.setText("N/A");
+			standardDeviationVoltageBLabel.setText("N/A");
+		} else if(channelIndex == Constant.MATH_INDEX) {
+			maxVoltageMathLabel.setText("N/A");
+			minVoltageMathLabel.setText("N/A");
+			maxP2pVoltageMathLabel.setText("N/A");
+			averageVoltageMathLabel.setText("N/A");
+			standardDeviationVoltageMathLabel.setText("N/A");
+		} else if(channelIndex == Constant.FILTER_INDEX) {
+			maxVoltageFilterLabel.setText("N/A");
+			minVoltageFilterLabel.setText("N/A");
+			maxP2pVoltageFilterLabel.setText("N/A");
+			averageVoltageFilterLabel.setText("N/A");
+			standardDeviationVoltageFilterLabel.setText("N/A");
+		}
+	}
 
 	@Override
 	public void chartMouseClicked(ChartMouseEvent event) {
@@ -1478,7 +1560,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
         if(! Double.isNaN(y)) {
         	this.timeCrosshair_.setValue(x);
         	this.voltageCrosshair_.setValue(y);
-        	this.cursorVerticalValueLabel.setText(miliVoltsToString(y));
+        	this.cursorVerticalValueLabel.setText(convertVoltsToVoltageString(y));
         }
 	}
 }

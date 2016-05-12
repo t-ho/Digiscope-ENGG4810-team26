@@ -141,6 +141,13 @@ public class Constant {
 	public static final Color MATH_LIGHT_COLOR = new Color(0, 165, 135); // light green
 	public static final Color FILTER_LIGHT_COLOR = new Color(186, 100, 252); // light purple
 	public static final Color GENERATOR_LIGHT_COLOR = new Color(140, 115, 115); // light brown
+	
+	public static final String MAX_VOLTAGE = "Max voltage";
+	public static final String MIN_VOLTAGE = "Min voltage";
+	public static final String MAX_P2P_VOLTAGE = "Max peak to peak voltage";
+	public static final String AVERAGE_VOLTAGE = "Average voltage";
+	public static final String STANDARD_DEVIATION_VOLTAGE = "Standard deviation of voltage";
+	public static final String FREQUENCY = "Frequency";
 
 	/**
 	 * Set application's LookAndFeel based on operating system type.

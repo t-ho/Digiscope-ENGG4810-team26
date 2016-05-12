@@ -9,10 +9,9 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.Range;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.RectangleInsets;
-
 import data.Constant;
 
 /**
@@ -51,7 +50,12 @@ public class Visualizer {
 		this();
 		addSeriesToDataset(channelIndex, xYSeries);
 	}
-
+	
+	/**
+	 * Add XYSeries to Dataset of the specified channel. The data will be visualized on the canvas
+	 * @param channelIndex the index of specified channel
+	 * @param xYSeries 
+	 */
 	public void addSeriesToDataset(int channelIndex, XYSeries xYSeries) {
 		if(xYSeries != null) {
 			datasets[channelIndex].removeAllSeries();
@@ -70,8 +74,25 @@ public class Visualizer {
 		}
 	}
 
+	/**
+	 * Remove all the XYSeries from the Dataset of the specified channel
+	 * @param channelIndex The index of the specified channel
+	 */
 	public void removeAllSeriesFromDataset(int channelIndex) {
 		datasets[channelIndex].removeAllSeries();
+	}
+	
+	/**
+	 * get XYSeries data of the specified channel
+	 * @param channelIndex The index of specified channel
+	 * @return XYSeries data or null
+	 */
+	public XYSeries getSeries(int channelIndex) {
+		if(datasets[channelIndex].getSeriesCount() != 0) {
+			return datasets[channelIndex].getSeries(0);
+		} else {
+			return null;
+		}
 	}
 
 	public JFreeChart getChart() {
@@ -197,5 +218,13 @@ public class Visualizer {
 		axis.setTickUnit(new NumberTickUnit(Constant.DEFAULT_HORIZONTAL_RANGE));
 		axis.setRange(lower, upper);
 		return axis;
+	}
+	
+	public Range getHorizontalRange() {
+		return commonHorizontalAxis.getRange();
+	}
+	
+	public Range getVerticalRange(int channelIndex) {
+		return verticalAxes[channelIndex].getRange();
 	}
 }

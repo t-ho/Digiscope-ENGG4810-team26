@@ -28,6 +28,9 @@ public class FilterFile {
 	 * @return true if file is loaded successful and the data is valid. Otherwise, false.
 	 */
 	public boolean loadCsvFile(String absolutePath) {
+		isValid = false;
+		firstColumn = new ArrayList<Double>();
+		secondColumn = new ArrayList<Double>();
 		File csvFile = new File(absolutePath);
 		if(csvFile.exists()) {
 			Scanner scanner = null;

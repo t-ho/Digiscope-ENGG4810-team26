@@ -614,7 +614,7 @@ public class MainWindowUi extends JFrame {
         leftPanel_.add(channelVisibilityPanel_);
 
         channelTabbedPane_.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        channelTabbedPane_.setPreferredSize(new Dimension(396, 360));
+        channelTabbedPane_.setPreferredSize(new Dimension(396, 440));
 
         horizontalAPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
         horizontalAPanel_.setPreferredSize(new Dimension(390, 55));
@@ -701,83 +701,77 @@ public class MainWindowUi extends JFrame {
         channelAPanel_.add(verticalAPannel_);
 
         measurementsAPanel_.setBorder(BorderFactory.createTitledBorder("Measurements"));
-        measurementsAPanel_.setPreferredSize(new Dimension(390, 105));
+        measurementsAPanel_.setPreferredSize(new Dimension(390, 185));
         measurementsAPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 1));
 
-        measurementATopLeftPanel_.setPreferredSize(new Dimension(190, 25));
+        measurementATopLeftPanel_.setPreferredSize(new Dimension(380, 25));
         measurementATopLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxVoltageALabel_.setText("Max Voltage:");
         measurementATopLeftPanel_.add(maxVoltageALabel_);
 
-        maxVoltageALabel.setText("00.00");
+        maxVoltageALabel.setText("N/A");
         maxVoltageALabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxVoltageALabel.setPreferredSize(new Dimension(60, 19));
         measurementATopLeftPanel_.add(maxVoltageALabel);
 
         measurementsAPanel_.add(measurementATopLeftPanel_);
 
-        measurementATopRightPanel_.setPreferredSize(new Dimension(185, 25));
-        measurementATopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
+        measurementATopRightPanel_.setPreferredSize(new Dimension(380, 25));
+        measurementATopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         minVoltageALabel_.setText("Min Voltage:");
         measurementATopRightPanel_.add(minVoltageALabel_);
 
-        minVoltageALabel.setText("00.00");
+        minVoltageALabel.setText("N/A");
         minVoltageALabel.setBorder(BorderFactory.createTitledBorder(""));
-        minVoltageALabel.setPreferredSize(new Dimension(60, 19));
         measurementATopRightPanel_.add(minVoltageALabel);
 
         measurementsAPanel_.add(measurementATopRightPanel_);
 
-        measurementAMiddleLeftPanel_.setPreferredSize(new Dimension(190, 25));
+        measurementAMiddleLeftPanel_.setPreferredSize(new Dimension(380, 25));
         measurementAMiddleLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxP2pVoltageALabel_.setText("Max P2P Voltage:");
         measurementAMiddleLeftPanel_.add(maxP2pVoltageALabel_);
 
-        maxP2pVoltageALabel.setText("00.00");
+        maxP2pVoltageALabel.setText("N/A");
         maxP2pVoltageALabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxP2pVoltageALabel.setPreferredSize(new Dimension(60, 19));
         measurementAMiddleLeftPanel_.add(maxP2pVoltageALabel);
 
         measurementsAPanel_.add(measurementAMiddleLeftPanel_);
 
-        measurementAMiddleRightPanel_.setPreferredSize(new Dimension(185, 25));
-        measurementAMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
+        measurementAMiddleRightPanel_.setPreferredSize(new Dimension(380, 25));
+        measurementAMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         averageVoltageALabel_.setText("Average Voltage:");
         measurementAMiddleRightPanel_.add(averageVoltageALabel_);
 
-        averageVoltageALabel.setText("00.00");
+        averageVoltageALabel.setText("N/A");
         averageVoltageALabel.setBorder(BorderFactory.createTitledBorder(""));
-        averageVoltageALabel.setPreferredSize(new Dimension(60, 19));
         measurementAMiddleRightPanel_.add(averageVoltageALabel);
 
         measurementsAPanel_.add(measurementAMiddleRightPanel_);
 
-        measurementABottomLeftPanel_.setPreferredSize(new Dimension(190, 25));
+        measurementABottomLeftPanel_.setPreferredSize(new Dimension(380, 25));
         measurementABottomLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         standardDeviationVoltageALabel_.setText("SD of Voltage:");
         measurementABottomLeftPanel_.add(standardDeviationVoltageALabel_);
 
-        standardDeviationVoltageALabel.setText("00.00");
+        standardDeviationVoltageALabel.setText("N/A");
         standardDeviationVoltageALabel.setBorder(BorderFactory.createTitledBorder(""));
-        standardDeviationVoltageALabel.setPreferredSize(new Dimension(60, 19));
         measurementABottomLeftPanel_.add(standardDeviationVoltageALabel);
 
         measurementsAPanel_.add(measurementABottomLeftPanel_);
 
-        measurementABottomRightPanel_.setPreferredSize(new Dimension(185, 25));
-        measurementABottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
+        measurementABottomRightPanel_.setPreferredSize(new Dimension(380, 25));
+        measurementABottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         frequencyALabel_.setText("Frequency:");
         measurementABottomRightPanel_.add(frequencyALabel_);
 
-        frequencyALabel.setText("00.00");
+        frequencyALabel.setText("N/A");
         frequencyALabel.setBorder(BorderFactory.createTitledBorder(""));
-        frequencyALabel.setPreferredSize(new Dimension(60, 19));
         measurementABottomRightPanel_.add(frequencyALabel);
 
         measurementsAPanel_.add(measurementABottomRightPanel_);
@@ -871,83 +865,77 @@ public class MainWindowUi extends JFrame {
         channelBPanel_.add(verticalBPanel_);
 
         measurementsBPanel_.setBorder(BorderFactory.createTitledBorder("Measurements"));
-        measurementsBPanel_.setPreferredSize(new Dimension(390, 105));
+        measurementsBPanel_.setPreferredSize(new Dimension(390, 185));
         measurementsBPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 1));
 
-        measurementBTopLeftPanel_.setPreferredSize(new Dimension(190, 25));
+        measurementBTopLeftPanel_.setPreferredSize(new Dimension(380, 25));
         measurementBTopLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxVoltageBLabel_.setText("Max Voltage:");
         measurementBTopLeftPanel_.add(maxVoltageBLabel_);
 
-        maxVoltageBLabel.setText("00.00");
+        maxVoltageBLabel.setText("N/A");
         maxVoltageBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxVoltageBLabel.setPreferredSize(new Dimension(60, 19));
         measurementBTopLeftPanel_.add(maxVoltageBLabel);
 
         measurementsBPanel_.add(measurementBTopLeftPanel_);
 
-        measurementBTopRightPanel_.setPreferredSize(new Dimension(185, 25));
-        measurementBTopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
+        measurementBTopRightPanel_.setPreferredSize(new Dimension(380, 25));
+        measurementBTopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         minVoltageBLabel_.setText("Min Voltage:");
         measurementBTopRightPanel_.add(minVoltageBLabel_);
 
-        minVoltageBLabel.setText("00.00");
+        minVoltageBLabel.setText("N/A");
         minVoltageBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        minVoltageBLabel.setPreferredSize(new Dimension(60, 19));
         measurementBTopRightPanel_.add(minVoltageBLabel);
 
         measurementsBPanel_.add(measurementBTopRightPanel_);
 
-        measurementBMiddleLeftPanel_.setPreferredSize(new Dimension(190, 25));
+        measurementBMiddleLeftPanel_.setPreferredSize(new Dimension(380, 25));
         measurementBMiddleLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxP2pVoltageBLabel_.setText("Max P2P Voltage:");
         measurementBMiddleLeftPanel_.add(maxP2pVoltageBLabel_);
 
-        maxP2pVoltageBLabel.setText("00.00");
+        maxP2pVoltageBLabel.setText("N/A");
         maxP2pVoltageBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxP2pVoltageBLabel.setPreferredSize(new Dimension(60, 19));
         measurementBMiddleLeftPanel_.add(maxP2pVoltageBLabel);
 
         measurementsBPanel_.add(measurementBMiddleLeftPanel_);
 
-        measurementBMiddleRightPanel_.setPreferredSize(new Dimension(185, 25));
-        measurementBMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
+        measurementBMiddleRightPanel_.setPreferredSize(new Dimension(380, 25));
+        measurementBMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         averageVoltageBLabel_.setText("Average Voltage:");
         measurementBMiddleRightPanel_.add(averageVoltageBLabel_);
 
-        averageVoltageBLabel.setText("00.00");
+        averageVoltageBLabel.setText("N/A");
         averageVoltageBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        averageVoltageBLabel.setPreferredSize(new Dimension(60, 19));
         measurementBMiddleRightPanel_.add(averageVoltageBLabel);
 
         measurementsBPanel_.add(measurementBMiddleRightPanel_);
 
-        measurementBBottomLeftPanel_.setPreferredSize(new Dimension(190, 25));
+        measurementBBottomLeftPanel_.setPreferredSize(new Dimension(380, 25));
         measurementBBottomLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         standardDeviationVoltageBLabel_.setText("SD of Voltage:");
         measurementBBottomLeftPanel_.add(standardDeviationVoltageBLabel_);
 
-        standardDeviationVoltageBLabel.setText("00.00");
+        standardDeviationVoltageBLabel.setText("N/A");
         standardDeviationVoltageBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        standardDeviationVoltageBLabel.setPreferredSize(new Dimension(60, 19));
         measurementBBottomLeftPanel_.add(standardDeviationVoltageBLabel);
 
         measurementsBPanel_.add(measurementBBottomLeftPanel_);
 
-        measurementBBottomRightPanel_.setPreferredSize(new Dimension(185, 25));
-        measurementBBottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
+        measurementBBottomRightPanel_.setPreferredSize(new Dimension(380, 25));
+        measurementBBottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         frequencyBLabel_.setText("Frequency:");
         measurementBBottomRightPanel_.add(frequencyBLabel_);
 
-        frequencyBLabel.setText("00.00");
+        frequencyBLabel.setText("N/A");
         frequencyBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        frequencyBLabel.setPreferredSize(new Dimension(60, 19));
         measurementBBottomRightPanel_.add(frequencyBLabel);
 
         measurementsBPanel_.add(measurementBBottomRightPanel_);
@@ -1082,83 +1070,77 @@ public class MainWindowUi extends JFrame {
         mathChannelPanel_.add(verticalMathPanel_);
 
         measurementsMathPanel_.setBorder(BorderFactory.createTitledBorder("Measurements"));
-        measurementsMathPanel_.setPreferredSize(new Dimension(390, 105));
+        measurementsMathPanel_.setPreferredSize(new Dimension(390, 185));
         measurementsMathPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 1));
 
-        measurementMathTopLeftPanel_.setPreferredSize(new Dimension(190, 25));
+        measurementMathTopLeftPanel_.setPreferredSize(new Dimension(380, 25));
         measurementMathTopLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxVoltageMathLabel_.setText("Max Voltage:");
         measurementMathTopLeftPanel_.add(maxVoltageMathLabel_);
 
-        maxVoltageMathLabel.setText("00.00");
+        maxVoltageMathLabel.setText("N/A");
         maxVoltageMathLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxVoltageMathLabel.setPreferredSize(new Dimension(60, 19));
         measurementMathTopLeftPanel_.add(maxVoltageMathLabel);
 
         measurementsMathPanel_.add(measurementMathTopLeftPanel_);
 
-        measurementMathTopRightPanel_.setPreferredSize(new Dimension(185, 25));
-        measurementMathTopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
+        measurementMathTopRightPanel_.setPreferredSize(new Dimension(380, 25));
+        measurementMathTopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         minVoltageMathLabel_.setText("Min Voltage:");
         measurementMathTopRightPanel_.add(minVoltageMathLabel_);
 
-        minVoltageMathLabel.setText("00.00");
+        minVoltageMathLabel.setText("N/A");
         minVoltageMathLabel.setBorder(BorderFactory.createTitledBorder(""));
-        minVoltageMathLabel.setPreferredSize(new Dimension(60, 19));
         measurementMathTopRightPanel_.add(minVoltageMathLabel);
 
         measurementsMathPanel_.add(measurementMathTopRightPanel_);
 
-        measurementMathMiddleLeftPanel_.setPreferredSize(new Dimension(190, 25));
+        measurementMathMiddleLeftPanel_.setPreferredSize(new Dimension(380, 25));
         measurementMathMiddleLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxP2pVoltageMathLabel_.setText("Max P2P Voltage:");
         measurementMathMiddleLeftPanel_.add(maxP2pVoltageMathLabel_);
 
-        maxP2pVoltageMathLabel.setText("00.00");
+        maxP2pVoltageMathLabel.setText("N/A");
         maxP2pVoltageMathLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxP2pVoltageMathLabel.setPreferredSize(new Dimension(60, 19));
         measurementMathMiddleLeftPanel_.add(maxP2pVoltageMathLabel);
 
         measurementsMathPanel_.add(measurementMathMiddleLeftPanel_);
 
-        measurementMathMiddleRightPanel_.setPreferredSize(new Dimension(185, 25));
-        measurementMathMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
+        measurementMathMiddleRightPanel_.setPreferredSize(new Dimension(380, 25));
+        measurementMathMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         averageVoltageMathLabel_.setText("Average Voltage:");
         measurementMathMiddleRightPanel_.add(averageVoltageMathLabel_);
 
-        averageVoltageMathLabel.setText("00.00");
+        averageVoltageMathLabel.setText("N/A");
         averageVoltageMathLabel.setBorder(BorderFactory.createTitledBorder(""));
-        averageVoltageMathLabel.setPreferredSize(new Dimension(60, 19));
         measurementMathMiddleRightPanel_.add(averageVoltageMathLabel);
 
         measurementsMathPanel_.add(measurementMathMiddleRightPanel_);
 
-        measurementMathBottomLeftPanel_.setPreferredSize(new Dimension(190, 25));
+        measurementMathBottomLeftPanel_.setPreferredSize(new Dimension(380, 25));
         measurementMathBottomLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         standardDeviationVoltageMathLabel_.setText("SD of Voltage:");
         measurementMathBottomLeftPanel_.add(standardDeviationVoltageMathLabel_);
 
-        standardDeviationVoltageMathLabel.setText("00.00");
+        standardDeviationVoltageMathLabel.setText("N/A");
         standardDeviationVoltageMathLabel.setBorder(BorderFactory.createTitledBorder(""));
-        standardDeviationVoltageMathLabel.setPreferredSize(new Dimension(60, 19));
         measurementMathBottomLeftPanel_.add(standardDeviationVoltageMathLabel);
 
         measurementsMathPanel_.add(measurementMathBottomLeftPanel_);
 
-        measurementMathBottomRightPanel_.setPreferredSize(new Dimension(185, 25));
-        measurementMathBottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
+        measurementMathBottomRightPanel_.setPreferredSize(new Dimension(380, 25));
+        measurementMathBottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         frequencyMathLabel_.setText("Frequency:");
         measurementMathBottomRightPanel_.add(frequencyMathLabel_);
 
-        frequencyMathLabel.setText("00.00");
+        frequencyMathLabel.setText("N/A");
         frequencyMathLabel.setBorder(BorderFactory.createTitledBorder(""));
-        frequencyMathLabel.setPreferredSize(new Dimension(60, 19));
         measurementMathBottomRightPanel_.add(frequencyMathLabel);
 
         measurementsMathPanel_.add(measurementMathBottomRightPanel_);
@@ -1177,7 +1159,8 @@ public class MainWindowUi extends JFrame {
         jLabel4.setText("Input:");
         inputTopPanel_.add(jLabel4);
 
-        inputChannelComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "Select channel" }));
+        inputChannelComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "Select channel" })
+        );
         inputChannelComboBox.setEnabled(false);
         inputChannelComboBox.setPreferredSize(new Dimension(230, 20));
         inputTopPanel_.add(inputChannelComboBox);
@@ -1292,83 +1275,77 @@ public class MainWindowUi extends JFrame {
         filterChannelPanel_.add(verticalFilterPanel_);
 
         measurementsFilterPanel_.setBorder(BorderFactory.createTitledBorder("Measurements"));
-        measurementsFilterPanel_.setPreferredSize(new Dimension(390, 105));
+        measurementsFilterPanel_.setPreferredSize(new Dimension(390, 185));
         measurementsFilterPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 1));
 
-        measurementFilterTopLeftPanel_.setPreferredSize(new Dimension(190, 25));
+        measurementFilterTopLeftPanel_.setPreferredSize(new Dimension(380, 25));
         measurementFilterTopLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxVoltageFilterLabel_.setText("Max Voltage:");
         measurementFilterTopLeftPanel_.add(maxVoltageFilterLabel_);
 
-        maxVoltageFilterLabel.setText("00.00");
+        maxVoltageFilterLabel.setText("N/A");
         maxVoltageFilterLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxVoltageFilterLabel.setPreferredSize(new Dimension(60, 19));
         measurementFilterTopLeftPanel_.add(maxVoltageFilterLabel);
 
         measurementsFilterPanel_.add(measurementFilterTopLeftPanel_);
 
-        measurementFilterTopRightPanel_.setPreferredSize(new Dimension(185, 25));
-        measurementFilterTopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
+        measurementFilterTopRightPanel_.setPreferredSize(new Dimension(380, 25));
+        measurementFilterTopRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         minVoltageFilterLabel_.setText("Min Voltage:");
         measurementFilterTopRightPanel_.add(minVoltageFilterLabel_);
 
-        minVoltageFilterLabel.setText("00.00");
+        minVoltageFilterLabel.setText("N/A");
         minVoltageFilterLabel.setBorder(BorderFactory.createTitledBorder(""));
-        minVoltageFilterLabel.setPreferredSize(new Dimension(60, 19));
         measurementFilterTopRightPanel_.add(minVoltageFilterLabel);
 
         measurementsFilterPanel_.add(measurementFilterTopRightPanel_);
 
-        measurementFilterMiddleLeftPanel_.setPreferredSize(new Dimension(190, 25));
+        measurementFilterMiddleLeftPanel_.setPreferredSize(new Dimension(380, 25));
         measurementFilterMiddleLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         maxP2pVoltageFilterLabel_.setText("Max P2P Voltage:");
         measurementFilterMiddleLeftPanel_.add(maxP2pVoltageFilterLabel_);
 
-        maxP2pVoltageFilterLabel.setText("00.00");
+        maxP2pVoltageFilterLabel.setText("N/A");
         maxP2pVoltageFilterLabel.setBorder(BorderFactory.createTitledBorder(""));
-        maxP2pVoltageFilterLabel.setPreferredSize(new Dimension(60, 19));
         measurementFilterMiddleLeftPanel_.add(maxP2pVoltageFilterLabel);
 
         measurementsFilterPanel_.add(measurementFilterMiddleLeftPanel_);
 
-        measurementFilterMiddleRightPanel_.setPreferredSize(new Dimension(185, 25));
-        measurementFilterMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
+        measurementFilterMiddleRightPanel_.setPreferredSize(new Dimension(380, 25));
+        measurementFilterMiddleRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         averageVoltageFilterLabel_.setText("Average Voltage:");
         measurementFilterMiddleRightPanel_.add(averageVoltageFilterLabel_);
 
-        averageVoltageFilterLabel.setText("00.00");
+        averageVoltageFilterLabel.setText("N/A");
         averageVoltageFilterLabel.setBorder(BorderFactory.createTitledBorder(""));
-        averageVoltageFilterLabel.setPreferredSize(new Dimension(60, 19));
         measurementFilterMiddleRightPanel_.add(averageVoltageFilterLabel);
 
         measurementsFilterPanel_.add(measurementFilterMiddleRightPanel_);
 
-        measurementFilterBottomLeftPanel_.setPreferredSize(new Dimension(190, 25));
+        measurementFilterBottomLeftPanel_.setPreferredSize(new Dimension(380, 25));
         measurementFilterBottomLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         standardDeviationVoltageFilterLabel_.setText("SD of Voltage:");
         measurementFilterBottomLeftPanel_.add(standardDeviationVoltageFilterLabel_);
 
-        standardDeviationVoltageFilterLabel.setText("00.00");
+        standardDeviationVoltageFilterLabel.setText("N/A");
         standardDeviationVoltageFilterLabel.setBorder(BorderFactory.createTitledBorder(""));
-        standardDeviationVoltageFilterLabel.setPreferredSize(new Dimension(60, 19));
         measurementFilterBottomLeftPanel_.add(standardDeviationVoltageFilterLabel);
 
         measurementsFilterPanel_.add(measurementFilterBottomLeftPanel_);
 
-        measurementFilterBottomRightPanel_.setPreferredSize(new Dimension(185, 25));
-        measurementFilterBottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 4));
+        measurementFilterBottomRightPanel_.setPreferredSize(new Dimension(380, 25));
+        measurementFilterBottomRightPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 4));
 
         frequencyFilterLabel_.setText("Frequency:");
         measurementFilterBottomRightPanel_.add(frequencyFilterLabel_);
 
-        frequencyFilterLabel.setText("00.00");
+        frequencyFilterLabel.setText("N/A");
         frequencyFilterLabel.setBorder(BorderFactory.createTitledBorder(""));
-        frequencyFilterLabel.setPreferredSize(new Dimension(60, 19));
         measurementFilterBottomRightPanel_.add(frequencyFilterLabel);
 
         measurementsFilterPanel_.add(measurementFilterBottomRightPanel_);
@@ -1664,7 +1641,7 @@ public class MainWindowUi extends JFrame {
         spaceLabel_.setText("  ");
         toolBar_.add(spaceLabel_);
 
-        cursorVerticalValueLabel.setText("0 mV");
+        cursorVerticalValueLabel.setText("N/A");
         cursorVerticalValueLabel.setBorder(BorderFactory.createTitledBorder(""));
         toolBar_.add(cursorVerticalValueLabel);
 
@@ -1757,6 +1734,7 @@ public class MainWindowUi extends JFrame {
             verticalOffsetUnitFilterComboBox.setEnabled(enabled);
             verticalRangeFilterComboBox.setEnabled(enabled);
             filterDivisionInfoLabel.setEnabled(enabled);
+            removeFilterButton.setEnabled(enabled);
         }
     }
 
