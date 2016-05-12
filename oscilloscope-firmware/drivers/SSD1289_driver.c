@@ -11,7 +11,9 @@
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
+#include "driverlib/pin_map.h"
 #include "driverlib/gpio.h"
+#include "driverlib/pwm.h"
 #include "driverlib/epi.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
@@ -81,7 +83,7 @@
 
 #define LCD_CS_B		GPIO_PORTN_BASE
 #define LCD_RST_B		GPIO_PORTP_BASE
-#define LCD_LED_B		GPIO_PORTQ_BASE
+#define LCD_LED_B		GPIO_PORTG_BASE
 
 #define LCD_DATA_0_P	GPIO_PIN_7
 #define LCD_DATA_1_P	GPIO_PIN_6
@@ -106,7 +108,7 @@
 
 #define LCD_CS_P		GPIO_PIN_5
 #define LCD_RST_P		GPIO_PIN_4
-#define LCD_LED_P		GPIO_PIN_0
+#define LCD_LED_P		GPIO_PIN_1
 
 static const uint32_t LCD_BASES[] =
 {
@@ -131,7 +133,6 @@ static const uint32_t LCD_BASES[] =
 	LCD_RD_B,
 	LCD_CS_B,
 	LCD_RST_B,
-	LCD_LED_B
 };
 
 static const uint8_t LCD_PINS[] =
@@ -157,7 +158,6 @@ static const uint8_t LCD_PINS[] =
 	LCD_RD_P,
 	LCD_CS_P,
 	LCD_RST_P,
-	LCD_LED_P
 };
 
 #define LCDOUTB(pin,bit) ((c >> (bit - pin)) & LCD_DATA_##bit##_P)
@@ -295,7 +295,7 @@ void Pant(uint16_t color)
 static void
 SSD1289_Init_Magic()
 {
-	MAP_GPIOPinWrite(LCD_LED_B, LCD_LED_P, LCD_LED_P);
+	//MAP_GPIOPinWrite(LCD_LED_B, LCD_LED_P, LCD_LED_P);
 
 	MAP_GPIOPinWrite(LCD_RST_B, LCD_RST_P, 0);
 	MAP_GPIOPinWrite(LCD_CS_B, LCD_CS_P, LCD_CS_P);
@@ -352,6 +352,33 @@ SSD1289_Init_Magic()
 }
 
 void
+SSD1289_Backlight_Set(uint8_t level)
+{
+	if (level > 5)
+	{
+		level = 5;
+	}
+
+	MAP_PWMPulseWidthSet(PWM0_BASE, PWM_OUT_5, 200 * level);
+}
+
+static void
+Backlight_Init(void)
+{
+	MAP_GPIOPinTypePWM(LCD_LED_B, LCD_LED_P);
+	MAP_GPIOPinConfigure(GPIO_PG1_M0PWM5);
+
+	MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM0);
+	while (!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_PWM0));
+
+	MAP_PWMGenConfigure(PWM0_BASE, PWM_GEN_2, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);
+	MAP_PWMGenPeriodSet(PWM0_BASE, PWM_GEN_2, 1000);
+	MAP_PWMPulseWidthSet(PWM0_BASE, PWM_OUT_5, 1000);
+	MAP_PWMGenEnable(PWM0_BASE, PWM_GEN_2);
+	MAP_PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, true);
+}
+
+void
 SSD1289_Init(void)
 {
 	int i;
@@ -361,7 +388,7 @@ SSD1289_Init(void)
 		MAP_GPIOPadConfigSet(LCD_BASES[i], LCD_PINS[i], GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
 	}
 
-	MAP_SysCtlDelay(100);
+	Backlight_Init();
 
 	SSD1289_Init_Magic();
 

@@ -234,6 +234,8 @@ BrightnessChange(int change)
 		brightness = 1;
 	}
 
+	SSD1289_Backlight_Set(brightness);
+
 	sprintf(brightness_text, "%d", brightness);
     WidgetPaint((tWidget *)&brightness_label);
 }

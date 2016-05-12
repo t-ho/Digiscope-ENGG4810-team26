@@ -12,6 +12,7 @@
 
 extern void SSD1289_Init(void);
 extern void Pant(uint16_t color);
+extern void SSD1289_Backlight_Set(uint8_t level);
 
 extern const tDisplay SSD1289_Display;
 
