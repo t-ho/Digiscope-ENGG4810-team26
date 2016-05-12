@@ -74,6 +74,7 @@
 #include "common.h"
 #include "net.h"
 #include "adc.h"
+#include "overvolt.h"
 #include "drivers/SSD1289_driver.h"
 #include "drivers/XPT2046_driver.h"
 
@@ -117,6 +118,8 @@ int main(void)
     XPT2046_SetCallback(WidgetPointerMessage);
 
     ADC_Init();
+
+    OverVoltageInit();
 
      /* Turn on user LED */
     GPIO_write(Board_LED0, Board_LED_ON);
