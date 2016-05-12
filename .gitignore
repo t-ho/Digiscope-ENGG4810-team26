@@ -37,5 +37,7 @@ Release/
 .config/
 .xdchelp
 
+oscilloscope-firmware/src
+
 *.obj
 *.aem4f
