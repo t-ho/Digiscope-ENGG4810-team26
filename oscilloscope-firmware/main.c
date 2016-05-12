@@ -66,7 +66,12 @@
 
 #include "driverlib/sysctl.h"
 #include "driverlib/interrupt.h"
+#include "driverlib/gpio.h"
+#include "driverlib/rom.h"
+#include "driverlib/rom_map.h"
+
 #include "inc/hw_memmap.h"
+#include "inc/hw_gpio.h"
 
 #include "grlib/grlib.h"
 #include "grlib/widget.h"
@@ -92,8 +97,6 @@ void heartBeatFxn(UArg arg0, UArg arg1)
     }
 }
 
-
-
 /*
  *  ======== main ========
  */
@@ -111,6 +114,12 @@ int main(void)
     // Board_initUSBMSCHFatFs();
     // Board_initWatchdog();
     // Board_initWiFi();
+
+    // Init LEDs
+	MAP_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_0);
+	MAP_GPIOPadConfigSet(GPIO_PORTN_BASE, GPIO_PIN_0, GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
+	MAP_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_1);
+	MAP_GPIOPadConfigSet(GPIO_PORTN_BASE, GPIO_PIN_1, GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
 
     Init_Semaphores();
     Init_SendQueue();
