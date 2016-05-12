@@ -1188,9 +1188,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	 */
 	private void showChannelPlotOnChartPanel(String channelName) {
 		refreshChannelPlotOnChartPanel(channelName);
-		// remove item if it exists in the combo box before adding
-		cursorComboBox.removeItem(channelName);
-		cursorComboBox.addItem(channelName);
+		if (rawXYSeries.containsKey(channelName)) {
+			// remove item if it exists in the combo box before adding
+			cursorComboBox.removeItem(channelName);
+			cursorComboBox.addItem(channelName);
+		}
 	}
 	
 	/**

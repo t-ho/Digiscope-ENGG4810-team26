@@ -98,8 +98,8 @@ public class ExpressionDialogUi extends JDialog {
 		secondRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
 
 		statusLabel_.setHorizontalAlignment(SwingConstants.CENTER);
-		statusLabel_.setPreferredSize(new Dimension(480, 14));
-		statusLabel_.setFont(new Font("Tahoma", 0, 14));
+		statusLabel_.setPreferredSize(new Dimension(480, 20));
+		statusLabel_.setFont(new Font("Lucida Grande", 0, 14));
 		secondRowPanel_.add(statusLabel_);
 
 		mainPanel_.add(secondRowPanel_);
