@@ -7,9 +7,6 @@
 
 #include "common.h"
 
-uint16_t adc_pos = 0;
-uint16_t adc_buffer[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
-
 Semaphore_Handle widget_message_h;
 Semaphore_Handle ip_update_h;
 Semaphore_Handle clients_connected_h;

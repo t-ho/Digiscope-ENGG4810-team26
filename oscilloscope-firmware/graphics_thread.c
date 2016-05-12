@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "net.h"
+#include "adc.h"
 #include "drivers/SSD1289_driver.h"
 
 #define HDIV_MIN 1
