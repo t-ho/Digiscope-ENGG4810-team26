@@ -123,8 +123,6 @@ void heartBeatFxn(UArg arg0, UArg arg1)
         Task_sleep((unsigned int)arg0);
         GPIO_toggle(Board_LED0);
         System_flush();
-
-
     }
 }
 

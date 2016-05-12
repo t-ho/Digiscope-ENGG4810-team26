@@ -1,12 +1,12 @@
 
-XOPTS = -I"C:/ti/xdctools_3_31_03_43_core/packages/" -Dxdc_target_types__=C:/ti/tirtos_tivac_2_16_00_08/products/bios_6_45_01_29/packages/ti/targets/arm/elf/std.h -Dxdc_target_name__=M4F
+XOPTS = -I"C:/ti/xdctools_3_32_00_06_core/packages/" -Dxdc_target_types__=C:/ti/tirtos_tivac_2_16_00_08/products/bios_6_45_01_29/packages/ti/targets/arm/elf/std.h -Dxdc_target_name__=M4F
 
 vpath % C:/ti/tirtos_tivac_2_16_00_08/products/bios_6_45_01_29/packages/ti/sysbios/
-vpath %.c C:/ti/xdctools_3_31_03_43_core/packages/
+vpath %.c C:/ti/xdctools_3_32_00_06_core/packages/
 
 CCOPTS    = --endian=little -mv7M4 --abi=eabi --float_support=fpv4spd16 -q -ms --opt_for_speed=2  --program_level_compile -o3 -g --optimize_with_debug -Dti_sysbios_knl_Task_minimizeLatency__D=FALSE -Dti_sysbios_knl_Clock_stopCheckNext__D=FALSE -Dti_sysbios_family_arm_m3_Hwi_enableException__D=TRUE -Dti_sysbios_family_arm_m3_Hwi_disablePriority__D=32U -Dti_sysbios_family_arm_m3_Hwi_numSparseInterrupts__D=0U
 
-XDC_ROOT  = C:/ti/xdctools_3_31_03_43_core/packages/
+XDC_ROOT  = C:/ti/xdctools_3_32_00_06_core/packages/
 
 BIOS_ROOT = C:/ti/tirtos_tivac_2_16_00_08/products/bios_6_45_01_29/packages/ti/sysbios/
 
@@ -16,14 +16,14 @@ BIOS_INC  = -I"C:/ti/tirtos_tivac_2_16_00_08/products/bios_6_45_01_29/packages/"
 
 TARGET_INC = -I"C:/ti/tirtos_tivac_2_16_00_08/products/bios_6_45_01_29/packages/"
 
-INCS = $(BIOS_INC) $(TARGET_INC)  --include_path="C:/Users/Ryan/repos/engg4810-team26/oscilloscope-firmware" --include_path="C:/ti/tirtos_tivac_2_16_00_08/products/ndk_2_25_00_09/packages/ti/ndk/inc/bsd" --include_path="C:/ti/tirtos_tivac_2_16_00_08/products/TivaWare_C_Series-2.1.1.71b" --include_path="C:/ti/tirtos_tivac_2_16_00_08/products/bios_6_45_01_29/packages/ti/sysbios/posix" --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_16.3.0.STS/include" 
+INCS = $(BIOS_INC) $(TARGET_INC)  --include_path="C:/Users/ryanf/repos/engg4810-team26/oscilloscope-firmware" --include_path="C:/ti/tirtos_tivac_2_16_00_08/products/ndk_2_25_00_09/packages/ti/ndk/inc/bsd" --include_path="C:/ti/tirtos_tivac_2_16_00_08/products/TivaWare_C_Series-2.1.1.71b" --include_path="C:/ti/tirtos_tivac_2_16_00_08/products/bios_6_45_01_29/packages/ti/sysbios/posix" --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_16.3.0.STS/include" 
 
 CC = C:/ti/ccsv6/tools/compiler/ti-cgt-arm_16.3.0.STS/bin/armcl -c $(CCOPTS) -I C:/ti/ccsv6/tools/compiler/ti-cgt-arm_16.3.0.STS/include
 ASM = C:/ti/ccsv6/tools/compiler/ti-cgt-arm_16.3.0.STS/bin/armcl -c $(CCOPTS) -I C:/ti/ccsv6/tools/compiler/ti-cgt-arm_16.3.0.STS/include
 AR = C:/ti/ccsv6/tools/compiler/ti-cgt-arm_16.3.0.STS/bin/armar rq
 
-DEL = C:/ti/xdctools_3_31_03_43_core/packages/../bin/rm -f
-CP = C:/ti/xdctools_3_31_03_43_core/packages/../bin/cp -f
+DEL = C:/ti/xdctools_3_32_00_06_core/packages/../bin/rm -f
+CP = C:/ti/xdctools_3_32_00_06_core/packages/../bin/cp -f
 
 define RM
 	$(if $(wildcard $1),$(DEL) $1,:)

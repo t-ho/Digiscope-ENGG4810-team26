@@ -31,6 +31,7 @@
  */
 
 #include <string.h>
+#include <stdio.h>
 
 /* XDCtools Header files */
 #include <xdc/std.h>
@@ -44,6 +45,7 @@
 #include <sys/socket.h>
 
 #include "common.h"
+#include "net.h"
 
 #define TCPPORT 1000
 
@@ -56,6 +58,88 @@ void tcpHandler(UArg arg0, UArg arg1);
 
 #define TCPPACKETSIZE 256
 #define NUMTCPWORKERS 3
+
+static Semaphore_Struct NetSendLock;
+static Semaphore_Handle NetSendLock_h;
+static Queue_Handle NetSendQueue;
+
+enum CommandTypes
+{
+	UNKNOWN = 0x00,
+	//VERTICAL_RANGE = 0x01,
+	VERTICAL_RANGE = 0x61,
+	HORIZONTAL_RANGE = 0x02,
+	TRIGGER_MODE = 0x03,
+	TRIGGER_TYPE = 0x04,
+	TRIGGER_THRESHOLD = 0x05,
+	CHANNEL_COUPLING = 0x0C,
+	FUNCTION_GEN_OUT = 0xF0,
+};
+
+void
+Init_SendQueue(void)
+{
+    Semaphore_Params params;
+    Semaphore_Params_init(&params);
+    params.mode = Semaphore_Mode_BINARY;
+
+    Semaphore_construct(&NetSendLock, 0, &params);
+    NetSendLock_h = Semaphore_handle(&NetSendLock);
+
+	NetSendQueue = Queue_create(NULL, NULL);
+
+	Semaphore_post(NetSendLock_h);
+}
+
+int
+NetSend(NetPacket *np)
+{
+	if (Semaphore_pend(NetSendLock_h, 100))
+	{
+		Queue_enqueue(NetSendQueue, (Queue_Elem*) np);
+		Semaphore_post(NetSendLock_h);
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+void
+packet_process(char *buffer, size_t len)
+{
+	static NetPacket np;
+
+	static char reply[64];
+
+	Command *command = (Command*) buffer;
+
+	if (len != 6) {
+		System_printf("Not a command\n");
+		return;
+	}
+
+	switch (command->id)
+	{
+		case VERTICAL_RANGE:
+			sprintf(reply, "Vert range %ul\n", command->arg);
+			break;
+		case HORIZONTAL_RANGE:
+			sprintf(reply, "Horiz range %ul\n", command->arg);
+			break;
+		case TRIGGER_MODE:
+			sprintf(reply, "Trigger mode %ul\n", command->arg);
+			break;
+		default:
+			sprintf(reply, "Unrecognised Command\n");
+	}
+
+	System_printf(reply);
+	np.data = reply;
+	np.len = strlen(np.data);
+	NetSend(&np);
+}
 
 /*
  *  ======== tcpWorker ========
@@ -78,44 +162,51 @@ Void tcpWorker(UArg arg0, UArg arg1)
 	keepalive.data = "keepalive\n";
 	keepalive.len = strlen(keepalive.data);
 
+	NetPacket echopacket;
 
     while (1) {
     	bytesRcvd = recv(clientfd, buffer, TCPPACKETSIZE, 0);
 
-    	if (bytesRcvd > 0)
+		if (bytesRcvd > 0)
+		{
+			packet_process(buffer, bytesRcvd);
+
+			echopacket.data = buffer;
+			echopacket.len = bytesRcvd;
+
+			NetSend(&echopacket);
+		}
+
+    	if (Semaphore_pend(NetSendLock_h, BIOS_WAIT_FOREVER))
     	{
-    		NetPacket sendpacket;
-    		sendpacket.data = buffer;
-    		sendpacket.len = bytesRcvd;
 
-			Queue_enqueue(NetSendQueue, &sendpacket);
+			if (Queue_empty(NetSendQueue) && ClientConnected)
+			{
+				Queue_enqueue(NetSendQueue, &keepalive);
+			}
+
+			NetPacket *np;
+			while(!Queue_empty(NetSendQueue)) {
+
+				np = Queue_dequeue(NetSendQueue);
+
+				bytesSent = send(clientfd, np->data, np->len, 0);
+
+				if (bytesSent < 0 || bytesSent != np->len) {
+					System_printf("Error: send failed.\n");
+					System_printf("tcpWorker stop clientfd = 0x%x\n", clientfd);
+
+					close(clientfd);
+			    	Semaphore_post(NetSendLock_h);
+
+					ClientConnected--;
+					Semaphore_post(ip_update_h);
+
+					return;
+				}
+			}
     	}
-
-    	if (Queue_empty(NetSendQueue)) {
-    		if (ClientConnected) {
-    			Queue_enqueue(NetSendQueue, &keepalive);
-    		}
-    	}
-
-    	NetPacket *np;
-    	while(!Queue_empty(NetSendQueue)) {
-
-    		np = Queue_dequeue(NetSendQueue);
-
-            bytesSent = send(clientfd, np->data, np->len, 0);
-
-            if (bytesSent < 0 || bytesSent != np->len) {
-                System_printf("Error: send failed.\n");
-                System_printf("tcpWorker stop clientfd = 0x%x\n", clientfd);
-
-                close(clientfd);
-
-                ClientConnected--;
-                Semaphore_post(ip_update_h);
-
-                return;
-            }
-    	}
+    	Semaphore_post(NetSendLock_h);
     }
 }
 
@@ -123,7 +214,7 @@ Void tcpWorker(UArg arg0, UArg arg1)
  *  ======== tcpHandler ========
  *  Creates new Task to handle new TCP connections.
  */
-Void tcpHandler(UArg arg0, UArg arg1)
+void tcpHandler(UArg arg0, UArg arg1)
 {
     int                status;
     int                clientfd;

@@ -18,7 +18,13 @@
 #include "grlib/pushbutton.h"
 
 #include "common.h"
+#include "net.h"
 #include "drivers/SSD1289_driver.h"
+
+#define HDIV_MIN 1
+#define HDIV_MAX 1000000
+#define VDIV_MIN 20000
+#define VDIV_MAX 2000000
 
 static const char * const menu_titles[] = { "Team 26 Oscilloscope", "Range", "Trigger", "Wave Generator", "Brightness" };
 
@@ -243,86 +249,58 @@ BrightnessDown(tWidget *psWidget)
 	BrightnessChange(-1);
 }
 
-static const char si_prefs[] = "um ";
-static int vdiv_ind = 4, hdiv_ind = 8;
-static const uint16_t vdivs[] = { 20, 50, 100, 200, 500, 1000, 2000 };
-static const uint32_t hdivs[] =
+static uint32_t vdiv_val = 500;
+static uint32_t hdiv_val = 500;
+
+void VertRangeChange(uint32_t newVal)
 {
-		1, 2, 5,
-		10, 20, 50,
-		100, 200, 500,
-		1000, 2000, 5000,
-		10000, 20000, 50000,
-		100000, 200000, 500000,
-		1000000
-};
-
-void VertRangeChange(int change)
-{
-	vdiv_ind += change;
-
-	if (vdiv_ind > 6)
+	if (newVal > VDIV_MAX)
 	{
-		vdiv_ind = 6;
+		vdiv_val = VDIV_MAX;
 	}
-	else if (vdiv_ind < 0)
+	else if (newVal < VDIV_MIN)
 	{
-		vdiv_ind = 0;
+		vdiv_val = VDIV_MIN;
+	}
+	else
+	{
+		vdiv_val = newVal;
 	}
 
-	uint32_t val = vdivs[vdiv_ind];
-	int count = 1;
-
-	while (val >= 1000)
-	{
-		val /= 1000;
-		count++;
-	}
-
-	sprintf(vert_div_text1, "%d", val);
-	vert_div_text2[0] = si_prefs[count];
+	SI_Micro_Print(vert_div_text1, vert_div_text2, vdiv_val, "V/div");
 
     WidgetPaint((tWidget *)&vert_div_label1);
     WidgetPaint((tWidget *)&vert_div_label2);
 }
 
-
 void
 VertRangeUp(tWidget *psWidget)
 {
-	VertRangeChange(1);
+	VertRangeChange(Standard_Step(vdiv_val, 1));
 }
 
 void
 VertRangeDown(tWidget *psWidget)
 {
-	VertRangeChange(-1);
+	VertRangeChange(Standard_Step(vdiv_val, -1));
 }
 
-void HorRangeChange(int change)
+void HorRangeChange(uint32_t newVal)
 {
-	hdiv_ind += change;
-
-	if (hdiv_ind > 18)
+	if (newVal > HDIV_MAX)
 	{
-		hdiv_ind = 18;
+		hdiv_val = HDIV_MAX;
 	}
-	else if (hdiv_ind < 0)
+	else if (newVal < HDIV_MIN)
 	{
-		hdiv_ind = 0;
+		hdiv_val = HDIV_MIN;
 	}
-
-	uint32_t val = hdivs[hdiv_ind];
-	int count = 0;
-
-	while (val >= 1000)
+	else
 	{
-		val /= 1000;
-		count++;
+		hdiv_val = newVal;
 	}
 
-	sprintf(hor_div_text1, "%d", val);
-	hor_div_text2[0] = si_prefs[count];
+	SI_Micro_Print(hor_div_text1, hor_div_text2, hdiv_val, "s/div");
 
     WidgetPaint((tWidget *)&hor_div_label1);
     WidgetPaint((tWidget *)&hor_div_label2);
@@ -331,13 +309,13 @@ void HorRangeChange(int change)
 void
 HorRangeUp(tWidget *psWidget)
 {
-	HorRangeChange(1);
+	HorRangeChange(Standard_Step(hdiv_val, 1));
 }
 
 void
 HorRangeDown(tWidget *psWidget)
 {
-	HorRangeChange(-1);
+	HorRangeChange(Standard_Step(hdiv_val, -1));
 }
 
 void
@@ -352,7 +330,7 @@ ForceTrigger(tWidget *psWidget)
     np.data = (char *) adc_buffer;
     np.len = 2 * ADC_BUF_SIZE;
 
-    Queue_enqueue(NetSendQueue, &np);
+    NetSend(&np);
 }
 
 void
