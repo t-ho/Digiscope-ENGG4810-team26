@@ -21,7 +21,7 @@
 #ifndef ADC_H_
 #define ADC_H_
 
-#define ADC_SAMPLE_BUF_SIZE 8
+#define ADC_SAMPLE_BUF_SIZE 1024
 #define ADC_BUF_SIZE 1024 * 25
 
 extern void ADC_Init(void);

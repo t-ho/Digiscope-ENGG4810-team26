@@ -9,6 +9,8 @@
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
 
+#include "common.h"
+
 void
 OverVoltageInit(void)
 {
@@ -18,9 +20,9 @@ OverVoltageInit(void)
 	MAP_ComparatorRefSet(COMP_BASE, COMP_REF_2_371875V);
 
 	// Uses pin PC7
-	MAP_ComparatorConfigure(COMP_BASE, 0, COMP_TRIG_NONE | COMP_INT_RISE | COMP_ASRCP_REF | COMP_OUTPUT_NORMAL);
+	MAP_ComparatorConfigure(COMP_BASE, 0, COMP_TRIG_NONE | COMP_INT_HIGH | COMP_ASRCP_REF | COMP_OUTPUT_NORMAL);
 	// Uses pin PC4
-	MAP_ComparatorConfigure(COMP_BASE, 1, COMP_TRIG_NONE | COMP_INT_RISE | COMP_ASRCP_REF | COMP_OUTPUT_NORMAL);
+	MAP_ComparatorConfigure(COMP_BASE, 1, COMP_TRIG_NONE | COMP_INT_HIGH | COMP_ASRCP_REF | COMP_OUTPUT_NORMAL);
 
 	MAP_ComparatorIntClear(COMP_BASE, 0);
 	MAP_ComparatorIntClear(COMP_BASE, 1);
@@ -32,5 +34,22 @@ OverVoltageInit(void)
 void
 ComparatorHandler(unsigned int index)
 {
-	MAP_ComparatorIntClear(COMP_BASE, index);
+	MAP_ComparatorIntDisable(COMP_BASE, 0);
+	MAP_ComparatorIntDisable(COMP_BASE, 1);
+
+	GraphicsMessage msg;
+	msg.type = GM_OVERVOLTAGE;
+	msg.data[0] = index;
+
+	Mailbox_post(GraphicsMailbox, &msg, 0);
+}
+
+void
+OverVoltageReenable(void)
+{
+	MAP_ComparatorIntClear(COMP_BASE, 0);
+	MAP_ComparatorIntClear(COMP_BASE, 1);
+
+	MAP_ComparatorIntEnable(COMP_BASE, 0);
+	MAP_ComparatorIntEnable(COMP_BASE, 1);
 }

@@ -21,6 +21,7 @@
 #include "common.h"
 #include "net.h"
 #include "adc.h"
+#include "overvolt.h"
 #include "drivers/SSD1289_driver.h"
 
 #define HDIV_MIN 1
@@ -28,7 +29,7 @@
 #define VDIV_MIN 20000
 #define VDIV_MAX 2000000
 
-static const char * const menu_titles[] = { "Team 26 Oscilloscope", "Range", "Trigger", "Wave Generator", "Brightness" };
+static const char * const menu_titles[] = { "Team 26 Oscilloscope", "Range", "Trigger", "Wave Generator", "Brightness", "Overvoltage Warning!" };
 
 static uint8_t brightness = 5;
 
@@ -39,6 +40,7 @@ tPushButtonWidget range_menu_buttons[];
 tPushButtonWidget trigger_menu_buttons[];
 tPushButtonWidget wavegen_menu_buttons[];
 tPushButtonWidget brightness_menu_buttons[];
+tPushButtonWidget overvoltage_menu_buttons[];
 
 #define MENU_NAV(X) void On##X(tWidget *psWidget) { \
 	WidgetRemove((tWidget *)&menus[current_menu]); \
@@ -48,11 +50,15 @@ tPushButtonWidget brightness_menu_buttons[];
     WidgetPaint(WIDGET_ROOT); \
 }
 
-#define MAIN_MENU 	0
-#define RANGE_MENU 	1
-#define TRIGGER_MENU 2
-#define WAVEGEN_MENU 3
-#define BRIGHTNESS_MENU 4
+enum menus
+{
+	MAIN_MENU,
+	RANGE_MENU,
+	TRIGGER_MENU,
+	WAVEGEN_MENU,
+	BRIGHTNESS_MENU,
+	OVERVOLTAGE_MENU
+};
 
 static uint8_t current_menu = MAIN_MENU;
 
@@ -73,6 +79,9 @@ tCanvasWidget menus[] =
 	// Brightness menu
 	CanvasStruct(0, 0, &brightness_menu_buttons, &SSD1289_Display, 0, 24,
 				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
+	// Overvoltage menu
+	CanvasStruct(0, 0, &overvoltage_menu_buttons, &SSD1289_Display, 0, 24,
+				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
 };
 
 MENU_NAV(MAIN)
@@ -80,6 +89,7 @@ MENU_NAV(RANGE)
 MENU_NAV(TRIGGER)
 MENU_NAV(WAVEGEN)
 MENU_NAV(BRIGHTNESS)
+MENU_NAV(OVERVOLTAGE)
 
 void EnterSleep(tWidget *psWidget);
 void OnPrevious(tWidget *psWidget);
@@ -91,6 +101,7 @@ void VertRangeUp(tWidget *psWidget);
 void HorRangeDown(tWidget *psWidget);
 void VertRangeDown(tWidget *psWidget);
 void ForceTrigger(tWidget *psWidget);
+void OverVoltageAcknowledge(tWidget *psWidget);
 
 Canvas(g_sTitle, 0, 0, 0, &SSD1289_Display, 50, 2, 220, 20,
        CANVAS_STYLE_TEXT | CANVAS_STYLE_TEXT_OPAQUE | CANVAS_STYLE_FILL, 0, 0, ClrWhite,
@@ -221,6 +232,25 @@ tPushButtonWidget brightness_menu_buttons[] =
 						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
 						  ClrWhite, &g_sFontCm18b, "+", 0, 0, 0, 0, BrightnessUp),
 };
+
+char overvoltage_text[] = "Overvoltage on channel X!";
+Canvas(overvoltage_label, &menus[OVERVOLTAGE_MENU], 0, 0, &SSD1289_Display, 10, 50, 300, 24,
+       CANVAS_STYLE_TEXT | CANVAS_STYLE_TEXT_OPAQUE | CANVAS_STYLE_FILL, 0, 0, ClrWhite,
+       &g_sFontCm22b, overvoltage_text, 0, 0);
+
+tPushButtonWidget overvoltage_menu_buttons[] =
+{
+		RectangularButtonStruct(&menus[OVERVOLTAGE_MENU], &overvoltage_label, 0, &SSD1289_Display, 10, 90,
+		                  300, 100, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrRed, ClrYellow, ClrWhite,
+						  ClrWhite, &g_sFontCm24b, "Acknowledge", 0, 0, 0, 0, OverVoltageAcknowledge),
+};
+
+void
+OverVoltageAcknowledge(tWidget *psWidget)
+{
+	OverVoltageReenable();
+	OnMAIN(NULL);
+}
 
 void
 BrightnessChange(int change)
@@ -417,8 +447,15 @@ screenDemo(UArg arg0, UArg arg1)
     			}
     			WidgetPointerMessage(WIDGET_MSG_PTR_UP, msg.data[0], msg.data[1]);
     			break;
+    		case GM_OVERVOLTAGE:
+    			SSD1289_Set_Backlight_On(true);
+    			overvoltage_text[strlen(overvoltage_text) - 2] = msg.data[0] + 1 + '0';
+    			OnOVERVOLTAGE(NULL);
+    			break;
     		case GM_REFRESH:
     			/* Fallthrough */
+    		default:
+    			break;
     		}
 
         	WidgetMessageQueueProcess();

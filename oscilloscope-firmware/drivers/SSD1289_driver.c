@@ -361,7 +361,7 @@ SSD1289_Backlight_Set(uint8_t level)
 		level = 5;
 	}
 
-	MAP_PWMPulseWidthSet(PWM0_BASE, PWM_OUT_5, 200 * level);
+	MAP_PWMPulseWidthSet(PWM0_BASE, PWM_OUT_5, 2000 * level);
 }
 
 static void
@@ -374,8 +374,8 @@ Backlight_Init(void)
 	while (!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_PWM0));
 
 	MAP_PWMGenConfigure(PWM0_BASE, PWM_GEN_2, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);
-	MAP_PWMGenPeriodSet(PWM0_BASE, PWM_GEN_2, 1000);
-	MAP_PWMPulseWidthSet(PWM0_BASE, PWM_OUT_5, 1000);
+	MAP_PWMGenPeriodSet(PWM0_BASE, PWM_GEN_2, 10000);
+	MAP_PWMPulseWidthSet(PWM0_BASE, PWM_OUT_5, 10000);
 	MAP_PWMGenEnable(PWM0_BASE, PWM_GEN_2);
 	MAP_PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, true);
 }

@@ -31,7 +31,8 @@ enum GraphicsMessageType
 	GM_PTR_DOWN,
 	GM_REFRESH,
 	GM_IP_UPDATE,
-	GM_CONN_UPDATE
+	GM_CONN_UPDATE,
+	GM_OVERVOLTAGE,
 };
 
 typedef struct GraphicsMessage

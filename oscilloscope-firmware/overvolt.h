@@ -19,5 +19,6 @@
 #include "inc/hw_memmap.h"
 
 extern void OverVoltageInit(void);
+extern void OverVoltageReenable(void);
 
 #endif /* OVERVOLT_H_ */
