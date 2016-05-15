@@ -30,9 +30,14 @@ bin/*
 *.blg
 *.out
 
+# CCS Generated Files #
 Debug/
-.settings/
+Release/
 .launches/
+.config/
+.xdchelp
+
+oscilloscope-firmware/src
 
 *.obj
 *.aem4f

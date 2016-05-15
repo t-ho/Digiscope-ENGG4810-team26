@@ -20,15 +20,27 @@
 \maketitle
 
 \section{Packet Types}
+
+$n_1$ and $n_2$ refer to the first and second nibbles of the argument bytes respectively.
+
 \begin{table}[H]
+	\renewcommand{\arraystretch}{1.2}
 	\centering
-	\begin{tabular}{|c|c|}
+	\begin{tabular}{|c|c|c|}
 		\hline
-		\textbf{Identifier} & \textbf{Type} \\ \hline
-		0xD1 & 8 bit sample packet, channel 1 \\ \hline
-		0xD2 & 8 bit sample packet, channel 2 \\ \hline
-		0xE1 & 12 bit sample packet, channel 1 \\ \hline
-		0xE2 & 12 bit sample packet, channel 2 \\ \hline
+		\textbf{Identifier} & \textbf{Type} & \textbf{Value} \\ \hline
+		0x01 & Vertical Range & $n_1 \times 10^{n_2}$ u s \\ \hline
+		0x02 & Horizontal Range & \\ \hline
+		0x03 & Trigger Mode & 0:Auto, 1:Single, 2:Normal \\ \hline
+		0x04 & Trigger Type & 0:Level, 1:Rising, 2:Falling \\ \hline
+		0x05 & Trigger Threshold &  \\ \hline
+		0x0C & Channel Coupling & 0 for DC, other for AC \\ \hline
+		0xD1 & 8 bit sample packet, channel 1 & uint8[ ] \\ \hline
+		0xD2 & 8 bit sample packet, channel 2 & uint8[ ] \\ \hline
+		0xE1 & 12 bit sample packet, channel 1 & uint16[ ] \\ \hline
+		0xE2 & 12 bit sample packet, channel 2 & uint16[ ] \\ \hline
+		0xEE & Keep alive & - \\ \hline
+		0xF0 & Function Generator Output & 0:Off, Other:On \\ \hline
 	\end{tabular}
 	\caption{Packet type identifiers}
 \end{table}
@@ -51,7 +63,8 @@
 	\centering
 	\begin{bytefield}[bitwidth=2em]{16}
 		\bitheader{0-15} \\
-		\bitbox{8}{Packet Type} & \bitbox{8}{Command Argument}
+		\bitbox{8}{Packet Type} & \bitbox{8}{Command / Notification Indicator} \\
+		\wordbox{2}{Argument}
 	\end{bytefield}
 	\caption{Command packet structure}
 \end{figure}
