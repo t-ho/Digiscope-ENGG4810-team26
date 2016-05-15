@@ -25,6 +25,8 @@ extern Semaphore_Handle clients_connected_h;
 
 extern Mailbox_Handle GraphicsMailbox;
 
+extern void ForceTrigger(void);
+
 enum GraphicsMessageType
 {
 	GM_PTR_UP,
@@ -33,6 +35,8 @@ enum GraphicsMessageType
 	GM_IP_UPDATE,
 	GM_CONN_UPDATE,
 	GM_OVERVOLTAGE,
+	GM_SET_HOR_RANGE,
+	GM_SET_VER_RANGE
 };
 
 typedef struct GraphicsMessage

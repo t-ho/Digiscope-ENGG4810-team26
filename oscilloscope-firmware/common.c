@@ -6,6 +6,8 @@
  */
 
 #include "common.h"
+#include "adc.h"
+#include "net.h"
 #include <xdc/runtime/Error.h>
 
 Semaphore_Handle clients_connected_h;
@@ -28,6 +30,16 @@ SI_Micro_Print(char* line1, char* line2, int32_t val, char* suffix)
 
 	sprintf(line1, "%lu", val);
 	sprintf(line2, "%c%s", prefs[mag], suffix);
+}
+
+void
+ForceTrigger(void)
+{
+    static NetPacket np;
+    np.data = (char *) adc_buffer;
+    np.len = 2 * ADC_BUF_SIZE;
+
+    NetSend(&np);
 }
 
 uint32_t

@@ -100,7 +100,7 @@ void HorRangeUp(tWidget *psWidget);
 void VertRangeUp(tWidget *psWidget);
 void HorRangeDown(tWidget *psWidget);
 void VertRangeDown(tWidget *psWidget);
-void ForceTrigger(tWidget *psWidget);
+void ForceTriggerPress(tWidget *psWidget);
 void OverVoltageAcknowledge(tWidget *psWidget);
 
 Canvas(g_sTitle, 0, 0, 0, &SSD1289_Display, 50, 2, 220, 20,
@@ -181,7 +181,7 @@ tPushButtonWidget trigger_menu_buttons[] =
 						  ClrWhite, &g_sFontCm18b, "Arm", 0, 0, 0, 0, OnPrevious),
 		RectangularButtonStruct(&menus[TRIGGER_MENU], trigger_menu_buttons + 3, 0, &SSD1289_Display, 220, 30,
 		                  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrRed, ClrGreen, ClrWhite,
-						  ClrWhite, &g_sFontCm18b, "Force", 0, 0, 0, 0, ForceTrigger),
+						  ClrWhite, &g_sFontCm18b, "Force", 0, 0, 0, 0, ForceTriggerPress),
 		RectangularButtonStruct(&menus[TRIGGER_MENU], trigger_menu_buttons + 4, 0, &SSD1289_Display, 0, 120,
 						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
 						  ClrWhite, &g_sFontCm18b, "Mode", 0, 0, 0, 0, OnPrevious),
@@ -304,8 +304,11 @@ void VertRangeChange(uint32_t newVal)
 
 	SI_Micro_Print(vert_div_text1, vert_div_text2, vdiv_val, "V/div");
 
-    WidgetPaint((tWidget *)&vert_div_label1);
-    WidgetPaint((tWidget *)&vert_div_label2);
+	if (current_menu == RANGE_MENU)
+	{
+		WidgetPaint((tWidget *)&vert_div_label1);
+		WidgetPaint((tWidget *)&vert_div_label2);
+	}
 }
 
 void
@@ -337,8 +340,11 @@ void HorRangeChange(uint32_t newVal)
 
 	SI_Micro_Print(hor_div_text1, hor_div_text2, hdiv_val, "s/div");
 
-    WidgetPaint((tWidget *)&hor_div_label1);
-    WidgetPaint((tWidget *)&hor_div_label2);
+	if (current_menu == RANGE_MENU)
+	{
+		WidgetPaint((tWidget *)&hor_div_label1);
+    	WidgetPaint((tWidget *)&hor_div_label2);
+	}
 }
 
 void
@@ -365,13 +371,9 @@ OnPrevious(tWidget *psWidget)
 }
 
 void
-ForceTrigger(tWidget *psWidget)
+ForceTriggerPress(tWidget *psWidget)
 {
-    static NetPacket np;
-    np.data = (char *) adc_buffer;
-    np.len = 2 * ADC_BUF_SIZE;
-
-    NetSend(&np);
+	ForceTrigger();
 }
 
 void
@@ -452,6 +454,12 @@ screenDemo(UArg arg0, UArg arg1)
     			overvoltage_text[strlen(overvoltage_text) - 2] = msg.data[0] + 1 + '0';
     			OnOVERVOLTAGE(NULL);
     			break;
+    		case GM_SET_HOR_RANGE:
+    			HorRangeChange(msg.data[0]);
+    			break;
+    		case GM_SET_VER_RANGE:
+				VertRangeChange(msg.data[0]);
+				break;
     		case GM_REFRESH:
     			/* Fallthrough */
     		default:

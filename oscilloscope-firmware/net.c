@@ -74,6 +74,7 @@ enum CommandTypes
 	TRIGGER_THRESHOLD = 0x05,
 	CHANNEL_COUPLING = 0x0C,
 	FUNCTION_GEN_OUT = 0xF0,
+	FORCE_TRIGGER = 'f',
 };
 
 void
@@ -118,16 +119,29 @@ packet_process(char *buffer, size_t len)
 		return;
 	}
 
+	GraphicsMessage msg;
+
+
 	switch (command->id)
 	{
 		case VERTICAL_RANGE:
+			msg.type = GM_SET_VER_RANGE;
+			msg.data[0] = command->arg;
+			Mailbox_post(GraphicsMailbox, &msg, 0);
 			sprintf(reply, "Vert range %ul\n", command->arg);
 			break;
 		case HORIZONTAL_RANGE:
+			msg.type = GM_SET_HOR_RANGE;
+			msg.data[0] = command->arg;
+			Mailbox_post(GraphicsMailbox, &msg, 0);
 			sprintf(reply, "Horiz range %ul\n", command->arg);
 			break;
 		case TRIGGER_MODE:
 			sprintf(reply, "Trigger mode %ul\n", command->arg);
+			break;
+		case FORCE_TRIGGER:
+			sprintf(reply, "Forcing trigger now\n");
+			ForceTrigger();
 			break;
 		default:
 			sprintf(reply, "Unrecognised Command\n");
