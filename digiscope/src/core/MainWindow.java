@@ -13,6 +13,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,6 +55,9 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private Crosshair voltageCrosshair_;
 	private int measuredChannelIndex_; // used for cursor measurement
 	private FilterFile filterFile_;
+	private Socket socket_;
+	private PacketWriter packetWriter_;
+	private PacketReader packetReader_;
 
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
@@ -62,6 +67,19 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		addComponentToCanvasPanel(chartPanel_);
 	}
 	
+	public MainWindow(LaunchWindow launchWindow, Socket socket) throws IOException {
+		super();
+		initialize();
+		addListenersToComponents();
+		setLaunchWindow(launchWindow);
+		setSocket(socket);
+		packetWriter_ = new PacketWriter(socket.getOutputStream());
+		packetReader_ = new PacketReader(socket.getInputStream());
+		InputStreamHandler inputStreamHandler = new InputStreamHandler(this, packetReader_, packetWriter_);
+		inputStreamHandler.run();
+		addComponentToCanvasPanel(chartPanel_);
+	}
+
 	private void initialize() {
 		visualizer_ = new Visualizer();
 		chartPanel_ = createDefaultChartPanel(visualizer_.getChart());
@@ -1564,5 +1582,29 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
         	this.voltageCrosshair_.setValue(y);
         	this.cursorVerticalValueLabel.setText(convertVoltsToVoltageString(y));
         }
+	}
+
+	public Socket getSocket() {
+		return socket_;
+	}
+
+	public void setSocket(Socket socket_) {
+		this.socket_ = socket_;
+	}
+
+	public PacketWriter getPacketWriter() {
+		return packetWriter_;
+	}
+
+	public void setPacketWriter(PacketWriter packetWriter_) {
+		this.packetWriter_ = packetWriter_;
+	}
+
+	public PacketReader getPacketReader() {
+		return packetReader_;
+	}
+
+	public void setPacketReader(PacketReader packetReader_) {
+		this.packetReader_ = packetReader_;
 	}
 }

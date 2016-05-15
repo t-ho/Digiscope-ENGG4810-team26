@@ -20,6 +20,8 @@ public class Constant {
 
 	public static final String CSV_FILE_EXTENSION = "csv";
 	
+	public static final int PORT_NUMBER = 4810;
+	
 	public static final int FIR = 1;
 	public static final int IIR = 2;
 	
