@@ -150,6 +150,7 @@ public class ExpressionDialogUi extends JDialog {
 	public void setStatus(String message, int statusType) {
 		if (statusType == Constant.ERROR) {
 			statusLabel_.setForeground(Color.RED);
+			message = "ERROR: " + message.trim();
 		} else if (statusType == Constant.NORMAL) {
 			statusLabel_.setForeground(Color.BLUE);
 		}

@@ -3,6 +3,7 @@ package core;
 import java.io.IOException;
 
 import data.Packet;
+import data.PacketFormatException;
 import data.PacketType;
 
 /**
@@ -56,6 +57,8 @@ public class InputStreamHandler implements Runnable {
 
 				}
 			}
+		} catch (PacketFormatException pfe) {
+			pfe.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

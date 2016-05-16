@@ -5,7 +5,7 @@ package data;
  * @author ToanHo
  */
 public class Packet {
-	public static int MAX_PACKET_SIZE = 1024;
+	public static short MAX_PACKET_SIZE = 1024;
 	
 	private byte type_;
 	

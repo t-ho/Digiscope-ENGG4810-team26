@@ -1,8 +1,5 @@
 package core;
 
-import gui.FileChooserUi;
-import gui.MainWindowUi;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -40,6 +37,8 @@ import org.jfree.ui.RectangleEdge;
 
 import data.Constant;
 import data.FilterFile;
+import gui.FileChooserUi;
+import gui.MainWindowUi;
 
 /**
  *
@@ -70,14 +69,15 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	public MainWindow(LaunchWindow launchWindow, Socket socket) throws IOException {
 		super();
 		initialize();
-		addListenersToComponents();
 		setLaunchWindow(launchWindow);
 		setSocket(socket);
 		packetWriter_ = new PacketWriter(socket.getOutputStream());
 		packetReader_ = new PacketReader(socket.getInputStream());
+		// Create a new thread to handle input stream
 		InputStreamHandler inputStreamHandler = new InputStreamHandler(this, packetReader_, packetWriter_);
 		inputStreamHandler.run();
 		addComponentToCanvasPanel(chartPanel_);
+		addListenersToComponents();
 	}
 
 	private void initialize() {
