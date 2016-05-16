@@ -2,6 +2,7 @@ package core;
 
 import java.io.IOException;
 
+import data.CommandPacket;
 import data.Packet;
 import data.PacketFormatException;
 import data.PacketType;
@@ -29,8 +30,9 @@ public class InputStreamHandler implements Runnable {
 			Packet packet = packetReader_.nextPacket();
 			while (packet != null) {
 				byte type = packet.getType();
-				if (type == PacketType.VERTICAL_RANGE) {
-
+				if (type == PacketType.VERTICAL_RANGE_A) {
+					CommandPacket commandPacket = (CommandPacket) packet;
+					mainWindow_.setVerticalRangeForChannelA(commandPacket.getArgument());
 				} else if (type == PacketType.HORIZONTAL_RANGE) {
 
 				} else if (type == PacketType.TRIGGER_MODE) {

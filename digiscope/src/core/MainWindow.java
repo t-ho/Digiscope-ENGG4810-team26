@@ -35,8 +35,10 @@ import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.ui.RectangleEdge;
 
+import data.CommandPacket;
 import data.Constant;
 import data.FilterFile;
+import data.PacketType;
 import gui.FileChooserUi;
 import gui.MainWindowUi;
 
@@ -276,6 +278,13 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				verticalRangeGeneratorComboBoxItemStateChanged();
 			}
 		});
+		
+		verticalRangeAComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				verticalRangeAComboBoxActionPerformed();
+			}
+		});
 
 		cursorComboBox.addItemListener(new ItemListener() {
 			@Override
@@ -472,6 +481,18 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				channelCouplingToggleButtonActionPerformed();
 			}
 		});
+	}
+
+	protected void verticalRangeAComboBoxActionPerformed() {
+		// TODO
+		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
+		int verticalRange = convertVoltageStringToMilivolts(selectedItem);
+		CommandPacket commandPacket = new CommandPacket(PacketType.VERTICAL_RANGE, (byte) 0x00, verticalRange);
+		try {
+			packetWriter_.writePacket(commandPacket);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected void channelCouplingToggleButtonActionPerformed() {
@@ -969,32 +990,124 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private double convertVoltageStringToVolts(String voltString) {
 		double value = 0;
 		switch(voltString) {
-			case Constant.TWENTY_MILIVOLTS:
+			case Constant.TWENTY_MILIVOLTS :
 				value = 0.02;
 				break;
-			case Constant.FIFTY_MILIVOLTS:
+
+			case Constant.FIFTY_MILIVOLTS :
 				value = 0.05;
 				break;
-			case Constant.ONE_HUNDRED_MILIVOLTS:
+
+			case Constant.ONE_HUNDRED_MILIVOLTS :
 				value = 0.1;
 				break;
-			case Constant.TWO_HUNDRED_MILIVOLTS:
+
+			case Constant.TWO_HUNDRED_MILIVOLTS :
 				value = 0.2;
 				break;
-			case Constant.FIVE_HUNDRED_MILIVOLTS:
+
+			case Constant.FIVE_HUNDRED_MILIVOLTS :
 				value = 0.5;
 				break;
-			case Constant.ONE_VOLT:
+
+			case Constant.ONE_VOLT :
 				value = 1;
 				break;
-			case Constant.TWO_VOLTS:
+
+			case Constant.TWO_VOLTS :
 				value = 2;
 				break;
+
 			default:
 				// Cannot reach here
 				value = 0.02;
 		}
 		return value;
+	}
+
+	/**
+	 * Convert the voltage string to milivolts
+	 * @param voltString The voltage string. e.g. 200 mV, 1 V,...
+	 * @return the voltage in milivolts
+	 */
+	private int convertVoltageStringToMilivolts(String voltString) {
+		int value = 0;
+		switch(voltString) {
+			case Constant.TWENTY_MILIVOLTS :
+				value = 20;
+				break;
+
+			case Constant.FIFTY_MILIVOLTS :
+				value = 50;
+				break;
+
+			case Constant.ONE_HUNDRED_MILIVOLTS :
+				value = 100;
+				break;
+
+			case Constant.TWO_HUNDRED_MILIVOLTS :
+				value = 200;
+				break;
+
+			case Constant.FIVE_HUNDRED_MILIVOLTS :
+				value = 500;
+				break;
+
+			case Constant.ONE_VOLT :
+				value = 1000;
+				break;
+
+			case Constant.TWO_VOLTS :
+				value = 2000;
+				break;
+
+			default:
+				// Cannot reach here
+				value = 20;
+		}
+		return value;
+	}
+
+	/**
+	 * Convert the milivolts to voltage string
+	 * @param milivolts The specified milivolts
+	 * @return the voltage string 
+	 */
+	private String convertMilivoltsToVoltageString(int milivolts) {
+		String string = "";
+		switch(milivolts) {
+			case 20 :
+				string = Constant.TWENTY_MILIVOLTS;
+				break;
+
+			case 50 :
+				string = Constant.FIFTY_MILIVOLTS;
+				break;
+
+			case 100 :
+				string = Constant.ONE_HUNDRED_MILIVOLTS;
+				break;
+
+			case 200 :
+				string = Constant.TWO_HUNDRED_MILIVOLTS;
+				break;
+
+			case 500 :
+				string = Constant.FIVE_HUNDRED_MILIVOLTS;
+				break;
+
+			case 1000 :
+				string = Constant.ONE_VOLT;
+				break;
+
+			case 2000 :
+				string = Constant.TWO_VOLTS; 
+				break;
+
+			default:
+				// Ignore
+		}
+		return string;
 	}
 
 	/**
@@ -1005,63 +1118,82 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private int convertTimeStringToMicroSeconds(String timeString) {
 		int value = 0;
 		switch(timeString) {
-			case Constant.ONE_MICROSECOND:
+			case Constant.ONE_MICROSECOND :
 				value = 1;
 				break;
-			case Constant.TWO_MICROSECONDS:
+
+			case Constant.TWO_MICROSECONDS :
 				value = 2;
 				break;
-			case Constant.FIVE_MICROSECONDS:
+
+			case Constant.FIVE_MICROSECONDS :
 				value = 5;
 				break;
-			case Constant.TEN_MICROSECONDS:
+
+			case Constant.TEN_MICROSECONDS :
 				value = 10;
 				break;
-			case Constant.TWENTY_MICROSECONDS:
+
+			case Constant.TWENTY_MICROSECONDS :
 				value = 20;
 				break;
-			case Constant.FIFTY_MICROSECONDS:
+
+			case Constant.FIFTY_MICROSECONDS :
 				value = 50;
 				break;
-			case Constant.ONE_HUNDRED_MICROSECONDS:
+
+			case Constant.ONE_HUNDRED_MICROSECONDS :
 				value = 100;
 				break;
-			case Constant.TWO_HUNDRED_MICROSECONDS:
+
+			case Constant.TWO_HUNDRED_MICROSECONDS :
 				value = 200;
 				break;
-			case Constant.FIVE_HUNDRED_MICROSECONDS:
+
+			case Constant.FIVE_HUNDRED_MICROSECONDS :
 				value = 500;
 				break;
-			case Constant.ONE_MILISECOND:
+
+			case Constant.ONE_MILISECOND :
 				value = 1000;
 				break;
-			case Constant.TWO_MILISECONDS:
+
+			case Constant.TWO_MILISECONDS :
 				value = 2000;
 				break;
-			case Constant.FIVE_MILISECONDS:
+
+			case Constant.FIVE_MILISECONDS :
 				value = 5000;
 				break;
-			case Constant.TEN_MILISECONDS:
+
+			case Constant.TEN_MILISECONDS :
 				value = 10000;
 				break;
-			case Constant.TWENTY_MILISECONDS:
+
+			case Constant.TWENTY_MILISECONDS :
 				value = 20000;
 				break;
-			case Constant.FIFTY_MILISECONDS:
+
+			case Constant.FIFTY_MILISECONDS :
 				value = 50000;
 				break;
-			case Constant.ONE_HUNDRED_MILISECONDS:
+
+			case Constant.ONE_HUNDRED_MILISECONDS :
 				value = 100000;
 				break;
-			case Constant.TWO_HUNDRED_MILISECONDS:
+
+			case Constant.TWO_HUNDRED_MILISECONDS :
 				value = 200000;
 				break;
-			case Constant.FIVE_HUNDRED_MILISECONDS:
+
+			case Constant.FIVE_HUNDRED_MILISECONDS :
 				value = 500000;
 				break;
-			case Constant.ONE_SECOND:
+
+			case Constant.ONE_SECOND :
 				value = 1000000;
 				break;
+
 			default:
 				// Cannot reach here
 				value = 1;
@@ -1606,5 +1738,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 
 	public void setPacketReader(PacketReader packetReader_) {
 		this.packetReader_ = packetReader_;
+	}
+	
+	public void setVerticalRangeForChannelA(int milivolts) {
+		String item = convertMilivoltsToVoltageString(milivolts);
+		verticalRangeAComboBox.setSelectedItem(item);
 	}
 }
