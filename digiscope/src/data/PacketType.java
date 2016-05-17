@@ -6,8 +6,8 @@ package data;
  */
 public class PacketType {
 
-	public static final byte VERTICAL_RANGE_A = (byte) 0x01;
-	public static final byte VERTICAL_RANGE_B = (byte) 0x06;
+	public static final byte VERTICAL_RANGE_A = (byte) 0xA1;
+	public static final byte VERTICAL_RANGE_B = (byte) 0xB1;
 	public static final byte HORIZONTAL_RANGE = (byte) 0x02;
 	public static final byte TRIGGER_MODE = (byte) 0x03;
 	public static final byte TRIGGER_TYPE = (byte) 0x04;

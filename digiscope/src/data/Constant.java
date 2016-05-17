@@ -94,20 +94,27 @@ public class Constant {
 	public static final String FILTER_CHANNEL = "Filter Channel";
 	public static final String GENERATOR_CHANNEL = "Generator Channel";
 
-	public static final String AUTO_MODE = "Auto";
-	public static final String NORMAL_MODE = "Normal";
-	public static final String SINGLE_MODE = "Single";
+	public static final String AUTO_MODE_NAME = "Auto";
+	public static final String SINGLE_MODE_NAME = "Single";
+	public static final String NORMAL_MODE_NAME = "Normal";
+
+	public static final int AUTO_MODE = 0;
+	public static final int SINGLE_MODE = 1;
+	public static final int NORMAL_MODE = 2;
 
 	public static final String[] TRIGGER_MODES = new String[] { 
-		AUTO_MODE, NORMAL_MODE, SINGLE_MODE };
+		AUTO_MODE_NAME, SINGLE_MODE_NAME, NORMAL_MODE_NAME };
 
 	public static final String RISING_EDGE_TYPE = "Rising edge";
 	public static final String FALLING_EDGE_TYPE = "Falling edge";
 	public static final String LEVEL_TYPE = "Level";
 
-	public static final  String [] TRIGGER_TYPES = new String[] { 
+	public static final String [] TRIGGER_TYPES = new String[] { 
 		RISING_EDGE_TYPE, FALLING_EDGE_TYPE, LEVEL_TYPE };
 
+	public static final int DC = 0;
+	public static final int AC = 1;
+	
 	public static final int ERROR = 1;
 
 	public static final int NORMAL = 0;
@@ -151,6 +158,9 @@ public class Constant {
 	public static final String AVERAGE_VOLTAGE = "Average voltage";
 	public static final String STANDARD_DEVIATION_VOLTAGE = "Standard deviation of voltage";
 	public static final String FREQUENCY = "Frequency";
+
+	public static final byte CONFIRMATION = (byte) 0xFF;
+	public static final byte REQUEST = (byte) 0x00;
 
 	/**
 	 * Set application's LookAndFeel based on operating system type.

@@ -32,7 +32,10 @@ public class PacketReader {
 		short[] samples;
 		int totalPacketSize;
 		switch (type) {
-			case PacketType.VERTICAL_RANGE :
+			case PacketType.VERTICAL_RANGE_A :
+				// Fallthrough
+				
+			case PacketType.VERTICAL_RANGE_B :
 				// Fallthrough
 
 			case PacketType.HORIZONTAL_RANGE :

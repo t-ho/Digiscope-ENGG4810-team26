@@ -46,7 +46,7 @@ import gui.MainWindowUi;
  *
  * @author ToanHo
  */
-public class MainWindow extends MainWindowUi implements ChartMouseListener{
+public class MainWindow extends MainWindowUi implements ChartMouseListener, ItemListener, ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	private LaunchWindow launchWindow_;
@@ -60,6 +60,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	private PacketWriter packetWriter_;
 	private PacketReader packetReader_;
 
+	private int currentVerticalRangeAIndex = 0;
+	private int currentVerticalRangeBIndex = 0;
+	private int currentHorizontalRangeIndex = 0;
+	
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
 		initialize();
@@ -77,7 +81,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		packetReader_ = new PacketReader(socket.getInputStream());
 		// Create a new thread to handle input stream
 		InputStreamHandler inputStreamHandler = new InputStreamHandler(this, packetReader_, packetWriter_);
-		inputStreamHandler.run();
+		Thread inputStreamHandlerThread = new Thread(inputStreamHandler);
+		inputStreamHandlerThread.start();
 		addComponentToCanvasPanel(chartPanel_);
 		addListenersToComponents();
 	}
@@ -139,159 +144,38 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 			}
 		});
 		
-		channelACheckBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				channelACheckboxItemStateChanged();
-			}
-		});
+		channelACheckBox.addItemListener(this);
 
-		channelBCheckBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				channelBCheckboxItemStateChanged();
-			}
-		});
+		channelBCheckBox.addItemListener(this);
 		
-		mathChannelCheckBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				mathChannelCheckboxItemStateChanged();
-			}
-		});
+		mathChannelCheckBox.addItemListener(this);
 		
-		filterChannelCheckBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				filterChannelCheckboxItemStateChanged();
-			}
-		});
-
-		generatorCheckBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				generatorCheckboxItemStateChanged();
-			}
-		});
-
-		horizontalRangeAComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				horizontalRangeAComboBoxItemStateChanged();
-			}
-		});
-
-		horizontalRangeBComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				horizontalRangeBComboBoxItemStateChanged();
-			}
-		});
-
-		horizontalRangeMathComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				horizontalRangeMathComboBoxItemStateChanged();
-			}
-		});
-
-		horizontalRangeFilterComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				horizontalRangeFilterComboBoxItemStateChanged();
-			}
-		});
+		filterChannelCheckBox.addItemListener(this);
 		
-		horizontalRangeGeneratorComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				horizontalRangeGeneratorComboBoxItemStateChanged();
-			}
-		});
+		generatorCheckBox.addItemListener(this);
+
+		cursorComboBox.addItemListener(this);
+
+		horizontalRangeAComboBox.addActionListener(this);
 		
-		horizontalRangeAComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				horizontalRangeAComboBoxActionPerformed();
-			}
-		});
+		horizontalRangeBComboBox.addActionListener(this);
+
+		horizontalRangeMathComboBox.addActionListener(this);
 		
-		horizontalRangeBComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				horizontalRangeBComboBoxActionPerformed();
-			}
-		});
+		horizontalRangeFilterComboBox.addActionListener(this);
 
-		horizontalRangeMathComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				horizontalRangeMathComboBoxActionPerformed();
-			}
-		});
+		horizontalRangeGeneratorComboBox.addActionListener(this);
+
+		verticalRangeAComboBox.addActionListener(this);
 		
-		horizontalRangeFilterComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				horizontalRangeFilterComboBoxActionPerformed();
-			}
-		});
+		verticalRangeBComboBox.addActionListener(this);
 
-		horizontalRangeGeneratorComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				horizontalRangeGeneratorComboBoxActionPerformed();
-			}
-		});
+		verticalRangeMathComboBox.addActionListener(this);
 
-		verticalRangeAComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				verticalRangeAComboBoxItemStateChanged();
-			}
-		});
+		verticalRangeFilterComboBox.addActionListener(this);
 
-		verticalRangeBComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				verticalRangeBComboBoxItemStateChanged();
-			}
-		});
-
-		verticalRangeMathComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				verticalRangeMathComboBoxItemStateChanged();
-			}
-		});
-
-		verticalRangeFilterComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				verticalRangeFilterComboBoxItemStateChanged();
-			}
-		});
-
-		verticalRangeGeneratorComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				verticalRangeGeneratorComboBoxItemStateChanged();
-			}
-		});
+		verticalRangeGeneratorComboBox.addActionListener(this);
 		
-		verticalRangeAComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				verticalRangeAComboBoxActionPerformed();
-			}
-		});
-
-		cursorComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				cursorComboBoxItemStateChanged();
-			}
-		});
 		
 		verticalOffsetASpinner.addChangeListener(new ChangeListener() {
 			@Override
@@ -481,22 +365,22 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				channelCouplingToggleButtonActionPerformed();
 			}
 		});
+		
+		channelCouplingToggleButton.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				channelCouplingToggleButtonItemStateChaned();
+			}
+		});
 	}
 
-	protected void verticalRangeAComboBoxActionPerformed() {
+
+
+	private void channelCouplingToggleButtonActionPerformed() {
 		// TODO
-		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
-		int verticalRange = convertVoltageStringToMilivolts(selectedItem);
-		CommandPacket commandPacket = new CommandPacket(PacketType.VERTICAL_RANGE, (byte) 0x00, verticalRange);
-		try {
-			packetWriter_.writePacket(commandPacket);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
-	protected void channelCouplingToggleButtonActionPerformed() {
-		// TODO
+	private void channelCouplingToggleButtonItemStateChaned() {
 		if(channelCouplingToggleButton.isSelected()) {
 			channelCouplingToggleButton.setText("DC");
 		} else {
@@ -504,8 +388,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		}
 	}
 
-	protected void removeFilterButtonActionPerformed() {
-		// TODO:
+	private void removeFilterButtonActionPerformed() {
 		String expression = expressionTextArea.getText().trim();
 		if (expression.contains("F")) {
 			int response = JOptionPane.showConfirmDialog(this,
@@ -531,8 +414,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		csvFilePathTextField.setText("Choose CSV file");
 	}
 
-	protected void inputChannelComboBoxActionPerformed() {
-		// TODO
+	private void inputChannelComboBoxActionPerformed() {
 		calculateFilterChannel();
 		String inputChannel = (String) inputChannelComboBox.getSelectedItem();
 		if(inputChannel != null) {
@@ -542,8 +424,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		}
 	}
 
-	protected void browseButtonActionPerformed() {
-		// TODO
+	private void browseButtonActionPerformed() {
 		String iconPath = "/icons/csv_icon_16x16.png";
 		String decription = "Comma-separated-values file (*." + Constant.CSV_FILE_EXTENSION + ")";
 		FileChooserUi fileChooser = new FileChooserUi(JFileChooser.FILES_ONLY,
@@ -570,8 +451,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		}
 	}
 
-	protected void removeExpressionButtonActionPerformed() {
-		// TODO
+	private void removeExpressionButtonActionPerformed() {
 		if(inputChannelComboBox.getSelectedItem().equals(Constant.MATH_CHANNEL)) {
 			int response = JOptionPane.showConfirmDialog(this, 
 					"The FILTER channel is derived from this channel.\n" + 
@@ -597,8 +477,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		updateInputChannelComboBox();
 	}
 
-	protected void editExpressionButtonActionPerformed() {
-		// TODO
+	private void editExpressionButtonActionPerformed() {
 		String expression = expressionTextArea.getText();
 		ExpressionDialog expressionDialog = new ExpressionDialog(this, expression);
 		expressionDialog.setVisible(true);
@@ -606,48 +485,47 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 	}
 
 	private void newExpressionButtonActionPerformed() {
-		// TODO
 		ExpressionDialog expressionDialog = new ExpressionDialog(this);
 		expressionDialog.setVisible(true);
 	}
 
-	protected void verticalOffsetUnitAComboBoxItemStateChanged() {
+	private void verticalOffsetUnitAComboBoxItemStateChanged() {
 		verticalOffsetASpinner.setValue(0);
 	}
 
-	protected void verticalOffsetUnitBComboBoxItemStateChanged() {
+	private void verticalOffsetUnitBComboBoxItemStateChanged() {
 		verticalOffsetBSpinner.setValue(0);
 	}
 
-	protected void verticalOffsetUnitMathComboBoxItemStateChanged() {
+	private void verticalOffsetUnitMathComboBoxItemStateChanged() {
 		verticalOffsetMathSpinner.setValue(0);
 	}
 
-	protected void verticalOffsetUnitFilterComboBoxItemStateChanged() {
+	private void verticalOffsetUnitFilterComboBoxItemStateChanged() {
 		verticalOffsetFilterSpinner.setValue(0);
 	}
 
-	protected void verticalOffsetUnitGeneratorComboBoxItemStateChanged() {
+	private void verticalOffsetUnitGeneratorComboBoxItemStateChanged() {
 		verticalOffsetGeneratorSpinner.setValue(0);
 	}
 
-	protected void horizontalOffsetUnitAComboBoxItemStateChanged() {
+	private void horizontalOffsetUnitAComboBoxItemStateChanged() {
 		horizontalOffsetASpinner.setValue(0);
 	}
 
-	protected void horizontalOffsetUnitBComboBoxItemStateChanged() {
+	private void horizontalOffsetUnitBComboBoxItemStateChanged() {
 		horizontalOffsetBSpinner.setValue(0);
 	}
 
-	protected void horizontalOffsetUnitMathComboBoxItemStateChanged() {
+	private void horizontalOffsetUnitMathComboBoxItemStateChanged() {
 		horizontalOffsetMathSpinner.setValue(0);
 	}
 
-	protected void horizontalOffsetUnitFilterComboBoxItemStateChanged() {
+	private void horizontalOffsetUnitFilterComboBoxItemStateChanged() {
 		horizontalOffsetFilterSpinner.setValue(0);
 	}
 
-	protected void horizontalOffsetUnitGeneratorComboBoxItemStateChanged() {
+	private void horizontalOffsetUnitGeneratorComboBoxItemStateChanged() {
 		horizontalOffsetGeneratorSpinner.setValue(0);
 	}
 
@@ -705,239 +583,40 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		visualizer_.addSeriesToDataset(Constant.GENERATOR_INDEX, generatorSeries);
 	}
 
-	private void cursorComboBoxItemStateChanged() {
-		// TODO
-		String selectChannel = (String) cursorComboBox.getSelectedItem();
-		if(selectChannel == Constant.CHANNEL_A) {
-			showCursorMeasurement(Constant.A_INDEX);
-			cursorVerticalValueLabel.setForeground(Constant.A_COLOR);
-		} else if(selectChannel == Constant.CHANNEL_B) {
-			showCursorMeasurement(Constant.B_INDEX);
-			cursorVerticalValueLabel.setForeground(Constant.B_COLOR);
-		} else if(selectChannel == Constant.MATH_CHANNEL) {
-			showCursorMeasurement(Constant.MATH_INDEX);
-			cursorVerticalValueLabel.setForeground(Constant.MATH_COLOR);
-		} else if(selectChannel == Constant.FILTER_CHANNEL) {
-			showCursorMeasurement(Constant.FILTER_INDEX);
-			cursorVerticalValueLabel.setForeground(Constant.FILTER_COLOR);
-		} else if(selectChannel == Constant.GENERATOR_CHANNEL) {
-			showCursorMeasurement(Constant.GENERATOR_INDEX);
-			cursorVerticalValueLabel.setForeground(Constant.GENERATOR_COLOR);
-		} else {
-			hideCursorMeasurement();
-			cursorVerticalValueLabel.setForeground(Color.BLACK);
-		}
-	}
-
-	private void horizontalRangeAComboBoxActionPerformed() {
+	/**
+	 * Send horizontal range command packet to the device
+	 * @param timeString 
+	 */
+	private void sendHorizontalRangeCommandPacket(String timeString) {
 		// TODO 
-		int selectedIndex = horizontalRangeAComboBox.getSelectedIndex();
-		horizontalRangeBComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeMathComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeFilterComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeGeneratorComboBox.setSelectedIndex(selectedIndex);
-	}
-
-	private void horizontalRangeBComboBoxActionPerformed() {
-		// TODO 
-		int selectedIndex = horizontalRangeBComboBox.getSelectedIndex();
-		horizontalRangeAComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeMathComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeFilterComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeGeneratorComboBox.setSelectedIndex(selectedIndex);
-	}
-
-	private void horizontalRangeMathComboBoxActionPerformed() {
-		// TODO
-		int selectedIndex = horizontalRangeMathComboBox.getSelectedIndex();
-		horizontalRangeAComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeBComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeFilterComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeGeneratorComboBox.setSelectedIndex(selectedIndex);
-	}
-
-	private void horizontalRangeFilterComboBoxActionPerformed() {
-		// TODO
-		int selectedIndex = horizontalRangeFilterComboBox.getSelectedIndex();
-		horizontalRangeAComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeBComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeMathComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeGeneratorComboBox.setSelectedIndex(selectedIndex);
-	}
-
-	private void horizontalRangeGeneratorComboBoxActionPerformed() {
-		// TODO
-		int selectedIndex = horizontalRangeGeneratorComboBox.getSelectedIndex();
-		horizontalRangeAComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeBComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeMathComboBox.setSelectedIndex(selectedIndex);
-		horizontalRangeFilterComboBox.setSelectedIndex(selectedIndex);
-	}
-
-	private void horizontalRangeAComboBoxItemStateChanged() {
-		// TODO
-		String selectedItem = (String) horizontalRangeAComboBox.getSelectedItem();
-		int horizontalRange = convertTimeStringToMicroSeconds(selectedItem);
-		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
-		showMeasurementResults(Constant.A_INDEX);
-		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
-	}
-
-	private void horizontalRangeBComboBoxItemStateChanged() {
-		// TODO
-		String selectedItem = (String) horizontalRangeBComboBox.getSelectedItem();
-		int horizontalRange = convertTimeStringToMicroSeconds(selectedItem);
-		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
-		showMeasurementResults(Constant.B_INDEX);
-		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
-	}
-
-	private void horizontalRangeMathComboBoxItemStateChanged() {
-		// TODO
-		String selectedItem = (String) horizontalRangeMathComboBox.getSelectedItem();
-		int horizontalRange = convertTimeStringToMicroSeconds(selectedItem);
-		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
-		showMeasurementResults(Constant.MATH_INDEX);
-		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
-	}
-
-	private void horizontalRangeFilterComboBoxItemStateChanged() {
-		// TODO
-		String selectedItem = (String) horizontalRangeFilterComboBox.getSelectedItem();
-		int horizontalRange = convertTimeStringToMicroSeconds(selectedItem);
-		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
-		showMeasurementResults(Constant.FILTER_INDEX);
-		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
-	}
-
-	private void horizontalRangeGeneratorComboBoxItemStateChanged() {
-		// TODO
-		String selectedItem = (String) horizontalRangeGeneratorComboBox.getSelectedItem();
-		int horizontalRange = convertTimeStringToMicroSeconds(selectedItem);
-		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
-		horizontalDivisionInfoLabel.setText("Horizontal: " + selectedItem + "/div");
-	}
-
-	private void verticalRangeAComboBoxItemStateChanged() {
-		// TODO
-		String selectedItem = (String) verticalRangeAComboBox.getSelectedItem();
-		double verticalRange = convertVoltageStringToVolts(selectedItem);
-		visualizer_.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
-		showMeasurementResults(Constant.A_INDEX);
-		if(measuredChannelIndex_ == Constant.A_INDEX) {
-			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+		int horizontalRange = convertTimeStringToMicroSeconds(timeString);
+		CommandPacket commandPacket = new CommandPacket(PacketType.HORIZONTAL_RANGE, Constant.REQUEST, horizontalRange);
+		try {
+			packetWriter_.writePacket(commandPacket);
+			System.out.println("Sent horizontal range: " + horizontalRange);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		aDivisionInfoLabel.setText("A: " + selectedItem + "/div");
 	}
 
-	private void verticalRangeBComboBoxItemStateChanged() {
-		// TODO
-		String selectedItem = (String) verticalRangeBComboBox.getSelectedItem();
-		double verticalRange = convertVoltageStringToVolts(selectedItem);
-		visualizer_.setValueForVerticalGridSpacing(Constant.B_INDEX, verticalRange);
-		showMeasurementResults(Constant.B_INDEX);
-		if(measuredChannelIndex_ == Constant.B_INDEX) {
-			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
-		}
-		bDivisionInfoLabel.setText("B: " + selectedItem + "/div");
-	}
-
-	private void verticalRangeMathComboBoxItemStateChanged() {
-		// TODO
-		String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();
-		double verticalRange = convertVoltageStringToVolts(selectedItem);
-		visualizer_.setValueForVerticalGridSpacing(Constant.MATH_INDEX, verticalRange);
-		showMeasurementResults(Constant.MATH_INDEX);
-		if(measuredChannelIndex_ == Constant.MATH_INDEX) {
-			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
-		}
-		mathDivisionInfoLabel.setText("Math: " + selectedItem + "/div");
-	}
-
-	private void verticalRangeFilterComboBoxItemStateChanged() {
-		// TODO
-		String selectedItem = (String) verticalRangeFilterComboBox.getSelectedItem();
-		double verticalRange = convertVoltageStringToVolts(selectedItem);
-		visualizer_.setValueForVerticalGridSpacing(Constant.FILTER_INDEX, verticalRange);
-		showMeasurementResults(Constant.FILTER_INDEX);
-		if(measuredChannelIndex_ == Constant.FILTER_INDEX) {
-			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
-		}
-		filterDivisionInfoLabel.setText("Filter: " + selectedItem + "/div");
-	}
-
-	private void verticalRangeGeneratorComboBoxItemStateChanged() {
-		// TODO
-		String selectedItem = (String) verticalRangeGeneratorComboBox.getSelectedItem();
-		double verticalRange = convertVoltageStringToVolts(selectedItem);
-		visualizer_.setValueForVerticalGridSpacing(Constant.GENERATOR_INDEX, verticalRange);
-		if(measuredChannelIndex_ == Constant.GENERATOR_INDEX) {
-			visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
-		}
-		generatorDivisionInfoLabel.setText("Generator: " + selectedItem + "/div");
-	}
-
-	private void channelACheckboxItemStateChanged() {
-		// TODO
-		if (channelACheckBox.isSelected()) {
-			setEnabledChannelAControls(true);
-			showTab(Constant.TAB.CHANNEL_A);
-			showChannelPlotOnChartPanel(Constant.CHANNEL_A);
-		} else {
-			setEnabledChannelAControls(false);
-			removeChannelPlotFromChartPanel(Constant.CHANNEL_A);
-		}
-	}	
 	
-	private void channelBCheckboxItemStateChanged() {
-		// TODO
-		if(channelBCheckBox.isSelected()) {
-			setEnabledChannelBControls(true);
-			showTab(Constant.TAB.CHANNEL_B);
-			showChannelPlotOnChartPanel(Constant.CHANNEL_B);
-		} else {
-			setEnabledChannelBControls(false);
-			removeChannelPlotFromChartPanel(Constant.CHANNEL_B);
+	/**
+	 * Send vertical range command packet to the device
+	 * @param packetType packet type
+	 * @param voltageString the voltage string
+	 */
+	private void sendVerticalRangeCommandPacket(byte packetType, String voltageString) {
+		// TODO:
+		int verticalRange = convertVoltageStringToMicrovolts(voltageString);
+		CommandPacket commandPacket = new CommandPacket(packetType, Constant.REQUEST, verticalRange);
+		try {
+			packetWriter_.writePacket(commandPacket);
+			System.out.println("Sent Vertical range: " + verticalRange);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-	private void mathChannelCheckboxItemStateChanged() {
-		// TODO
-		if(mathChannelCheckBox.isSelected()) {
-			setEnabledMathChannelControls(true);
-			showTab(Constant.TAB.MATH_CHANNEL);
-			showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
-		} else {
-			setEnabledMathChannelControls(false);
-			removeChannelPlotFromChartPanel(Constant.MATH_CHANNEL);
-		}
-	}
-	
-	private void filterChannelCheckboxItemStateChanged() {
-		// TODO
-		if(filterChannelCheckBox.isSelected()) {
-			setEnabledFilterChannelControls(true);
-			showTab(Constant.TAB.FILTER_CHANNEL);
-			updateInputChannelComboBox();
-			showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
-		} else {
-			setEnabledFilterChannelControls(false);
-			removeChannelPlotFromChartPanel(Constant.FILTER_CHANNEL);
-		}
-	}
-
-	private void generatorCheckboxItemStateChanged() {
-		// TODO
-		if(generatorCheckBox.isSelected()) {
-			setEnabledGeneratorChannelControls(true);
-			showTab(Constant.TAB.GENERATOR_CHANNEL);
-			showChannelPlotOnChartPanel(Constant.GENERATOR_CHANNEL);
-		} else {
-			setEnabledGeneratorChannelControls(false);
-			removeChannelPlotFromChartPanel(Constant.GENERATOR_CHANNEL);
-		}
-	}
-	
 	/**
 	 * Update inputChannelCombox's items for filter channel by adding 
 	 * available channels and remove unavailable ones to/from the list.
@@ -1019,99 +698,97 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				break;
 
 			default:
-				// Cannot reach here
-				value = 0.02;
+				System.err.println("Cannot convert the specified voltage string to volts");
 		}
 		return value;
 	}
 
 	/**
-	 * Convert the voltage string to milivolts
+	 * Convert the voltage string to microvolts
 	 * @param voltString The voltage string. e.g. 200 mV, 1 V,...
-	 * @return the voltage in milivolts
+	 * @return the voltage in microvolts
 	 */
-	private int convertVoltageStringToMilivolts(String voltString) {
+	private int convertVoltageStringToMicrovolts(String voltString) {
 		int value = 0;
 		switch(voltString) {
 			case Constant.TWENTY_MILIVOLTS :
-				value = 20;
+				value = 20000;
 				break;
 
 			case Constant.FIFTY_MILIVOLTS :
-				value = 50;
+				value = 50000;
 				break;
 
 			case Constant.ONE_HUNDRED_MILIVOLTS :
-				value = 100;
+				value = 100000;
 				break;
 
 			case Constant.TWO_HUNDRED_MILIVOLTS :
-				value = 200;
+				value = 200000;
 				break;
 
 			case Constant.FIVE_HUNDRED_MILIVOLTS :
-				value = 500;
+				value = 500000;
 				break;
 
 			case Constant.ONE_VOLT :
-				value = 1000;
+				value = 1000000;
 				break;
 
 			case Constant.TWO_VOLTS :
-				value = 2000;
+				value = 2000000;
 				break;
 
 			default:
-				// Cannot reach here
-				value = 20;
+				System.err.println("Cannot convert the specified voltage string to milivolts");
 		}
 		return value;
 	}
 
 	/**
-	 * Convert the milivolts to voltage string
+	 * Convert the microvolts to voltage string
 	 * @param milivolts The specified milivolts
 	 * @return the voltage string 
 	 */
-	private String convertMilivoltsToVoltageString(int milivolts) {
+	private String convertMicrovoltsToVoltageString(int microvolts) {
 		String string = "";
-		switch(milivolts) {
-			case 20 :
+		switch(microvolts) {
+			case 20000 :
 				string = Constant.TWENTY_MILIVOLTS;
 				break;
 
-			case 50 :
+			case 50000 :
 				string = Constant.FIFTY_MILIVOLTS;
 				break;
 
-			case 100 :
+			case 100000 :
 				string = Constant.ONE_HUNDRED_MILIVOLTS;
 				break;
 
-			case 200 :
+			case 200000 :
 				string = Constant.TWO_HUNDRED_MILIVOLTS;
 				break;
 
-			case 500 :
+			case 500000 :
 				string = Constant.FIVE_HUNDRED_MILIVOLTS;
 				break;
 
-			case 1000 :
+			case 1000000 :
 				string = Constant.ONE_VOLT;
 				break;
 
-			case 2000 :
+			case 2000000 :
 				string = Constant.TWO_VOLTS; 
 				break;
 
 			default:
-				// Ignore
+				System.err.println("Cannot convert " + microvolts + " milivolts to voltage string.");
 		}
 		return string;
 	}
 
 	/**
-	 * Change time string to micro seconds
+	 * Convert time string to micro seconds
 	 * @param timeString The time string. e.g. 1 us, 500 ms
 	 * @return the microseconds
 	 */
@@ -1195,10 +872,99 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 				break;
 
 			default:
-				// Cannot reach here
-				value = 1;
+				System.err.println("Cannot convert the specified time string to microseconds");
 		}
 		return value;
+	}
+	
+	/**
+	 * Convert micro seconds to time string
+	 * @param microSeconds
+	 * @return the time string 
+	 */
+	private String convertMicroSecondsToTimeString(int microSeconds) {
+		String timeString = "";
+		switch (microSeconds) {
+		case 1:
+			timeString = Constant.ONE_MICROSECOND;
+			break;
+
+		case 2:
+			timeString = Constant.TWO_MICROSECONDS;
+			break;
+
+		case 5:
+			timeString = Constant.FIVE_MICROSECONDS;
+			break;
+
+		case 10:
+			timeString = Constant.TEN_MICROSECONDS;
+			break;
+
+		case 20:
+			timeString = Constant.TWENTY_MICROSECONDS;
+			break;
+
+		case 50:
+			timeString = Constant.FIFTY_MICROSECONDS;
+			break;
+
+		case 100:
+			timeString = Constant.ONE_HUNDRED_MICROSECONDS;
+			break;
+
+		case 200:
+			timeString = Constant.TWO_HUNDRED_MICROSECONDS;
+			break;
+
+		case 500:
+			timeString = Constant.FIVE_HUNDRED_MICROSECONDS;
+			break;
+
+		case 1000:
+			timeString = Constant.ONE_MILISECOND;
+			break;
+
+		case 2000:
+			timeString = Constant.TWO_MILISECONDS;
+			break;
+
+		case 5000:
+			timeString = Constant.FIVE_MILISECONDS;
+			break;
+
+		case 10000:
+			timeString = Constant.TEN_MILISECONDS;
+			break;
+
+		case 20000:
+			timeString = Constant.TWENTY_MILISECONDS;
+			break;
+
+		case 50000:
+			timeString = Constant.FIFTY_MILISECONDS;
+			break;
+
+		case 100000:
+			timeString = Constant.ONE_HUNDRED_MILISECONDS;
+			break;
+
+		case 200000:
+			timeString = Constant.TWO_HUNDRED_MILISECONDS;
+			break;
+
+		case 500000:
+			timeString = Constant.FIVE_HUNDRED_MILISECONDS;
+			break;
+
+		case 1000000:
+			timeString = Constant.ONE_SECOND;
+			break;
+
+		default:
+			System.err.println("Cannot convert " + microSeconds + " us to time String.");
+		}
+		return timeString;
 	}
 	
 	/**
@@ -1519,7 +1285,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 						filterSeries.add(derivedSeries.getDataItem(n).getX(), result);
 					}
 				} else if (filterFile_.getType() == Constant.IIR) {
-					// TODO:
 					ArrayList<Double> secondColumn = filterFile_.getSecondColumn();
 					for (int n = 0; n < derivedSeries.getItemCount(); n++) {
 						Double firstSum = 0.0;
@@ -1697,12 +1462,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 
 	@Override
 	public void chartMouseClicked(ChartMouseEvent event) {
-		// TODO
 	}
 
 	@Override
 	public void chartMouseMoved(ChartMouseEvent event) {
-		// TODO
         Rectangle2D dataArea = this.chartPanel_.getScreenDataArea();
         JFreeChart chart = event.getChart();
         XYPlot plot = (XYPlot) chart.getPlot();
@@ -1740,8 +1503,313 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener{
 		this.packetReader_ = packetReader_;
 	}
 	
-	public void setVerticalRangeForChannelA(int milivolts) {
-		String item = convertMilivoltsToVoltageString(milivolts);
-		verticalRangeAComboBox.setSelectedItem(item);
+	/**
+	 * Set horizontal range
+	 * @param microSeconds
+	 */
+	public void setHorizontalRange(int microSeconds) {
+		String timeString = convertMicroSecondsToTimeString(microSeconds);
+		horizontalRangeAComboBox.removeActionListener(this);
+		horizontalRangeBComboBox.removeActionListener(this);
+		horizontalRangeMathComboBox.removeActionListener(this);
+		horizontalRangeFilterComboBox.removeActionListener(this);
+		horizontalRangeGeneratorComboBox.removeActionListener(this);
+
+		horizontalRangeAComboBox.setSelectedItem(timeString);
+		horizontalRangeBComboBox.setSelectedItem(timeString);
+		horizontalRangeMathComboBox.setSelectedItem(timeString);
+		horizontalRangeFilterComboBox.setSelectedItem(timeString);
+		horizontalRangeGeneratorComboBox.setSelectedItem(timeString);
+
+		horizontalRangeAComboBox.addActionListener(this);
+		horizontalRangeBComboBox.addActionListener(this);
+		horizontalRangeMathComboBox.addActionListener(this);
+		horizontalRangeFilterComboBox.addActionListener(this);
+		horizontalRangeGeneratorComboBox.addActionListener(this);
+
+		int horizontalRange = convertTimeStringToMicroSeconds(timeString);
+		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
+		showMeasurementResults(Constant.A_INDEX);
+		showMeasurementResults(Constant.B_INDEX);
+		showMeasurementResults(Constant.MATH_INDEX);
+		showMeasurementResults(Constant.FILTER_INDEX);
+		showMeasurementResults(Constant.GENERATOR_INDEX);
+		horizontalDivisionInfoLabel.setText("Horizontal: " + timeString + "/div");
+		currentHorizontalRangeIndex = horizontalRangeAComboBox.getSelectedIndex();
+	}
+	
+	/**
+	 * Set vertical range for the specified channel
+	 * @param channelName The specified channel's name
+	 * @param microvolts
+	 */
+	public void setVerticalRange(String channelName, int microvolts) {
+		String voltageString = convertMicrovoltsToVoltageString(microvolts);
+		if (channelName.equals(Constant.CHANNEL_A)) {
+			verticalRangeAComboBox.removeActionListener(this);
+			verticalRangeAComboBox.setSelectedItem(voltageString);
+			verticalRangeAComboBox.addActionListener(this);
+			currentVerticalRangeAIndex = verticalRangeAComboBox.getSelectedIndex();
+			double verticalRange = convertVoltageStringToVolts(voltageString);
+			visualizer_.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
+			showMeasurementResults(Constant.A_INDEX);
+			if (measuredChannelIndex_ == Constant.A_INDEX) {
+				visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+			}
+			aDivisionInfoLabel.setText("A: " + voltageString + "/div");
+
+		} else if(channelName.equals(Constant.CHANNEL_B)) {
+			verticalRangeBComboBox.removeActionListener(this);
+			verticalRangeBComboBox.setSelectedItem(voltageString);
+			verticalRangeBComboBox.addActionListener(this);
+			currentVerticalRangeBIndex = verticalRangeBComboBox.getSelectedIndex();
+			double verticalRange = convertVoltageStringToVolts(voltageString);
+			visualizer_.setValueForVerticalGridSpacing(Constant.B_INDEX, verticalRange);
+			showMeasurementResults(Constant.B_INDEX);
+			if(measuredChannelIndex_ == Constant.B_INDEX) {
+				visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+			}
+			bDivisionInfoLabel.setText("B: " + voltageString + "/div");
+			
+		} else {
+			System.err.println("The channel named \"" + channelName + "\" does not exists.");
+		}
+	}
+	
+	/**
+	 * Set trigger mode
+	 * @param triggerMode
+	 */
+	public void setTriggerMode(int triggerMode) {
+		if(triggerMode >= 0 && triggerMode <= 2) {
+			triggerModeComboBox.setSelectedIndex(triggerMode);
+		} else {
+			System.err.println("Trigger mode is out of range.");
+		}
+	}
+	
+	/**
+	 * Set trigger type
+	 * @param triggerType
+	 */
+	public void setTriggerType(int triggerType) {
+		if(triggerType >= 0 && triggerType <= 2) {
+			triggerTypeComboBox.setSelectedIndex(triggerType);
+		} else {
+			System.err.println("Trigger type is out of range.");
+		}
+	}
+	
+	/**
+	 * Set channel coupling
+	 * @param channelCoupling
+	 */
+	public void setChannelCoupling(int channelCoupling) {
+		if(channelCoupling == Constant.DC) {
+			channelCouplingToggleButton.setSelected(true);
+		} else {
+			channelCouplingToggleButton.setSelected(false);
+		}
+	}
+	
+	/**
+	 * Set XYSeries for the specified channel
+	 * @param channelName channel's name
+	 * @param xYSeries
+	 */
+	public void setXYSeriesForChannel(String channelName, XYSeries xYSeries) {
+		rawXYSeries.put(channelName, xYSeries);
+		if(channelName.equals(Constant.CHANNEL_A)) {
+			if(channelACheckBox.isSelected()) {
+				refreshChannelPlotOnChartPanel(channelName);
+			}
+		} else if(channelName.equals(Constant.CHANNEL_B)) {
+			if(channelBCheckBox.isSelected()) {
+				refreshChannelPlotOnChartPanel(channelName);
+			}
+		}
+	}
+
+	/**
+	 * Get maximum voltage displayed on screen
+	 * @param channelIndex
+	 * @return
+	 */
+	public double getMaxDisplayVoltage(int channelIndex) {
+		return visualizer_.getVerticalRange(channelIndex).getUpperBound();
+	}
+	
+	/**
+	 * Get minimum voltage displayed on screen
+	 * @param channelIndex
+	 * @return
+	 */
+	public double getMinDisplayVoltage(int channelIndex) {
+		return visualizer_.getVerticalRange(channelIndex).getLowerBound();
+	}
+
+	@Override
+	public void itemStateChanged(ItemEvent event) {
+		// TODO Auto-generated method stub
+		Object source = event.getSource();
+		if (source == channelACheckBox) {
+			if (channelACheckBox.isSelected()) {
+				setEnabledChannelAControls(true);
+				showTab(Constant.TAB.CHANNEL_A);
+				showChannelPlotOnChartPanel(Constant.CHANNEL_A);
+			} else {
+				setEnabledChannelAControls(false);
+				removeChannelPlotFromChartPanel(Constant.CHANNEL_A);
+			}
+
+		} else if (source == channelBCheckBox) {
+			if (channelBCheckBox.isSelected()) {
+				setEnabledChannelBControls(true);
+				showTab(Constant.TAB.CHANNEL_B);
+				showChannelPlotOnChartPanel(Constant.CHANNEL_B);
+			} else {
+				setEnabledChannelBControls(false);
+				removeChannelPlotFromChartPanel(Constant.CHANNEL_B);
+			}
+
+		} else if (source == mathChannelCheckBox) {
+			if (mathChannelCheckBox.isSelected()) {
+				setEnabledMathChannelControls(true);
+				showTab(Constant.TAB.MATH_CHANNEL);
+				showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
+			} else {
+				setEnabledMathChannelControls(false);
+				removeChannelPlotFromChartPanel(Constant.MATH_CHANNEL);
+			}
+
+		} else if (source == filterChannelCheckBox) {
+			if (filterChannelCheckBox.isSelected()) {
+				setEnabledFilterChannelControls(true);
+				showTab(Constant.TAB.FILTER_CHANNEL);
+				updateInputChannelComboBox();
+				showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
+			} else {
+				setEnabledFilterChannelControls(false);
+				removeChannelPlotFromChartPanel(Constant.FILTER_CHANNEL);
+			}
+
+		} else if (source == generatorCheckBox) {
+			if (generatorCheckBox.isSelected()) {
+				setEnabledGeneratorChannelControls(true);
+				showTab(Constant.TAB.GENERATOR_CHANNEL);
+				showChannelPlotOnChartPanel(Constant.GENERATOR_CHANNEL);
+			} else {
+				setEnabledGeneratorChannelControls(false);
+				removeChannelPlotFromChartPanel(Constant.GENERATOR_CHANNEL);
+			}
+
+		} else if (source == cursorComboBox) {
+			String selectChannel = (String) cursorComboBox.getSelectedItem();
+			if (selectChannel == Constant.CHANNEL_A) {
+				showCursorMeasurement(Constant.A_INDEX);
+				cursorVerticalValueLabel.setForeground(Constant.A_COLOR);
+			} else if (selectChannel == Constant.CHANNEL_B) {
+				showCursorMeasurement(Constant.B_INDEX);
+				cursorVerticalValueLabel.setForeground(Constant.B_COLOR);
+			} else if (selectChannel == Constant.MATH_CHANNEL) {
+				showCursorMeasurement(Constant.MATH_INDEX);
+				cursorVerticalValueLabel.setForeground(Constant.MATH_COLOR);
+			} else if (selectChannel == Constant.FILTER_CHANNEL) {
+				showCursorMeasurement(Constant.FILTER_INDEX);
+				cursorVerticalValueLabel.setForeground(Constant.FILTER_COLOR);
+			} else if (selectChannel == Constant.GENERATOR_CHANNEL) {
+				showCursorMeasurement(Constant.GENERATOR_INDEX);
+				cursorVerticalValueLabel.setForeground(Constant.GENERATOR_COLOR);
+			} else {
+				hideCursorMeasurement();
+				cursorVerticalValueLabel.setForeground(Color.BLACK);
+			}
+
+		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent event) {
+		// TODO Auto-generated method stub
+		Object source = event.getSource();
+		if (source == horizontalRangeAComboBox) {
+			String timeString = (String) horizontalRangeAComboBox.getSelectedItem();
+			horizontalRangeAComboBox.removeActionListener(this);
+			horizontalRangeAComboBox.setSelectedIndex(currentHorizontalRangeIndex);
+			horizontalRangeAComboBox.addActionListener(this);
+			sendHorizontalRangeCommandPacket(timeString);
+			
+		} else if (source == horizontalRangeBComboBox) {
+			String timeString = (String) horizontalRangeBComboBox.getSelectedItem();
+			horizontalRangeBComboBox.removeActionListener(this);
+			horizontalRangeBComboBox.setSelectedIndex(currentHorizontalRangeIndex);
+			horizontalRangeBComboBox.addActionListener(this);
+			sendHorizontalRangeCommandPacket(timeString);
+			
+		} else if (source == horizontalRangeMathComboBox) {
+			String timeString = (String) horizontalRangeMathComboBox.getSelectedItem();
+			horizontalRangeMathComboBox.removeActionListener(this);
+			horizontalRangeMathComboBox.setSelectedIndex(currentHorizontalRangeIndex);
+			horizontalRangeMathComboBox.addActionListener(this);
+			sendHorizontalRangeCommandPacket(timeString);
+			
+		} else if (source == horizontalRangeFilterComboBox) {
+			String timeString = (String) horizontalRangeFilterComboBox.getSelectedItem();
+			horizontalRangeFilterComboBox.removeActionListener(this);
+			horizontalRangeFilterComboBox.setSelectedIndex(currentHorizontalRangeIndex);
+			horizontalRangeFilterComboBox.addActionListener(this);
+			sendHorizontalRangeCommandPacket(timeString);
+			
+		} else if (source == horizontalRangeGeneratorComboBox) {
+			String timeString = (String) horizontalRangeGeneratorComboBox.getSelectedItem();
+			horizontalRangeGeneratorComboBox.removeActionListener(this);
+			horizontalRangeGeneratorComboBox.setSelectedIndex(currentHorizontalRangeIndex);
+			horizontalRangeGeneratorComboBox.addActionListener(this);
+			sendHorizontalRangeCommandPacket(timeString);
+			
+		} else if (source == verticalRangeAComboBox) {
+			String voltageString = (String) verticalRangeAComboBox.getSelectedItem();
+			verticalRangeAComboBox.removeActionListener(this);
+			verticalRangeAComboBox.setSelectedIndex(currentVerticalRangeAIndex);
+			verticalRangeAComboBox.addActionListener(this);
+			sendVerticalRangeCommandPacket(PacketType.VERTICAL_RANGE_A, voltageString);
+
+		} else if (source == verticalRangeBComboBox) {
+			String voltageString = (String) verticalRangeBComboBox.getSelectedItem();
+			verticalRangeBComboBox.removeItemListener(this);
+			verticalRangeBComboBox.setSelectedIndex(currentVerticalRangeBIndex);
+			verticalRangeBComboBox.addItemListener(this);
+			sendVerticalRangeCommandPacket(PacketType.VERTICAL_RANGE_B, voltageString);
+
+		} else if (source == verticalRangeMathComboBox) {
+			String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();
+			double verticalRange = convertVoltageStringToVolts(selectedItem);
+			visualizer_.setValueForVerticalGridSpacing(Constant.MATH_INDEX, verticalRange);
+			showMeasurementResults(Constant.MATH_INDEX);
+			if (measuredChannelIndex_ == Constant.MATH_INDEX) {
+				visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+			}
+			mathDivisionInfoLabel.setText("Math: " + selectedItem + "/div");
+
+		} else if (source == verticalRangeFilterComboBox) {
+			String selectedItem = (String) verticalRangeFilterComboBox.getSelectedItem();
+			double verticalRange = convertVoltageStringToVolts(selectedItem);
+			visualizer_.setValueForVerticalGridSpacing(Constant.FILTER_INDEX, verticalRange);
+			showMeasurementResults(Constant.FILTER_INDEX);
+			if (measuredChannelIndex_ == Constant.FILTER_INDEX) {
+				visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+			}
+			filterDivisionInfoLabel.setText("Filter: " + selectedItem + "/div");
+
+		} else if (source == verticalRangeGeneratorComboBox) {
+			String selectedItem = (String) verticalRangeGeneratorComboBox.getSelectedItem();
+			double verticalRange = convertVoltageStringToVolts(selectedItem);
+			visualizer_.setValueForVerticalGridSpacing(Constant.GENERATOR_INDEX, verticalRange);
+			if (measuredChannelIndex_ == Constant.GENERATOR_INDEX) {
+				visualizer_.setValueForCommonVerticalGridSpacing(verticalRange);
+			}
+			generatorDivisionInfoLabel.setText("Generator: " + selectedItem + "/div");
+
+		}	
 	}
 }
