@@ -2,6 +2,10 @@
 
 \usepackage{bytefield}
 \usepackage{float}
+\usepackage{hyperref}
+\usepackage{textcomp}
+
+\usepackage[a4paper, margin=1.5cm]{geometry}
 
 %opening
 \title{ENGG4810 Oscilloscope Communication Protocol Specification}
@@ -15,13 +19,14 @@
 	\texttt{minh.ho2@uq.net.au}
 }
 
+
 \begin{document}
 
 \maketitle
 
 \section{Packet Types}
 
-$n_1$ and $n_2$ refer to the first and second nibbles of the argument bytes respectively.
+Values are signed 32 bit integers unless otherwise stated.
 
 \begin{table}[H]
 	\renewcommand{\arraystretch}{1.2}
@@ -29,18 +34,35 @@ $n_1$ and $n_2$ refer to the first and second nibbles of the argument bytes resp
 	\begin{tabular}{|c|c|c|}
 		\hline
 		\textbf{Identifier} & \textbf{Type} & \textbf{Value} \\ \hline
-		0x01 & Vertical Range & $n_1 \times 10^{n_2}$ u s \\ \hline
-		0x02 & Horizontal Range & \\ \hline
-		0x03 & Trigger Mode & 0:Auto, 1:Single, 2:Normal \\ \hline
-		0x04 & Trigger Type & 0:Level, 1:Rising, 2:Falling \\ \hline
-		0x05 & Trigger Threshold &  \\ \hline
-		0x0C & Channel Coupling & 0 for DC, other for AC \\ \hline
-		0xD1 & 8 bit sample packet, channel 1 & uint8[ ] \\ \hline
-		0xD2 & 8 bit sample packet, channel 2 & uint8[ ] \\ \hline
-		0xE1 & 12 bit sample packet, channel 1 & uint16[ ] \\ \hline
-		0xE2 & 12 bit sample packet, channel 2 & uint16[ ] \\ \hline
-		0xEE & Keep alive & - \\ \hline
+		0x02 & Horizontal Range & Range in \textmu s \\ \hline
+		0xA1 & Channel A Vertical Range & Range in \textmu V \\ \hline
+		0xB1 & Channel B Vertical Range & Range in \textmu V \\ \hline
+		0xA3 & Channel A Trigger Mode & 0:Auto, 1:Single, 2:Normal \\ \hline
+		0xB3 & Channel B Trigger Mode & 0:Auto, 1:Single, 2:Normal \\ \hline
+		0xA4 & Channel A Trigger Type & 0:Level, 1:Rising, 2:Falling \\ \hline
+		0xB4 & Channel B Trigger Type & 0:Level, 1:Rising, 2:Falling \\ \hline
+		0xA5 & Channel A Trigger Threshold & Threshold in \textmu V \\ \hline
+		0xB5 & Channel B Trigger Threshold & Threshold in \textmu V \\ \hline
+		0xA6 & Channel A DC Offset & Offset in \textmu V \\ \hline
+		0xB6 & Channel B DC Offset & Offset in \textmu V \\ \hline
+		0xAA & Channel A Trigger Arm & 0:Off, Other:On \\ \hline 
+		0xBA & Channel B Trigger Arm & 0:Off, Other:On \\ \hline 
+		0xAF & Channel A Trigger Force & Ignored \\ \hline 
+		0xBF & Channel B Trigger Force & Ignored \\ \hline 
+		0xAC & Channel A Coupling & 0:DC, Other:AC \\ \hline
+		0xBC & Channel B Coupling & 0:DC, Other:AC \\ \hline
 		0xF0 & Function Generator Output & 0:Off, Other:On \\ \hline
+		0xF1 & Function Generator Wave Type & 0:Sine, 1:Square, 2:Triangle, 3:Ramp, 4:Noise \\ \hline
+		0xF2 & Function Generator Voltage & Voltage in \textmu V \\ \hline
+		0xF3 & Function Generator Offset & Voltage in \textmu V \\ \hline
+		0xF4 & Function Generator Frequency & Frequency in Hz \\ \hline
+		0xEE & Keep alive & Ignored \\ \hline
+		0xD0 & Display Power & 0:Off, Other:On \\ \hline
+		0xD1 & Display Backlight Brightness & Brightness level (0 - 5) \\ \hline
+		0xAD & 8 bit sample packet, channel A & See \autoref{8bit} \\ \hline
+		0xBD & 8 bit sample packet, channel B & See \autoref{8bit} \\ \hline
+		0xAE & 12 bit sample packet, channel A & See \autoref{12bit} \\ \hline
+		0xBE & 12 bit sample packet, channel B & See \autoref{12bit} \\ \hline
 	\end{tabular}
 	\caption{Packet type identifiers}
 \end{table}
@@ -59,24 +81,36 @@ $n_1$ and $n_2$ refer to the first and second nibbles of the argument bytes resp
 \end{figure}
 
 \section{Command Packet}
+
+0x00 for command, 0xFF for confirmation.
+
 \begin{figure}[H]
 	\centering
 	\begin{bytefield}[bitwidth=2em]{16}
 		\bitheader{0-15} \\
-		\bitbox{8}{Packet Type} & \bitbox{8}{Command / Notification Indicator} \\
+		\bitbox{8}{Packet Type} & \bitbox{8}{Command / Confirmation Indicator} \\
 		\wordbox{2}{Argument}
 	\end{bytefield}
 	\caption{Command packet structure}
 \end{figure}
 
 \section{Data Packet}
+
+Sequence numbers begin at 0.
+
 \subsection{8 bit mode}
+\label{8bit}
 \begin{figure}[H]
 	\centering
 	\begin{bytefield}[bitwidth=2em]{16}
 		\bitheader{0-15} \\
 		\bitbox{8}{Packet Type} & \bitbox{8}{Sequence Number} \\
+<<<<<<< Updated upstream
 		\bitbox{16}{Number of Samples}  \\
+=======
+		\bitbox{16}{Number of Samples} \\
+		\bitbox{16}{Sample Period in \textmu s} \\
+>>>>>>> Stashed changes
 		\begin{rightwordgroup}{Payload}
 			\bitbox{8}{Sample 0} & \bitbox{8}{Sample 1} \\
 			\bitbox{8}{Sample 2} & \bitbox{8}{Sample 3}\\
@@ -90,19 +124,25 @@ $n_1$ and $n_2$ refer to the first and second nibbles of the argument bytes resp
 \end{figure}
 
 \subsection{12 bit mode}
+\label{12bit}
 \begin{figure}[H]
 	\centering
 	\begin{bytefield}[bitwidth=2em]{16}
 		\bitheader{0-15} \\
 		\bitbox{8}{Packet Type} & \bitbox{8}{Sequence Number} \\
+<<<<<<< Updated upstream
 		\bitbox{16}{Number of Samples}  \\
+=======
+		\bitbox{16}{Number of Samples} \\
+		\bitbox{16}{Sample Period in \textmu s} \\
+>>>>>>> Stashed changes
 		\begin{rightwordgroup}{Payload}
-			\bitbox{12}{Sample 0} & \bitbox{4}{Sample 1\dots} \\
-			\bitbox{4}{\dots Sample 1} & \bitbox{12}{Sample 2}\\
+			\bitbox{4}{Pad} & \bitbox{12}{Sample 0} \\
+			\bitbox{4}{Pad} & \bitbox{12}{Sample 1} \\
 			\wordbox[tlr]{1}{\dots} \\
 			\wordbox[lr]{1}{Samples} \\
 			\wordbox[lr]{1}{\dots} \\
-			\bitbox[blr]{4}{} & \bitbox{12}{Sample n}
+			\bitbox{4}{Pad} & \bitbox{12}{Sample 0} \\
 		\end{rightwordgroup}
 	\end{bytefield}
 	\caption{12 bit mode data packet structure}
