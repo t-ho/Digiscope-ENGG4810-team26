@@ -83,6 +83,7 @@ public class LaunchWindowUi extends JFrame {
 		secondRowPanel_.setPreferredSize(new Dimension(460, 75));
 		secondRowPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
 
+		connectButton.setFocusable(false);
 		connectButton.setPreferredSize(new Dimension(140, 40));
 		connectButton.setFont(new Font("Lucida Grande", 1, 18));
 		secondRowPanel_.add(connectButton);

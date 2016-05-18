@@ -1,7 +1,10 @@
 package data;
 
+import java.awt.Color;
 import java.awt.Image;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -14,26 +17,93 @@ import javax.swing.UIManager;
 public class Constant {
 
 	public static final String APPLICATION_TITLE = "Digiscope - Team 26";
+
+	public static final String CSV_FILE_EXTENSION = "csv";
+	
+	public static final int FIR = 1;
+	public static final int IIR = 2;
+	
+	public static final String ONE_MILIVOLT = "1 mV";
+	public static final String TEN_MILIVOLTS = "10 mV";
+	public static final String TWENTY_MILIVOLTS = "20 mV";
+	public static final String FIFTY_MILIVOLTS = "50 mV";
+	public static final String ONE_HUNDRED_MILIVOLTS = "100 mV";
+	public static final String TWO_HUNDRED_MILIVOLTS = "200 mV";
+	public static final String FIVE_HUNDRED_MILIVOLTS = "500 mV";
+	public static final String ONE_VOLT = "1 V";
+	public static final String TWO_VOLTS = "2 V";
 	
 	public static final String[] VERTICAL_RANGE_VALUES = new String[] {
-		"1 us", "2 us", "5 us", "10 us", "20 us", "50 us", "100 us", "200 us",
-		"500 us", "1 ms", "2 ms", "5 ms", "10 ms", "20 ms", "50 ms", "100 ms",
-		"200 ms", "500 ms", "1 s" };
+		TWENTY_MILIVOLTS, FIFTY_MILIVOLTS, ONE_HUNDRED_MILIVOLTS, TWO_HUNDRED_MILIVOLTS,
+		FIVE_HUNDRED_MILIVOLTS, ONE_VOLT, TWO_VOLTS };
+	
+	public static final String[] VERTICAL_OFFSET_UNITS = new String[] {
+		ONE_MILIVOLT, TEN_MILIVOLTS, ONE_HUNDRED_MILIVOLTS, ONE_VOLT};
+        
+        public static final String[] VOLTAGE_UNITS = new String[] { ONE_MILIVOLT,
+                ONE_VOLT };
 
+	public static final String ONE_MICROSECOND = "1 us";
+	public static final String TWO_MICROSECONDS = "2 us";
+	public static final String FIVE_MICROSECONDS = "5 us";
+	public static final String TEN_MICROSECONDS = "10 us";
+	public static final String TWENTY_MICROSECONDS = "20 us";
+	public static final String FIFTY_MICROSECONDS = "50 us";
+	public static final String ONE_HUNDRED_MICROSECONDS = "100 us";
+	public static final String TWO_HUNDRED_MICROSECONDS = "200 us";
+	public static final String FIVE_HUNDRED_MICROSECONDS = "500 us";
+	public static final String ONE_MILISECOND = "1 ms";
+	public static final String TWO_MILISECONDS = "2 ms";
+	public static final String FIVE_MILISECONDS = "5 ms";
+	public static final String TEN_MILISECONDS = "10 ms";
+	public static final String TWENTY_MILISECONDS = "20 ms";
+	public static final String FIFTY_MILISECONDS = "50 ms";
+	public static final String ONE_HUNDRED_MILISECONDS = "100 ms";
+	public static final String TWO_HUNDRED_MILISECONDS = "200 ms";
+	public static final String FIVE_HUNDRED_MILISECONDS = "500 ms";
+	public static final String ONE_SECOND = "1 s";
+	
 	public static final String[] HORIZONTAL_RANGE_VALUES = new String[] {
-		"20 mV", "50 mV", "100 mV", "200 mV", "500 mV", "1 V", "2 V" };
+		ONE_MICROSECOND, TWO_MICROSECONDS, FIVE_MICROSECONDS,
+		TEN_MICROSECONDS, TWENTY_MICROSECONDS, FIFTY_MICROSECONDS,
+		ONE_HUNDRED_MICROSECONDS, TWO_HUNDRED_MICROSECONDS, FIVE_HUNDRED_MICROSECONDS,
+		ONE_MILISECOND, TWO_MILISECONDS, FIVE_MILISECONDS,
+		TEN_MILISECONDS, TWENTY_MILISECONDS, FIFTY_MILISECONDS,
+		ONE_HUNDRED_MILISECONDS, TWO_HUNDRED_MILISECONDS, FIVE_HUNDRED_MILISECONDS,
+		ONE_SECOND };
 
+	public static final String[] HORIZONTAL_OFFSET_UNITS = new String[] {
+		ONE_MICROSECOND, TEN_MICROSECONDS, ONE_HUNDRED_MICROSECONDS,
+		ONE_MILISECOND, TEN_MILISECONDS, ONE_HUNDRED_MILISECONDS, ONE_SECOND};
+
+	public static final String SINE = "Sine";
+	public static final String SQUARE = "Square";
+	public static final String TRIANGLE = "Triangle";
+	public static final String RAMP = "Ramp";
+	public static final String RANDOM_NOISE = "Random noise";
+	
 	public static final String[] WAVE_TYPES = new String[] {
-		"Sine", "Square", "Triangle", "Ramp", "Random noise" };
+		SINE, SQUARE, TRIANGLE, RAMP, RANDOM_NOISE };
+	
+	public static final String CHANNEL_A = "Channel A";
+	public static final String CHANNEL_B = "Channel B";
+	public static final String MATH_CHANNEL = "Math Channel";
+	public static final String FILTER_CHANNEL = "Filter Channel";
+	public static final String GENERATOR_CHANNEL = "Generator Channel";
 
-	public static final String[] INPUT_CHANNELS = new String[] { 
-		"Channel A", "Channel B", "Math Channel" };
+	public static final String AUTO_MODE = "Auto";
+	public static final String NORMAL_MODE = "Normal";
+	public static final String SINGLE_MODE = "Single";
 
 	public static final String[] TRIGGER_MODES = new String[] { 
-		"Auto", "Normal", "Single" };
+		AUTO_MODE, NORMAL_MODE, SINGLE_MODE };
+
+	public static final String RISING_EDGE_TYPE = "Rising edge";
+	public static final String FALLING_EDGE_TYPE = "Falling edge";
+	public static final String LEVEL_TYPE = "Level";
 
 	public static final  String [] TRIGGER_TYPES = new String[] { 
-		"Rising edge", "Falling edge", "Level" };
+		RISING_EDGE_TYPE, FALLING_EDGE_TYPE, LEVEL_TYPE };
 
 	public static final int ERROR = 1;
 
@@ -45,7 +115,39 @@ public class Constant {
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
 			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
-	public static enum TAB {CHANNEL_A, CHANNEL_B, MATH_CHANNEL, FILTER_CHANNEL};
+	public static enum TAB {CHANNEL_A, CHANNEL_B, MATH_CHANNEL, FILTER_CHANNEL, GENERATOR_CHANNEL};
+	
+	public static int VERTICAL_GRID_SPACINGS = 10;
+	public static int HORIZONTAL_GRID_SPACINGS = 16;
+	
+	public static double DEFAULT_VERTICAL_RANGE = 0.02;
+	public static int DEFAULT_HORIZONTAL_RANGE = 1;
+	
+	public static final int NUMBER_OF_CHANNELS = 5;
+	public static final int A_INDEX = 0;
+	public static final int B_INDEX = 1;
+	public static final int MATH_INDEX = 2;
+	public static final int FILTER_INDEX = 3;
+	public static final int GENERATOR_INDEX = 4;
+	
+	public static final Color A_COLOR = new Color(255, 0, 0); // red
+	public static final Color B_COLOR = new Color(0, 0, 255); // blue
+	public static final Color MATH_COLOR = new Color(0, 152, 125); // green
+	public static final Color FILTER_COLOR = new Color(177, 75, 255); // purple
+	public static final Color GENERATOR_COLOR = new Color(120, 75, 75); // brown
+	
+	public static final Color A_LIGHT_COLOR = new Color(252, 73, 73); // light red
+	public static final Color B_LIGHT_COLOR = new Color(65, 114, 248); // light blue
+	public static final Color MATH_LIGHT_COLOR = new Color(0, 165, 135); // light green
+	public static final Color FILTER_LIGHT_COLOR = new Color(186, 100, 252); // light purple
+	public static final Color GENERATOR_LIGHT_COLOR = new Color(140, 115, 115); // light brown
+	
+	public static final String MAX_VOLTAGE = "Max voltage";
+	public static final String MIN_VOLTAGE = "Min voltage";
+	public static final String MAX_P2P_VOLTAGE = "Max peak to peak voltage";
+	public static final String AVERAGE_VOLTAGE = "Average voltage";
+	public static final String STANDARD_DEVIATION_VOLTAGE = "Standard deviation of voltage";
+	public static final String FREQUENCY = "Frequency";
 
 	/**
 	 * Set application's LookAndFeel based on operating system type.
@@ -87,6 +189,12 @@ public class Constant {
 		} else {
 			frame.setIconImage(image);
 		}
-
+	}
+	
+	public static double round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+	    BigDecimal bigDecimal = new BigDecimal(value);
+	    bigDecimal = bigDecimal.setScale(places, RoundingMode.HALF_UP);
+	    return bigDecimal.doubleValue();
 	}
 }
