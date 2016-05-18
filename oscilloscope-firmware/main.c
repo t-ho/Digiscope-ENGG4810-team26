@@ -128,6 +128,7 @@ int main(void)
     XPT2046_Init();
 
     ADC_Init();
+    WaveGen_Init();
 
     OverVoltageInit();
 
