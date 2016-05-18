@@ -93,6 +93,8 @@ public class ExpressionDialog extends ExpressionDialogUi implements ActionListen
 			} else {
 				setStatus("The expression does not have any derived channels", Constant.ERROR);
 			}
+		} else {
+			setStatus("Do not leave the expression empty!" , Constant.ERROR);
 		}
 	}
 
