@@ -192,13 +192,13 @@ Touch_Read(uint32_t *x_out, uint32_t *y_out)
 	}
 }
 
-static GraphicsMessage msg;
+static Command cmd;
 
 static void
 TouchReenable(void)
 {
-	msg.type = GM_PTR_UP;
-	Mailbox_post(GraphicsMailbox, &msg, 0);
+	cmd.type = _COMMAND_PTR_UP;
+	Mailbox_post(GraphicsMailbox, &cmd, 0);
 	MAP_GPIOIntClear(T_IRQ_B, T_IRQ_P);
 	MAP_GPIOIntEnable(T_IRQ_B, T_IRQ_P);
 }
@@ -209,10 +209,10 @@ TouchCallback(unsigned int index)
 	MAP_GPIOIntClear(T_IRQ_B, T_IRQ_P);
 	MAP_GPIOIntDisable(T_IRQ_B, T_IRQ_P);
 
-	msg.type = GM_PTR_DOWN;
-	Touch_Read(&(msg.data[0]), &(msg.data[1]));
+	cmd.type = _COMMAND_PTR_DOWN;
+	Touch_Read(&cmd.args[0], &cmd.args[1]);
 
-	Mailbox_post(GraphicsMailbox, &msg, 0);
+	Mailbox_post(GraphicsMailbox, &cmd, 0);
 
 	Clock_start(TouchClkHandle);
 }

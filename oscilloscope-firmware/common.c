@@ -35,11 +35,20 @@ SI_Micro_Print(char* line1, char* line2, int32_t val, char* suffix)
 void
 ForceTrigger(void)
 {
-    static NetPacket np;
-    np.data = (char *) adc_buffer;
-    np.len = 2 * ADC_BUF_SIZE;
+	SampleCommand scmd;
+	scmd.type = SAMPLE_PACKET_A_12;
+	scmd.num_samples = (1024 - COMMANDLENGTH) / 2;
+	scmd.period = 1;
 
-    NetSend(&np);
+	int seqnum = 0;
+
+	while (seqnum * scmd.num_samples < ADC_BUF_SIZE)
+	{
+		scmd.seq_num = seqnum;
+		scmd.buffer = &adc_buffer[seqnum * scmd.num_samples];
+		NetSend((Command *) &scmd, 0);
+		seqnum++;
+	}
 }
 
 uint32_t
@@ -114,7 +123,7 @@ Init_Semaphores(void)
 	Mailbox_Params_init(&mbparams);
 	static Error_Block eb;
 
-	GraphicsMailbox = Mailbox_create(12,10,&mbparams,&eb);
+	GraphicsMailbox = Mailbox_create(sizeof(Command),10,&mbparams,&eb);
 
     // Initialise semaphores
     Semaphore_Params params;

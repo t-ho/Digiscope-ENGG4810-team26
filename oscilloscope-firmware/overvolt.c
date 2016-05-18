@@ -37,9 +37,9 @@ ComparatorHandler(unsigned int index)
 	MAP_ComparatorIntDisable(COMP_BASE, 0);
 	MAP_ComparatorIntDisable(COMP_BASE, 1);
 
-	GraphicsMessage msg;
-	msg.type = GM_OVERVOLTAGE;
-	msg.data[0] = index;
+	Command msg;
+	msg.type = _COMMAND_OVERVOLTAGE;
+	msg.args[0] = index;
 
 	Mailbox_post(GraphicsMailbox, &msg, 0);
 }

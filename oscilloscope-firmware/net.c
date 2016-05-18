@@ -47,7 +47,7 @@
 #include "common.h"
 #include "net.h"
 
-#define TCPPORT 1000
+#define TCPPORT 4810
 
 #define TCPHANDLERSTACK 1024
 
@@ -59,98 +59,22 @@ void tcpHandler(UArg arg0, UArg arg1);
 #define TCPPACKETSIZE 256
 #define NUMTCPWORKERS 3
 
-static Semaphore_Struct NetSendLock;
-static Semaphore_Handle NetSendLock_h;
-static Queue_Handle NetSendQueue;
-
-enum CommandTypes
-{
-	UNKNOWN = 0x00,
-	//VERTICAL_RANGE = 0x01,
-	VERTICAL_RANGE = 0x61,
-	HORIZONTAL_RANGE = 0x02,
-	TRIGGER_MODE = 0x03,
-	TRIGGER_TYPE = 0x04,
-	TRIGGER_THRESHOLD = 0x05,
-	CHANNEL_COUPLING = 0x0C,
-	FUNCTION_GEN_OUT = 0xF0,
-	FORCE_TRIGGER = 'f',
-};
+static Mailbox_Handle NetCommandMailbox;
+static Mailbox_Handle NetSampleMailbox;
 
 void
 Init_SendQueue(void)
 {
-    Semaphore_Params params;
-    Semaphore_Params_init(&params);
-    params.mode = Semaphore_Mode_BINARY;
-
-    Semaphore_construct(&NetSendLock, 0, &params);
-    NetSendLock_h = Semaphore_handle(&NetSendLock);
-
-	NetSendQueue = Queue_create(NULL, NULL);
+	Mailbox_Params mbparams;
+	Mailbox_Params_init(&mbparams);
+	static Error_Block eb;
+	NetCommandMailbox = Mailbox_create(sizeof(Command),50,&mbparams,&eb);
 }
 
 int
-NetSend(NetPacket *np)
+NetSend(Command *cmd, uint32_t timeout)
 {
-	if (Semaphore_pend(NetSendLock_h, 100))
-	{
-		Queue_enqueue(NetSendQueue, (Queue_Elem*) np);
-		Semaphore_post(NetSendLock_h);
-		return 0;
-	}
-	else
-	{
-		return -1;
-	}
-}
-
-void
-packet_process(char *buffer, size_t len)
-{
-	static NetPacket np;
-
-	static char reply[64];
-
-	Command *command = (Command*) buffer;
-
-	if (len != 6) {
-		System_printf("Not a command\n");
-		return;
-	}
-
-	GraphicsMessage msg;
-
-
-	switch (command->id)
-	{
-		case VERTICAL_RANGE:
-			msg.type = GM_SET_VER_RANGE;
-			msg.data[0] = command->arg;
-			Mailbox_post(GraphicsMailbox, &msg, 0);
-			sprintf(reply, "Vert range %ul\n", command->arg);
-			break;
-		case HORIZONTAL_RANGE:
-			msg.type = GM_SET_HOR_RANGE;
-			msg.data[0] = command->arg;
-			Mailbox_post(GraphicsMailbox, &msg, 0);
-			sprintf(reply, "Horiz range %ul\n", command->arg);
-			break;
-		case TRIGGER_MODE:
-			sprintf(reply, "Trigger mode %ul\n", command->arg);
-			break;
-		case FORCE_TRIGGER:
-			sprintf(reply, "Forcing trigger now\n");
-			ForceTrigger();
-			break;
-		default:
-			sprintf(reply, "Unrecognised Command\n");
-	}
-
-	System_printf(reply);
-	np.data = reply;
-	np.len = strlen(np.data);
-	NetSend(&np);
+	return Mailbox_post(NetCommandMailbox, cmd, timeout);
 }
 
 /*
@@ -168,67 +92,82 @@ Void tcpWorker(UArg arg0, UArg arg1)
     System_printf("tcpWorker: start clientfd = 0x%x\n", clientfd);
 
     Semaphore_post(clients_connected_h);
-	Semaphore_post(NetSendLock_h);
 
-	NetPacket keepalive;
-	keepalive.data = "keepalive\n";
-	keepalive.len = strlen(keepalive.data);
-
-	NetPacket echopacket;
-
-	GraphicsMessage msg;
-	msg.type = GM_CONN_UPDATE;
+	Command msg;
+	msg.type = _COMMAND_CONN_UPDATE;
 	Mailbox_post(GraphicsMailbox, &msg, 0);
 
-    while (1) {
+    while (1)
+    {
     	bytesRcvd = recv(clientfd, buffer, TCPPACKETSIZE, 0);
 
-		if (bytesRcvd > 0)
+		if (bytesRcvd == 6)
 		{
-			packet_process(buffer, bytesRcvd);
-
-			echopacket.data = buffer;
-			echopacket.len = bytesRcvd;
-
-			NetSend(&echopacket);
+			Command *cmd = (Command*) buffer;
+			cmd->args[0] = ntohl(cmd->args[0]);
+			Mailbox_post(GraphicsMailbox, cmd, 0);
+		}
+		else if (bytesRcvd > 0)
+		{
+			System_printf("Not a command\n");
 		}
 
-    	if (Semaphore_pend(NetSendLock_h, BIOS_WAIT_FOREVER))
-    	{
+		if (Mailbox_getNumPendingMsgs(NetCommandMailbox) == 0)
+		{
+			Command keepalive;
+			keepalive.type = _COMMAND_KEEPALIVE;
+			NetSend(&keepalive, 0);
+		}
 
-			if (Queue_empty(NetSendQueue))
+		Command cmd;
+		while(Mailbox_pend(NetCommandMailbox, &cmd, 0)) {
+
+			if (cmd.type == SAMPLE_PACKET_A_8 || cmd.type == SAMPLE_PACKET_B_8
+					|| cmd.type == SAMPLE_PACKET_A_12 || cmd.type == SAMPLE_PACKET_B_12)
 			{
-				Queue_enqueue(NetSendQueue, (Queue_Elem*) &keepalive);
+				SampleCommand *scmd = (SampleCommand*) &cmd;
+				scmd->num_samples = htons(scmd->num_samples);
+				scmd->period = htons(scmd->period);
+			}
+			else
+			{
+				cmd.args[0] = htonl(cmd.args[0]);
 			}
 
-			NetPacket *np;
-			while(!Queue_empty(NetSendQueue)) {
+			bytesSent = send(clientfd, &cmd, COMMANDLENGTH, 0);
 
-				np = Queue_dequeue(NetSendQueue);
+			if (bytesSent < 0 || bytesSent != COMMANDLENGTH) {
+				System_printf("Error: send failed.\n");
+				goto clientlost;
+			}
 
-				bytesSent = send(clientfd, np->data, np->len, 0);
+			if (cmd.type == SAMPLE_PACKET_A_8 || cmd.type == SAMPLE_PACKET_B_8
+					|| cmd.type == SAMPLE_PACKET_A_12 || cmd.type == SAMPLE_PACKET_B_12)
+			{
+				SampleCommand *scmd = (SampleCommand*) &cmd;
+				bytesSent = send(clientfd, scmd->buffer, ntohs(scmd->num_samples) * 2, 0);
 
-				if (bytesSent < 0 || bytesSent != np->len) {
-					System_printf("Error: send failed.\n");
-					System_printf("tcpWorker stop clientfd = 0x%x\n", clientfd);
-
-					close(clientfd);
-
-					if (!Semaphore_pend(clients_connected_h, 0))
-					{
-						System_printf("Unable to decrement client count\n");
-					}
-
-					GraphicsMessage msg;
-					msg.type = GM_CONN_UPDATE;
-					Mailbox_post(GraphicsMailbox, &msg, 0);
-
-					return;
+				if (bytesSent < 0 || bytesSent != ntohs(scmd->num_samples) * 2) {
+					System_printf("Error: buffer send failed.\n");
+					goto clientlost;
 				}
 			}
     	}
-    	Semaphore_post(NetSendLock_h);
     }
+
+clientlost:
+	System_printf("tcpWorker stop clientfd = 0x%x\n", clientfd);
+
+	close(clientfd);
+
+	if (!Semaphore_pend(clients_connected_h, 0))
+	{
+		System_printf("Unable to decrement client count\n");
+	}
+
+	Command connupdate;
+	connupdate.type = _COMMAND_CONN_UPDATE;
+	Mailbox_post(GraphicsMailbox, &connupdate, 0);
 }
 
 /*
@@ -351,9 +290,9 @@ ipAddrHook(uint32_t IPAddr, uint32_t IfIdx, uint32_t fAdd)
 {
 //    System_printf("mynetworkIPAddrHook: enter\n");
 
-	GraphicsMessage msg;
-	msg.type = GM_IP_UPDATE;
-	msg.data[0] = ntohl(IPAddr);
+	Command msg;
+	msg.type = _COMMAND_IP_UPDATE;
+	msg.args[0] = ntohl(IPAddr);
 
 	Mailbox_post(GraphicsMailbox, &msg, 0);
 

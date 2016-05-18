@@ -284,25 +284,31 @@ BrightnessDown(tWidget *psWidget)
 	BrightnessChange(-1);
 }
 
-static uint32_t vdiv_val = 500;
+static uint32_t vdiv_vals[2] = { 500, 500 };
 static uint32_t hdiv_val = 500;
 
-void VertRangeChange(uint32_t newVal)
+void VertRangeChange(uint32_t newVal, uint8_t channel)
 {
 	if (newVal > VDIV_MAX)
 	{
-		vdiv_val = VDIV_MAX;
+		vdiv_vals[channel] = VDIV_MAX;
 	}
 	else if (newVal < VDIV_MIN)
 	{
-		vdiv_val = VDIV_MIN;
+		vdiv_vals[channel] = VDIV_MIN;
 	}
 	else
 	{
-		vdiv_val = newVal;
+		vdiv_vals[channel] = newVal;
+
+		Command cmd;
+		cmd.type = channel ? COMMAND_VERTICAL_RANGE_A : COMMAND_VERTICAL_RANGE_B;
+		cmd.args[0] = newVal;
+		cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+		NetSend(&cmd, 0);
 	}
 
-	SI_Micro_Print(vert_div_text1, vert_div_text2, vdiv_val, "V/div");
+	SI_Micro_Print(vert_div_text1, vert_div_text2, vdiv_vals[channel], "V/div");
 
 	if (current_menu == RANGE_MENU)
 	{
@@ -314,13 +320,13 @@ void VertRangeChange(uint32_t newVal)
 void
 VertRangeUp(tWidget *psWidget)
 {
-	VertRangeChange(Standard_Step(vdiv_val, 1));
+	VertRangeChange(Standard_Step(vdiv_vals[0], 1), 0);
 }
 
 void
 VertRangeDown(tWidget *psWidget)
 {
-	VertRangeChange(Standard_Step(vdiv_val, -1));
+	VertRangeChange(Standard_Step(vdiv_vals[0], -1), 0);
 }
 
 void HorRangeChange(uint32_t newVal)
@@ -336,6 +342,11 @@ void HorRangeChange(uint32_t newVal)
 	else
 	{
 		hdiv_val = newVal;
+		Command cmd;
+		cmd.type = COMMAND_HORIZONTAL_RANGE;
+		cmd.args[0] = newVal;
+		cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+		NetSend(&cmd, 0);
 	}
 
 	SI_Micro_Print(hor_div_text1, hor_div_text2, hdiv_val, "s/div");
@@ -379,6 +390,8 @@ ForceTriggerPress(tWidget *psWidget)
 void
 screenDemo(UArg arg0, UArg arg1)
 {
+	uint32_t ipaddr = 0;
+
     tContext sContext;
     tRectangle sRect;
 
@@ -410,57 +423,60 @@ screenDemo(UArg arg0, UArg arg1)
 
     WidgetPaint(WIDGET_ROOT);
 
-	GraphicsMessage msg;
-	msg.type = GM_REFRESH;
+	Command cmd;
+	cmd.type = _COMMAND_UNKNOWN;
 
-	Mailbox_post(GraphicsMailbox, &msg, 0);
-
-	uint32_t ipaddr = 0;
+	Mailbox_post(GraphicsMailbox, &cmd, 0);
 
     while (1)
     {
-    	if (Mailbox_pend(GraphicsMailbox, &msg, BIOS_WAIT_FOREVER))
+    	if (Mailbox_pend(GraphicsMailbox, &cmd, BIOS_WAIT_FOREVER))
     	{
-    		switch(msg.type)
+    		switch(cmd.type)
     		{
 
-    		case GM_IP_UPDATE:
-    			ipaddr = msg.data[0];
+    		case _COMMAND_IP_UPDATE:
+    			ipaddr = cmd.args[0];
     			/* Fallthrough */
-    		case GM_CONN_UPDATE:
+    		case _COMMAND_CONN_UPDATE:
                 sprintf(ipaddrstring, "%d.%d.%d.%d %s",
                         (uint8_t)(ipaddr>>24)&0xFF, (uint8_t)(ipaddr>>16)&0xFF,
                         (uint8_t)(ipaddr>>8)&0xFF, (uint8_t)ipaddr&0xFF,
     					Semaphore_getCount(clients_connected_h)?"Connected":"No Client");
                 WidgetPaint((tWidget *)&g_sConnStatus);
     			break;
-    		case GM_PTR_DOWN:
+    		case _COMMAND_PTR_DOWN:
     			if (!SSD1289_Get_Backlight_On())
 				{
     				break;
 				}
-    			WidgetPointerMessage(WIDGET_MSG_PTR_DOWN, msg.data[0], msg.data[1]);
+
+    			WidgetPointerMessage(WIDGET_MSG_PTR_DOWN, cmd.args[0], cmd.args[1]);
     			break;
-    		case GM_PTR_UP:
+    		case _COMMAND_PTR_UP:
     			if (!SSD1289_Get_Backlight_On())
     			{
         			SSD1289_Set_Backlight_On(true);
     				break;
     			}
-    			WidgetPointerMessage(WIDGET_MSG_PTR_UP, msg.data[0], msg.data[1]);
+
+    			WidgetPointerMessage(WIDGET_MSG_PTR_UP, cmd.args[0], cmd.args[1]);
     			break;
-    		case GM_OVERVOLTAGE:
+    		case _COMMAND_OVERVOLTAGE:
     			SSD1289_Set_Backlight_On(true);
-    			overvoltage_text[strlen(overvoltage_text) - 2] = msg.data[0] + 1 + '0';
+    			overvoltage_text[strlen(overvoltage_text) - 2] = cmd.args[0] + 1 + '0';
     			OnOVERVOLTAGE(NULL);
     			break;
-    		case GM_SET_HOR_RANGE:
-    			HorRangeChange(msg.data[0]);
+    		case COMMAND_HORIZONTAL_RANGE:
+    			HorRangeChange(cmd.args[0]);
     			break;
-    		case GM_SET_VER_RANGE:
-				VertRangeChange(msg.data[0]);
+    		case COMMAND_VERTICAL_RANGE_A:
+				VertRangeChange(cmd.args[0], 0);
 				break;
-    		case GM_REFRESH:
+    		case COMMAND_VERTICAL_RANGE_B:
+				VertRangeChange(cmd.args[0], 1);
+				break;
+    		case _COMMAND_UNKNOWN:
     			/* Fallthrough */
     		default:
     			break;
