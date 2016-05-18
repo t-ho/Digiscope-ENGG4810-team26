@@ -26,21 +26,21 @@
 
 #include "common.h"
 
-#define T_CLK_B		GPIO_PORTM_BASE
-#define T_CS_B		GPIO_PORTQ_BASE
-#define T_DIN_B		GPIO_PORTP_BASE
+#define T_CLK_B		GPIO_PORTL_BASE
+#define T_CS_B		GPIO_PORTL_BASE
+#define T_DIN_B		GPIO_PORTL_BASE
 
-#define T_BUSY_B	GPIO_PORTQ_BASE
-#define T_IRQ_B		GPIO_PORTN_BASE
-#define T_DOUT_B	GPIO_PORTQ_BASE
+#define T_BUSY_B	GPIO_PORTL_BASE
+#define T_IRQ_B		GPIO_PORTL_BASE
+#define T_DOUT_B	GPIO_PORTL_BASE
 
-#define T_CLK_P		GPIO_PIN_6
-#define T_CS_P		GPIO_PIN_1
+#define T_CLK_P		GPIO_PIN_5
+#define T_CS_P		GPIO_PIN_4
 #define T_DIN_P		GPIO_PIN_3
 
-#define T_BUSY_P	GPIO_PIN_3
-#define T_IRQ_P		GPIO_PIN_4
-#define T_DOUT_P	GPIO_PIN_2
+#define T_BUSY_P	GPIO_PIN_2
+#define T_IRQ_P		GPIO_PIN_0
+#define T_DOUT_P	GPIO_PIN_1
 
 /* Touch screen calibration */
 #define X_MIN 200
