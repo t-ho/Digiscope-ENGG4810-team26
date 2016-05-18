@@ -116,7 +116,9 @@ public class PacketReader {
 			case PacketType.CHANNEL_B_8_BITS :
 				sequenceNumber = (short) dis_.readByte();
 				nSamples = dis_.readShort();
-				totalPacketSize = 4 + nSamples;
+				// Skip period for now
+				dis_.readShort();
+				totalPacketSize = 6 + nSamples;
 				if(totalPacketSize > Packet.MAX_PACKET_SIZE) {
 					throw new PacketFormatException("Exceeds the maximum packet size.");
 				}
@@ -133,13 +135,15 @@ public class PacketReader {
 			case PacketType.CHANNEL_B_12_BITS :
 				sequenceNumber = (short) dis_.readByte();
 				nSamples = dis_.readShort();
-				totalPacketSize = 4 + nSamples * 2;
+				// Skip period for now
+				dis_.readShort();
+				totalPacketSize = 6 + nSamples * 2;
 				if(totalPacketSize > Packet.MAX_PACKET_SIZE) {
 					throw new PacketFormatException("Exceeds the maximum packet size.");
 				}
 				samples = new short[nSamples];
 				for(short i = 0; i < nSamples; i++) {
-					samples[i] = dis_.readShort();
+					samples[i] = Short.reverseBytes(dis_.readShort());
 				}
 				packet = new DataPacket(type, sequenceNumber, nSamples, samples);
 				break;
