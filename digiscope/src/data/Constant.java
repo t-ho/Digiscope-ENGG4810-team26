@@ -22,6 +22,7 @@ public class Constant {
 	
 	public static final int PORT_NUMBER = 4810;
 	public static final String DEFAULT_IP_ADDRESS = "192.168.137.8";
+//	public static final String DEFAULT_IP_ADDRESS = "127.0.0.1";
 	
 	public static final int FIR = 1;
 	public static final int IIR = 2;
@@ -105,12 +106,16 @@ public class Constant {
 	public static final String[] TRIGGER_MODES = new String[] { 
 		AUTO_MODE_NAME, SINGLE_MODE_NAME, NORMAL_MODE_NAME };
 
+	public static final String LEVEL_TYPE = "Level";
 	public static final String RISING_EDGE_TYPE = "Rising edge";
 	public static final String FALLING_EDGE_TYPE = "Falling edge";
-	public static final String LEVEL_TYPE = "Level";
+
+	public static final int LEVEL = 0;
+	public static final int RISING = 1;
+	public static final int FALLING = 2;
 
 	public static final String [] TRIGGER_TYPES = new String[] { 
-		RISING_EDGE_TYPE, FALLING_EDGE_TYPE, LEVEL_TYPE };
+		LEVEL_TYPE, RISING_EDGE_TYPE, FALLING_EDGE_TYPE };
 
 	public static final int DC = 0;
 	public static final int AC = 1;
@@ -161,6 +166,7 @@ public class Constant {
 
 	public static final byte CONFIRMATION = (byte) 0xFF;
 	public static final byte REQUEST = (byte) 0x00;
+	public static final int IGNORE = 0;
 
 	/**
 	 * Set application's LookAndFeel based on operating system type.

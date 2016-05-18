@@ -48,8 +48,8 @@ public class LaunchWindow extends LaunchWindowUi {
 
 	private void connectButtonActionPerformed(ActionEvent event) {
 		//TODO
-		connect();
-		//connect(ipAddressTextField.getText());
+//		connect();
+		connect(ipAddressTextField.getText());
 	}
 
 	private void ipAddressTextFieldKeyTyped(KeyEvent keyEvent) {

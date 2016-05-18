@@ -1,5 +1,6 @@
 package core;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import org.jfree.data.xy.XYSeries;
@@ -63,19 +64,19 @@ public class InputStreamHandler implements Runnable {
 								mainWindow_.setHorizontalRange(commandPacket.getArgument());
 								break;
 
-							case PacketType.TRIGGER_MODE:
-								mainWindow_.setTriggerMode(commandPacket.getArgument());
+							case PacketType.TRIGGER_MODE_A:
+								mainWindow_.setTriggerMode(Constant.CHANNEL_A, commandPacket.getArgument());
 								break;
 
-							case PacketType.TRIGGER_TYPE:
-								mainWindow_.setTriggerType(commandPacket.getArgument());
+							case PacketType.TRIGGER_TYPE_A:
+								mainWindow_.setTriggerType(Constant.CHANNEL_A, commandPacket.getArgument());
 								break;
 
-							case PacketType.TRIGGER_THRESHOLD:
+							case PacketType.TRIGGER_THRESHOLD_A:
 								//TODO
 								break;
 
-							case PacketType.CHANNEL_COUPLING:
+							case PacketType.CHANNEL_COUPLING_A:
 								mainWindow_.setChannelCoupling(commandPacket.getArgument());
 							}
 						}

@@ -22,7 +22,7 @@ public class PacketReader {
 		dis_ = new DataInputStream(new BufferedInputStream(is)) ;
 	}
 	
-	public synchronized Packet nextPacket() throws IOException, PacketFormatException{
+	public synchronized Packet nextPacket() throws IOException, PacketFormatException {
 		//TODO:
 		Packet packet = null;
 		byte type = dis_.readByte();
@@ -32,28 +32,79 @@ public class PacketReader {
 		short[] samples;
 		int totalPacketSize;
 		switch (type) {
+			case PacketType.HORIZONTAL_RANGE :
+				// Fallthrough
+
 			case PacketType.VERTICAL_RANGE_A :
 				// Fallthrough
 				
 			case PacketType.VERTICAL_RANGE_B :
 				// Fallthrough
 
-			case PacketType.HORIZONTAL_RANGE :
+			case PacketType.TRIGGER_MODE_A :
 				// Fallthrough
 
-			case PacketType.TRIGGER_MODE :
+			case PacketType.TRIGGER_MODE_B :
 				// Fallthrough
 
-			case PacketType.TRIGGER_TYPE :
+			case PacketType.TRIGGER_TYPE_A :
 				// Fallthrough
 
-			case PacketType.TRIGGER_THRESHOLD :
+			case PacketType.TRIGGER_TYPE_B :
 				// Fallthrough
 
-			case PacketType.CHANNEL_COUPLING :
+			case PacketType.TRIGGER_THRESHOLD_A :
+				// Fallthrough
+
+			case PacketType.TRIGGER_THRESHOLD_B :
+				// Fallthrough
+
+			case PacketType.DC_OFFSET_A :
+				// Fallthrough
+			
+			case PacketType.DC_OFFSET_B :
+				// Fallthrough
+
+			case PacketType.TRIGGER_ARM_A :
+				// Fallthrough
+			
+			case PacketType.TRIGGER_ARM_B :
+				// Fallthrough
+
+			case PacketType.TRIGGER_FORCE_A :
+				// Fallthrough
+			
+			case PacketType.TRIGGER_FORCE_B :
+				// Fallthrough
+
+			case PacketType.CHANNEL_COUPLING_A :
+				// Fallthrough
+
+			case PacketType.CHANNEL_COUPLING_B :
 				// Fallthrough
 
 			case PacketType.FUNCTION_GENERATOR_OUTPUT :
+				// Fallthrough
+				
+			case PacketType.WAVE_TYPE :
+				// Fallthrough
+
+			case PacketType.FUNCTION_GENERATOR_VOLTAGE :
+				// Fallthrough
+				
+			case PacketType.FUNCTION_GENERATOR_OFFSET :
+				// Fallthrough
+
+			case PacketType.FUNCTION_GENERATOR_FREQUENCY :
+				// Fallthrough
+				
+			case PacketType.KEEP_ALIVE :
+				// Fallthrough
+
+			case PacketType.DISPLAY_POWER :
+				// Fallthrough
+				
+			case PacketType.BACKLIGHT_BRIGHTNESS :
 				indicator = dis_.readByte();
 				int argument = dis_.readInt();
 				packet = new CommandPacket(type, indicator, argument);
@@ -93,9 +144,6 @@ public class PacketReader {
 				packet = new DataPacket(type, sequenceNumber, nSamples, samples);
 				break;
 		
-			case PacketType.KEEP_ALIVE :
-				break;
-				
 			default :
 				// Ignore 
 		}
