@@ -34,13 +34,18 @@ public class InputStreamHandler implements Runnable {
 		try {
 			boolean isComplete = false;
 			int aCurrentTime = 0;
-			int aPeriod = 0; 
+			int aPeriod = 0;
 			int bCurrentTime = 0;
 			int bPeriod = 0;
 			double aMaxDiplayVoltage = 0;
 			double aMinDiplayVoltage = 0;
 			double bMaxDiplayVoltage = 0;
 			double bMinDiplayVoltage = 0;
+			double maxDisplayTime = 0;
+			boolean isUpdateA = false;
+			boolean isUpdateB = false;
+			int aTotalOfSamples = 0;
+			int bTotalOfSamples = 0;
 			XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
 			XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
 			while (isComplete == false) {
@@ -49,6 +54,11 @@ public class InputStreamHandler implements Runnable {
 					byte type = packet.getType();
 					if (packet instanceof CommandPacket) {
 						CommandPacket commandPacket = (CommandPacket) packet;
+						/// Test
+						if(type != PacketType.KEEP_ALIVE) {
+							System.out.printf("Received: Type %x argument %d\n\n",commandPacket.getType(), commandPacket.getArgument());
+						}
+						/// Test
 						byte indicator = commandPacket.getIndicator();
 						if (indicator == Constant.CONFIRMATION) {
 							switch (type) {
@@ -68,30 +78,38 @@ public class InputStreamHandler implements Runnable {
 								mainWindow_.setTriggerMode(Constant.CHANNEL_A, commandPacket.getArgument());
 								break;
 
+							case PacketType.TRIGGER_MODE_B:
+								mainWindow_.setTriggerMode(Constant.CHANNEL_B, commandPacket.getArgument());
+								break;
+
 							case PacketType.TRIGGER_TYPE_A:
 								mainWindow_.setTriggerType(Constant.CHANNEL_A, commandPacket.getArgument());
 								break;
 
+							case PacketType.TRIGGER_TYPE_B:
+								mainWindow_.setTriggerType(Constant.CHANNEL_B, commandPacket.getArgument());
+								break;
+
 							case PacketType.TRIGGER_THRESHOLD_A:
-								//TODO
+								// TODO
 								break;
 
 							case PacketType.CHANNEL_COUPLING_A:
 								mainWindow_.setChannelCoupling(Constant.CHANNEL_A, commandPacket.getArgument());
 								break;
-							
+
 							case PacketType.CHANNEL_COUPLING_B:
 								mainWindow_.setChannelCoupling(Constant.CHANNEL_B, commandPacket.getArgument());
 								break;
-								
+
 							case PacketType.CHANNEL_MODE_A:
 								mainWindow_.setChannelMode(Constant.CHANNEL_A, commandPacket.getArgument());
 								break;
-								
+
 							case PacketType.CHANNEL_MODE_B:
 								mainWindow_.setChannelMode(Constant.CHANNEL_B, commandPacket.getArgument());
 								break;
-								
+
 							}
 						}
 					} else if (packet instanceof DataPacket) {
@@ -101,70 +119,135 @@ public class InputStreamHandler implements Runnable {
 						short samples[] = dataPacket.getSamples();
 						switch (type) {
 						case PacketType.CHANNEL_A_8_BITS:
-							if (sequenceNumber == 0) { // Start a new series for channel A
+							if (sequenceNumber == 0) {
+								if (isUpdateA == true) {
+									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, false);
+								}
+								isUpdateA = false;
 								aSeries = new XYSeries(Constant.CHANNEL_A);
 								aCurrentTime = 0;
 								aPeriod = dataPacket.getPeriod();
 								aMaxDiplayVoltage = mainWindow_.getMaxDisplayVoltage(Constant.A_INDEX);
 								aMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.A_INDEX);
+								maxDisplayTime = mainWindow_.getMaxDisplayTime();
+								aTotalOfSamples = 0;
 							}
 							for (short i = 0; i < nSamples; i++) {
 								double voltage = (aMaxDiplayVoltage - aMinDiplayVoltage) * ((double) samples[i] / 255.0)
 										+ aMinDiplayVoltage;
 								aSeries.add(aCurrentTime, voltage);
 								aCurrentTime += aPeriod;
+								aTotalOfSamples += 1;
 							}
-							mainWindow_.setXYSeriesForChannel(Constant.CHANNEL_A, aSeries);
+							if (isUpdateA == false) {
+								if (aCurrentTime >= maxDisplayTime) {
+									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, true);
+									isUpdateA = true;
+								} else if (aTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_A)) {
+									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, true);
+									isUpdateA = false;
+								}
+							}
+							break;
 
 						case PacketType.CHANNEL_B_8_BITS:
-							if (sequenceNumber == 0) { // Start a new series for channel B
+							if (sequenceNumber == 0) {
+								if (isUpdateB == true) {
+									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, false);
+								}
+								isUpdateB = false;
 								bSeries = new XYSeries(Constant.CHANNEL_B);
 								bCurrentTime = 0;
-								bPeriod = dataPacket.getPeriod(); 
+								bPeriod = dataPacket.getPeriod();
 								bMaxDiplayVoltage = mainWindow_.getMaxDisplayVoltage(Constant.B_INDEX);
 								bMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.B_INDEX);
+								maxDisplayTime = mainWindow_.getMaxDisplayTime();
+								bTotalOfSamples = 0;
 							}
 							for (short i = 0; i < nSamples; i++) {
 								double voltage = (bMaxDiplayVoltage - bMinDiplayVoltage) * ((double) samples[i] / 255.0)
 										+ bMinDiplayVoltage;
 								bSeries.add(bCurrentTime, voltage);
 								bCurrentTime += bPeriod;
+								bTotalOfSamples += 1;
 							}
-							mainWindow_.setXYSeriesForChannel(Constant.CHANNEL_B, bSeries);
+							if (isUpdateB == false) {
+								if (bCurrentTime >= maxDisplayTime) {
+									mainWindow_.setXYSeries(Constant.CHANNEL_B, aSeries, true);
+									isUpdateB = true;
+								} else if (bTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_B)) {
+									mainWindow_.setXYSeries(Constant.CHANNEL_B, aSeries, true);
+									isUpdateB = false;
+								}
+							}
+							break;
 
 						case PacketType.CHANNEL_A_12_BITS:
-							if (sequenceNumber == 0) { // Start a new series for channel A
+							if (sequenceNumber == 0) {
+								if (isUpdateA == true) {
+									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, false);
+								}
+								isUpdateA = false;
 								aSeries = new XYSeries(Constant.CHANNEL_A);
 								aCurrentTime = 0;
 								aPeriod = dataPacket.getPeriod();
 								aMaxDiplayVoltage = mainWindow_.getMaxDisplayVoltage(Constant.A_INDEX);
 								aMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.A_INDEX);
+								maxDisplayTime = mainWindow_.getMaxDisplayTime();
+								aTotalOfSamples = 0;
 							}
 							for (short i = 0; i < nSamples; i++) {
-								double voltage = (aMaxDiplayVoltage - aMinDiplayVoltage) * ((double) samples[i] / 4095.0)
-										+ aMinDiplayVoltage;
+								double voltage = (aMaxDiplayVoltage - aMinDiplayVoltage)
+										* ((double) samples[i] / 4095.0) + aMinDiplayVoltage;
 								aSeries.add(aCurrentTime, voltage);
 								aCurrentTime += aPeriod;
+								aTotalOfSamples += 1;
 							}
-							mainWindow_.setXYSeriesForChannel(Constant.CHANNEL_A, aSeries);
+							if (isUpdateA == false) {
+								if (aCurrentTime >= maxDisplayTime) {
+									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, true);
+									isUpdateA = true;
+								} else if (aTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_A)) {
+									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, true);
+									isUpdateA = false;
+								}
+							}
+							break;
 
 						case PacketType.CHANNEL_B_12_BITS:
-							if (sequenceNumber == 0) { // Start a new series for channel B
+							if (sequenceNumber == 0) {
+								if (isUpdateB == true) {
+									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, false);
+								}
+								isUpdateB = false;
 								bSeries = new XYSeries(Constant.CHANNEL_B);
 								bCurrentTime = 0;
 								bPeriod = dataPacket.getPeriod();
 								bMaxDiplayVoltage = mainWindow_.getMaxDisplayVoltage(Constant.B_INDEX);
 								bMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.B_INDEX);
+								maxDisplayTime = mainWindow_.getMaxDisplayTime();
+								bTotalOfSamples = 0;
 							}
 							for (short i = 0; i < nSamples; i++) {
-								double voltage = (bMaxDiplayVoltage - bMinDiplayVoltage) * ((double) samples[i] / 4095.0)
-										+ bMinDiplayVoltage;
+								double voltage = (bMaxDiplayVoltage - bMinDiplayVoltage)
+										* ((double) samples[i] / 4095.0) + bMinDiplayVoltage;
 								bSeries.add(bCurrentTime, voltage);
 								bCurrentTime += bPeriod;
+								bTotalOfSamples += 1;
 							}
-							mainWindow_.setXYSeriesForChannel(Constant.CHANNEL_B, bSeries);
+							if (isUpdateB == false) {
+								if (bCurrentTime >= maxDisplayTime) {
+									mainWindow_.setXYSeries(Constant.CHANNEL_B, aSeries, true);
+									isUpdateB = true;
+								} else if (bTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_B)) {
+									mainWindow_.setXYSeries(Constant.CHANNEL_B, aSeries, true);
+									isUpdateB = false;
+								}
+							}
+							break;
+
 						}
-					} 
+					}
 				}
 			}
 		} catch (PacketFormatException pfe) {
