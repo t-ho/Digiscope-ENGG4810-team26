@@ -29,9 +29,17 @@
 #define VDIV_MIN 20000
 #define VDIV_MAX 2000000
 
-static const char * const menu_titles[] = { "Team 26 Oscilloscope", "Range", "Trigger", "Wave Generator", "Brightness", "Overvoltage Warning!" };
+#define CHANNEL_A 0
+#define CHANNEL_B 1
+#define COUPLING_DC 0
+#define COUPLING_AC 1
+
+static const char * const menu_titles[] = { "Team 26 Oscilloscope", "Channel X", "Trigger", "Wave Generator", "Brightness", "Overvoltage Warning!" };
 
 static uint8_t brightness = 5;
+
+static uint8_t current_channel = 0;
+static uint8_t current_coupling[] = { COUPLING_DC, COUPLING_DC };
 
 tCanvasWidget g_sTitle;
 
@@ -85,12 +93,36 @@ tCanvasWidget menus[] =
 };
 
 MENU_NAV(MAIN)
-MENU_NAV(RANGE)
 MENU_NAV(TRIGGER)
 MENU_NAV(WAVEGEN)
 MENU_NAV(BRIGHTNESS)
 MENU_NAV(OVERVOLTAGE)
 
+char coupling_text[] = "DC";
+
+void OnRange_A(tWidget *psWidget)
+{
+	current_channel = CHANNEL_A;
+	WidgetRemove((tWidget *)&menus[current_menu]);
+	current_menu = RANGE_MENU;
+	WidgetAdd(WIDGET_ROOT, (tWidget *)&menus[current_menu]);
+    CanvasTextSet(&g_sTitle, "Channel A");
+	coupling_text[0] = ((current_coupling[current_channel] == COUPLING_AC) ? 'A':'D');
+    WidgetPaint(WIDGET_ROOT);
+}
+
+void OnRange_B(tWidget *psWidget)
+{
+	current_channel = CHANNEL_B;
+	WidgetRemove((tWidget *)&menus[current_menu]);
+	current_menu = RANGE_MENU;
+	WidgetAdd(WIDGET_ROOT, (tWidget *)&menus[current_menu]);
+    CanvasTextSet(&g_sTitle, "Channel B");
+	coupling_text[0] = ((current_coupling[current_channel] == COUPLING_AC) ? 'A':'D');
+    WidgetPaint(WIDGET_ROOT);
+}
+
+void OnCoupling(tWidget *psWidget);
 void EnterSleep(tWidget *psWidget);
 void OnPrevious(tWidget *psWidget);
 void OnNext(tWidget *psWidget);
@@ -116,25 +148,28 @@ tPushButtonWidget main_menu_buttons[] =
 {
 		RectangularButtonStruct(&menus[MAIN_MENU], main_menu_buttons + 1, 0, &SSD1289_Display, 0, 30,
 		                  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrBlue, ClrYellow, ClrWhite,
-						  ClrWhite, &g_sFontCm18b, "Range", 0, 0, 0, 0, OnRANGE),
+						  ClrWhite, &g_sFontCm18b, "Channel A", 0, 0, 0, 0, OnRange_A),
 		RectangularButtonStruct(&menus[MAIN_MENU], main_menu_buttons + 2, 0, &SSD1289_Display, 110, 30,
 						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrBlue, ClrYellow, ClrWhite,
-						  ClrWhite, &g_sFontCm18b, "Trigger", 0, 0, 0, 0, OnTRIGGER),
+						  ClrWhite, &g_sFontCm18b, "Channel B", 0, 0, 0, 0, OnRange_B),
 		RectangularButtonStruct(&menus[MAIN_MENU], main_menu_buttons + 3, 0, &SSD1289_Display, 220, 30,
-		                  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrBlue, ClrYellow, ClrWhite,
-						  ClrWhite, &g_sFontCm18b, "Wave Gen", 0, 0, 0, 0, OnWAVEGEN),
+						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrBlue, ClrYellow, ClrWhite,
+						  ClrWhite, &g_sFontCm18b, "Trigger", 0, 0, 0, 0, OnTRIGGER),
 		RectangularButtonStruct(&menus[MAIN_MENU], main_menu_buttons + 4, 0, &SSD1289_Display, 0, 120,
 						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrBlue, ClrYellow, ClrWhite,
 						  ClrWhite, &g_sFontCm18b, "Brightness", 0, 0, 0, 0, OnBRIGHTNESS),
-		RectangularButtonStruct(&menus[MAIN_MENU], 0, 0, &SSD1289_Display, 110, 120,
+		RectangularButtonStruct(&menus[MAIN_MENU], main_menu_buttons + 5, 0, &SSD1289_Display, 110, 120,
 						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrBlue, ClrYellow, ClrWhite,
 						  ClrWhite, &g_sFontCm18b, "Sleep", 0, 0, 0, 0, EnterSleep),
+		RectangularButtonStruct(&menus[MAIN_MENU], 0, 0, &SSD1289_Display, 220, 120,
+					  	  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrBlue, ClrYellow, ClrWhite,
+						  ClrWhite, &g_sFontCm18b, "Wave Gen", 0, 0, 0, 0, OnWAVEGEN),
 };
 
-char vert_div_text1[] = "500";
-char vert_div_text2[] = "mV/div";
-char hor_div_text1[] = "500";
-char hor_div_text2[] = "us/div";
+static char vert_div_text1[] = "500";
+static char vert_div_text2[] = "mV/div";
+static char hor_div_text1[] = "500";
+static char hor_div_text2[] = "us/div";
 
 Canvas(hor_div_label1, &menus[RANGE_MENU], 0, 0, &SSD1289_Display, 170, 140, 90, 20,
        CANVAS_STYLE_TEXT | CANVAS_STYLE_TEXT_OPAQUE | CANVAS_STYLE_FILL, 0, 0, ClrWhite,
@@ -156,7 +191,7 @@ tPushButtonWidget range_menu_buttons[] =
 						  ClrWhite, &g_sFontCm18b, "Back", 0, 0, 0, 0, OnMAIN),
 		RectangularButtonStruct(&menus[RANGE_MENU], range_menu_buttons + 2, 0, &SSD1289_Display, 0, 120,
 						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
-						  ClrWhite, &g_sFontCm18b, "AC", 0, 0, 0, 0, OnPrevious),
+						  ClrWhite, &g_sFontCm18b, coupling_text, 0, 0, 0, 0, OnCoupling),
 		RectangularButtonStruct(&menus[RANGE_MENU], range_menu_buttons + 3, 0, &SSD1289_Display, 110, 30,
 		                  60, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
 						  ClrWhite, &g_sFontCm18b, "-", 0, 0, 0, 0, VertRangeDown),
@@ -246,6 +281,29 @@ tPushButtonWidget overvoltage_menu_buttons[] =
 };
 
 void
+SetCoupling(uint8_t channel, uint8_t coupling)
+{
+	current_coupling[channel] = coupling;
+
+	if (current_channel == channel && current_menu == RANGE_MENU)
+	{
+		coupling_text[0] = ((coupling == COUPLING_AC) ? 'A':'D');
+	    WidgetPaint(WIDGET_ROOT);
+	}
+
+	Command cmd;
+	cmd.type = (channel == CHANNEL_A) ? COMMAND_COUPLING_A : COMMAND_COUPLING_B;
+	cmd.args[0] = coupling;
+	NetSend(&cmd, 0);
+}
+
+void
+OnCoupling(tWidget *psWidget)
+{
+	SetCoupling(current_channel, (current_coupling[current_channel] == COUPLING_AC) ? COUPLING_DC : COUPLING_AC);
+}
+
+void
 OverVoltageAcknowledge(tWidget *psWidget)
 {
 	OverVoltageReenable();
@@ -320,13 +378,13 @@ void VertRangeChange(uint32_t newVal, uint8_t channel)
 void
 VertRangeUp(tWidget *psWidget)
 {
-	VertRangeChange(Standard_Step(vdiv_vals[0], 1), 0);
+	VertRangeChange(Standard_Step(vdiv_vals[0], 1), current_channel);
 }
 
 void
 VertRangeDown(tWidget *psWidget)
 {
-	VertRangeChange(Standard_Step(vdiv_vals[0], -1), 0);
+	VertRangeChange(Standard_Step(vdiv_vals[0], -1), current_channel);
 }
 
 void HorRangeChange(uint32_t newVal)
@@ -479,6 +537,12 @@ screenDemo(UArg arg0, UArg arg1)
     		case COMMAND_TRIGGER_FORCE_A:
     		case COMMAND_TRIGGER_FORCE_B:
     			ForceTrigger();
+    			break;
+    		case COMMAND_COUPLING_A:
+    			SetCoupling(CHANNEL_A, 1 ^ current_coupling[CHANNEL_A]);
+    			break;
+    		case COMMAND_COUPLING_B:
+    			SetCoupling(CHANNEL_B, 1 ^ current_coupling[CHANNEL_A]);
     			break;
     		case _COMMAND_UNKNOWN:
     			/* Fallthrough */

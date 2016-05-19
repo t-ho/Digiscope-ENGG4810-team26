@@ -27,6 +27,12 @@ WaveGenSetFreq(uint32_t freq)
 
 }
 
+uint32_t
+WaveGenGetFreq(void)
+{
+	return 1000000;
+}
+
 void
 WaveGenEnableSet(uint8_t on)
 {

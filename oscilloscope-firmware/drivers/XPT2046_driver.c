@@ -138,7 +138,7 @@ Touch_ReadData()
 }
 
 static void
-Touch_Read(uint32_t *x_out, uint32_t *y_out)
+Touch_Read(int32_t *x_out, int32_t *y_out)
 {
 	uint32_t tx=0;
 	uint32_t ty=0;

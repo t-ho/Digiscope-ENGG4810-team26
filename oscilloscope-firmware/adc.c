@@ -66,18 +66,6 @@ ADC_Init(void)
 	ADCIntEnable(ADC0_BASE, 0);
 }
 
-static void
-ADCprocess(uint32_t ch)
-{
-	//if (uDMAChannelModeGet(ch) != UDMA_MODE_STOP) return;
-	// Faster way?
-    if ((((tDMAControlTable *) udmaCtrlTable)[ch].ui32Control & UDMA_CHCTL_XFERMODE_M) != UDMA_MODE_STOP) return;
-
-    // store the next buffer in the uDMA transfer descriptor
-    // the ADC is read directly into the correct emacBufTx to be transmitted
-    uDMAChannelTransferSet(ch, UDMA_MODE_PINGPONG, (void *)(ADC0_BASE + ADC_O_SSFIFO0), &adc_buffer[adc_pos], ADC_SAMPLE_BUF_SIZE);
-}
-
 void
 ADCPause(void)
 {

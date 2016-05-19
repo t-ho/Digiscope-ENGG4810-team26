@@ -60,7 +60,6 @@ void tcpHandler(UArg arg0, UArg arg1);
 #define NUMTCPWORKERS 3
 
 static Mailbox_Handle NetCommandMailbox;
-static Mailbox_Handle NetSampleMailbox;
 
 void
 Init_SendQueue(void)
@@ -105,6 +104,7 @@ Void tcpWorker(UArg arg0, UArg arg1)
 		{
 			Command *cmd = (Command*) buffer;
 			cmd->args[0] = ntohl(cmd->args[0]);
+			System_printf("C: %x - %d\n", cmd->type, cmd->args[0]);
 			Mailbox_post(GraphicsMailbox, cmd, 0);
 		}
 		else if (bytesRcvd > 0)
