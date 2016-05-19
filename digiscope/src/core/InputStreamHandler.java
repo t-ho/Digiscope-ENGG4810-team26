@@ -34,9 +34,9 @@ public class InputStreamHandler implements Runnable {
 		try {
 			boolean isComplete = false;
 			int aCurrentTime = 0;
-			int aTimeDistance = 1; // 1 us
+			int aPeriod = 0; 
 			int bCurrentTime = 0;
-			int bTimeDistance = 1;
+			int bPeriod = 0;
 			double aMaxDiplayVoltage = 0;
 			double aMinDiplayVoltage = 0;
 			double bMaxDiplayVoltage = 0;
@@ -104,7 +104,7 @@ public class InputStreamHandler implements Runnable {
 							if (sequenceNumber == 0) { // Start a new series for channel A
 								aSeries = new XYSeries(Constant.CHANNEL_A);
 								aCurrentTime = 0;
-								aTimeDistance = 1; // 1 us
+								aPeriod = dataPacket.getPeriod();
 								aMaxDiplayVoltage = mainWindow_.getMaxDisplayVoltage(Constant.A_INDEX);
 								aMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.A_INDEX);
 							}
@@ -112,7 +112,7 @@ public class InputStreamHandler implements Runnable {
 								double voltage = (aMaxDiplayVoltage - aMinDiplayVoltage) * ((double) samples[i] / 255.0)
 										+ aMinDiplayVoltage;
 								aSeries.add(aCurrentTime, voltage);
-								aCurrentTime += aTimeDistance;
+								aCurrentTime += aPeriod;
 							}
 							mainWindow_.setXYSeriesForChannel(Constant.CHANNEL_A, aSeries);
 
@@ -120,7 +120,7 @@ public class InputStreamHandler implements Runnable {
 							if (sequenceNumber == 0) { // Start a new series for channel B
 								bSeries = new XYSeries(Constant.CHANNEL_B);
 								bCurrentTime = 0;
-								bTimeDistance = 1; // 1 us
+								bPeriod = dataPacket.getPeriod(); 
 								bMaxDiplayVoltage = mainWindow_.getMaxDisplayVoltage(Constant.B_INDEX);
 								bMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.B_INDEX);
 							}
@@ -128,7 +128,7 @@ public class InputStreamHandler implements Runnable {
 								double voltage = (bMaxDiplayVoltage - bMinDiplayVoltage) * ((double) samples[i] / 255.0)
 										+ bMinDiplayVoltage;
 								bSeries.add(bCurrentTime, voltage);
-								bCurrentTime += bTimeDistance;
+								bCurrentTime += bPeriod;
 							}
 							mainWindow_.setXYSeriesForChannel(Constant.CHANNEL_B, bSeries);
 
@@ -136,7 +136,7 @@ public class InputStreamHandler implements Runnable {
 							if (sequenceNumber == 0) { // Start a new series for channel A
 								aSeries = new XYSeries(Constant.CHANNEL_A);
 								aCurrentTime = 0;
-								aTimeDistance = 1; // 1 us
+								aPeriod = dataPacket.getPeriod();
 								aMaxDiplayVoltage = mainWindow_.getMaxDisplayVoltage(Constant.A_INDEX);
 								aMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.A_INDEX);
 							}
@@ -144,7 +144,7 @@ public class InputStreamHandler implements Runnable {
 								double voltage = (aMaxDiplayVoltage - aMinDiplayVoltage) * ((double) samples[i] / 4095.0)
 										+ aMinDiplayVoltage;
 								aSeries.add(aCurrentTime, voltage);
-								aCurrentTime += aTimeDistance;
+								aCurrentTime += aPeriod;
 							}
 							mainWindow_.setXYSeriesForChannel(Constant.CHANNEL_A, aSeries);
 
@@ -152,7 +152,7 @@ public class InputStreamHandler implements Runnable {
 							if (sequenceNumber == 0) { // Start a new series for channel B
 								bSeries = new XYSeries(Constant.CHANNEL_B);
 								bCurrentTime = 0;
-								bTimeDistance = 1; // 1 us
+								bPeriod = dataPacket.getPeriod();
 								bMaxDiplayVoltage = mainWindow_.getMaxDisplayVoltage(Constant.B_INDEX);
 								bMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.B_INDEX);
 							}
@@ -160,7 +160,7 @@ public class InputStreamHandler implements Runnable {
 								double voltage = (bMaxDiplayVoltage - bMinDiplayVoltage) * ((double) samples[i] / 4095.0)
 										+ bMinDiplayVoltage;
 								bSeries.add(bCurrentTime, voltage);
-								bCurrentTime += bTimeDistance;
+								bCurrentTime += bPeriod;
 							}
 							mainWindow_.setXYSeriesForChannel(Constant.CHANNEL_B, bSeries);
 						}
