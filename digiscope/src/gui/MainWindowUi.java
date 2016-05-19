@@ -54,8 +54,12 @@ public class MainWindowUi extends JFrame {
     private JPanel channelAPanel_;
     protected JCheckBox channelBCheckBox;
     private JPanel channelBPanel_;
-    private JPanel channelCouplingPanel_;
-    protected JToggleButton channelCouplingToggleButton;
+    private JPanel channelCouplingAPanel_;
+    protected JToggleButton channelCouplingAToggleButton;
+    private JPanel channelCouplingBPanel_;
+    protected JToggleButton channelCouplingBToggleButton;
+    protected JToggleButton channelModeAToggleButton;
+    protected JToggleButton channelModeBToggleButton;
     private JTabbedPane channelTabbedPane_;
     private JPanel channelVisibilityPanel_;
     protected JTextField csvFilePathTextField;
@@ -71,7 +75,8 @@ public class MainWindowUi extends JFrame {
     protected JCheckBox filterChannelCheckBox;
     private JPanel filterChannelPanel_;
     protected JLabel filterDivisionInfoLabel;
-    protected JButton forceTriggerButton;
+    protected JButton forceTriggerAButton;
+    protected JButton forceTriggerBButton;
     protected JLabel frequencyALabel;
     private JLabel frequencyALabel_;
     protected JLabel frequencyBLabel;
@@ -200,15 +205,18 @@ public class MainWindowUi extends JFrame {
     protected JLabel minVoltageMathLabel;
     private JLabel minVoltageMathLabel_;
     protected JButton newExpressionButton;
-    private JLabel noOfSamplesLabel_;
-    protected JSpinner noOfSamplesSpinner;
+    private JLabel noOfSamplesALabel_;
+    protected JSpinner noOfSamplesASpinner;
+    private JLabel noOfSamplesBLabel_;
+    protected JSpinner noOfSamplesBSpinner;
     private JLabel outputLabel_;
     protected JToggleButton outputToggleButton;
     private JLabel p2pVoltageLabel2_;
     private JLabel p2pVoltageLabel_;
     protected JTextField p2pVoltageTextField;
     protected JComboBox<String> p2pVoltageUnitComboBox;
-    protected JButton rearmTriggerButton;
+    protected JButton rearmTriggerAButton;
+    protected JButton rearmTriggerBButton;
     protected JButton removeExpressionButton;
     protected JButton removeFilterButton;
     private JPanel rightPanel_;
@@ -223,22 +231,38 @@ public class MainWindowUi extends JFrame {
     protected JLabel standardDeviationVoltageMathLabel;
     private JLabel standardDeviationVoltageMathLabel_;
     private JToolBar toolBar_;
-    private JPanel triggerBottomLeftPanel3_;
-    private JPanel triggerBottomRightPanel3_;
-    private JPanel triggerMiddleLeftPanel1_;
-    private JPanel triggerMiddleLeftPanel2_;
-    private JPanel triggerMiddleRightPanel1_;
-    private JPanel triggerMiddleRightPanel2_;
-    protected JComboBox<String> triggerModeComboBox;
-    private JLabel triggerModeLabel_;
-    private JPanel triggerPanel_;
-    protected JLabel triggerStateLabel;
-    private JLabel triggerStateLabel_;
-    private JLabel triggerThresholdLabel_;
-    protected JSpinner triggerThresholdSpinner;
-    private JPanel triggerTopPanel_;
-    protected JComboBox<String> triggerTypeComboBox;
-    private JLabel triggerTypeLabel_;
+    private JPanel triggerABottomLeftPanel3_;
+    private JPanel triggerABottomRightPanel3_;
+    private JPanel triggerAMiddleLeftPanel1_;
+    private JPanel triggerAMiddleLeftPanel2_;
+    private JPanel triggerAMiddleRightPanel1_;
+    private JPanel triggerAMiddleRightPanel2_;
+    private JPanel triggerAPanel_;
+    private JPanel triggerATopPanel_;
+    private JPanel triggerBBottomLeftPanel3_;
+    private JPanel triggerBBottomRightPanel3_;
+    private JPanel triggerBMiddleLeftPanel1_;
+    private JPanel triggerBMiddleLeftPanel2_;
+    private JPanel triggerBMiddleRightPanel1_;
+    private JPanel triggerBMiddleRightPanel2_;
+    private JPanel triggerBPanel_;
+    private JPanel triggerBTopPanel_;
+    protected JComboBox<String> triggerModeAComboBox;
+    private JLabel triggerModeALabel_;
+    protected JComboBox<String> triggerModeBComboBox;
+    private JLabel triggerModeBLabel_;
+    protected JLabel triggerStateALabel;
+    private JLabel triggerStateALabel_;
+    protected JLabel triggerStateBLabel;
+    private JLabel triggerStateBLabel_;
+    private JLabel triggerThresholdALabel_;
+    protected JSpinner triggerThresholdASpinner;
+    private JLabel triggerThresholdBLabel_;
+    protected JSpinner triggerThresholdBSpinner;
+    protected JComboBox<String> triggerTypeAComboBox;
+    private JLabel triggerTypeALabel_;
+    protected JComboBox<String> triggerTypeBComboBox;
+    private JLabel triggerTypeBLabel_;
     private JPanel verticalALeftPanel_;
     private JPanel verticalAPannel_;
     private JPanel verticalARightPanel_;
@@ -310,8 +334,6 @@ public class MainWindowUi extends JFrame {
     private void initComponents() {
 
         leftPanel_ = new JPanel();
-        channelCouplingPanel_ = new JPanel();
-        channelCouplingToggleButton = new JToggleButton();
         channelVisibilityPanel_ = new JPanel();
         channelACheckBox = new JCheckBox();
         channelBCheckBox = new JCheckBox();
@@ -320,6 +342,9 @@ public class MainWindowUi extends JFrame {
         generatorCheckBox = new JCheckBox();
         channelTabbedPane_ = new JTabbedPane();
         channelAPanel_ = new JPanel();
+        channelCouplingAPanel_ = new JPanel();
+        channelCouplingAToggleButton = new JToggleButton();
+        channelModeAToggleButton = new JToggleButton();
         horizontalAPanel_ = new JPanel();
         horizontalALeftPanel_ = new JPanel();
         horizontalRangeALabel1_ = new JLabel();
@@ -359,7 +384,30 @@ public class MainWindowUi extends JFrame {
         measurementABottomRightPanel_ = new JPanel();
         frequencyALabel_ = new JLabel();
         frequencyALabel = new JLabel();
+        triggerAPanel_ = new JPanel();
+        triggerATopPanel_ = new JPanel();
+        triggerStateALabel_ = new JLabel();
+        triggerStateALabel = new JLabel();
+        triggerAMiddleLeftPanel1_ = new JPanel();
+        triggerModeALabel_ = new JLabel();
+        triggerModeAComboBox = new JComboBox<String>();
+        triggerAMiddleRightPanel1_ = new JPanel();
+        forceTriggerAButton = new JButton();
+        triggerAMiddleLeftPanel2_ = new JPanel();
+        triggerTypeALabel_ = new JLabel();
+        triggerTypeAComboBox = new JComboBox<String>();
+        triggerAMiddleRightPanel2_ = new JPanel();
+        rearmTriggerAButton = new JButton();
+        triggerABottomLeftPanel3_ = new JPanel();
+        noOfSamplesALabel_ = new JLabel();
+        noOfSamplesASpinner = new JSpinner();
+        triggerABottomRightPanel3_ = new JPanel();
+        triggerThresholdALabel_ = new JLabel();
+        triggerThresholdASpinner = new JSpinner();
         channelBPanel_ = new JPanel();
+        channelCouplingBPanel_ = new JPanel();
+        channelCouplingBToggleButton = new JToggleButton();
+        channelModeBToggleButton = new JToggleButton();
         horizontalBPanel_ = new JPanel();
         horizontalBLeftPanel_ = new JPanel();
         horizontalRangeBLabel1_ = new JLabel();
@@ -399,6 +447,26 @@ public class MainWindowUi extends JFrame {
         measurementBBottomRightPanel_ = new JPanel();
         frequencyBLabel_ = new JLabel();
         frequencyBLabel = new JLabel();
+        triggerBPanel_ = new JPanel();
+        triggerBTopPanel_ = new JPanel();
+        triggerStateBLabel_ = new JLabel();
+        triggerStateBLabel = new JLabel();
+        triggerBMiddleLeftPanel1_ = new JPanel();
+        triggerModeBLabel_ = new JLabel();
+        triggerModeBComboBox = new JComboBox<String>();
+        triggerBMiddleRightPanel1_ = new JPanel();
+        forceTriggerBButton = new JButton();
+        triggerBMiddleLeftPanel2_ = new JPanel();
+        triggerTypeBLabel_ = new JLabel();
+        triggerTypeBComboBox = new JComboBox<String>();
+        triggerBMiddleRightPanel2_ = new JPanel();
+        rearmTriggerBButton = new JButton();
+        triggerBBottomLeftPanel3_ = new JPanel();
+        noOfSamplesBLabel_ = new JLabel();
+        noOfSamplesBSpinner = new JSpinner();
+        triggerBBottomRightPanel3_ = new JPanel();
+        triggerThresholdBLabel_ = new JLabel();
+        triggerThresholdBSpinner = new JSpinner();
         mathChannelPanel_ = new JPanel();
         expressionPannel_ = new JPanel();
         expressionTopPanel_ = new JPanel();
@@ -528,26 +596,6 @@ public class MainWindowUi extends JFrame {
         verticalOffsetGeneratorSpinner = new JSpinner();
         verticalOffsetGeneratorLabel2_ = new JLabel();
         verticalOffsetUnitGeneratorComboBox = new JComboBox<String>();
-        triggerPanel_ = new JPanel();
-        triggerTopPanel_ = new JPanel();
-        triggerStateLabel_ = new JLabel();
-        triggerStateLabel = new JLabel();
-        triggerMiddleLeftPanel1_ = new JPanel();
-        triggerModeLabel_ = new JLabel();
-        triggerModeComboBox = new JComboBox<String>();
-        triggerMiddleRightPanel1_ = new JPanel();
-        forceTriggerButton = new JButton();
-        triggerMiddleLeftPanel2_ = new JPanel();
-        triggerTypeLabel_ = new JLabel();
-        triggerTypeComboBox = new JComboBox<String>();
-        triggerMiddleRightPanel2_ = new JPanel();
-        rearmTriggerButton = new JButton();
-        triggerBottomLeftPanel3_ = new JPanel();
-        noOfSamplesLabel_ = new JLabel();
-        noOfSamplesSpinner = new JSpinner();
-        triggerBottomRightPanel3_ = new JPanel();
-        triggerThresholdLabel_ = new JLabel();
-        triggerThresholdSpinner = new JSpinner();
         rightPanel_ = new JPanel();
         divisionInfoPanel_ = new JPanel();
         aDivisionInfoLabel = new JLabel();
@@ -570,17 +618,6 @@ public class MainWindowUi extends JFrame {
         leftPanel_.setBorder(BorderFactory.createTitledBorder(""));
         leftPanel_.setPreferredSize(new Dimension(400, 650));
         leftPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 2, 3));
-
-        channelCouplingPanel_.setBorder(BorderFactory.createTitledBorder("Channel Coupling"));
-        channelCouplingPanel_.setPreferredSize(new Dimension(396, 50));
-        channelCouplingPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 8, 0));
-
-        channelCouplingToggleButton.setText("AC");
-        channelCouplingToggleButton.setFocusable(false);
-        channelCouplingToggleButton.setPreferredSize(new Dimension(80, 23));
-        channelCouplingPanel_.add(channelCouplingToggleButton);
-
-        leftPanel_.add(channelCouplingPanel_);
 
         channelVisibilityPanel_.setBorder(BorderFactory.createTitledBorder("Channel Visibility"));
         channelVisibilityPanel_.setPreferredSize(new Dimension(396, 45));
@@ -614,7 +651,22 @@ public class MainWindowUi extends JFrame {
         leftPanel_.add(channelVisibilityPanel_);
 
         channelTabbedPane_.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        channelTabbedPane_.setPreferredSize(new Dimension(396, 440));
+        channelTabbedPane_.setPreferredSize(new Dimension(396, 520));
+
+        channelCouplingAPanel_.setPreferredSize(new Dimension(390, 30));
+        channelCouplingAPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 5));
+
+        channelCouplingAToggleButton.setText("AC");
+        channelCouplingAToggleButton.setFocusable(false);
+        channelCouplingAToggleButton.setPreferredSize(new Dimension(80, 23));
+        channelCouplingAPanel_.add(channelCouplingAToggleButton);
+
+        channelModeAToggleButton.setText("12-bit");
+        channelModeAToggleButton.setFocusable(false);
+        channelModeAToggleButton.setPreferredSize(new Dimension(80, 23));
+        channelCouplingAPanel_.add(channelModeAToggleButton);
+
+        channelAPanel_.add(channelCouplingAPanel_);
 
         horizontalAPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
         horizontalAPanel_.setPreferredSize(new Dimension(390, 55));
@@ -778,7 +830,112 @@ public class MainWindowUi extends JFrame {
 
         channelAPanel_.add(measurementsAPanel_);
 
+        triggerAPanel_.setBorder(BorderFactory.createTitledBorder("Trigger"));
+        triggerAPanel_.setPreferredSize(new Dimension(390, 140));
+        triggerAPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
+
+        triggerATopPanel_.setPreferredSize(new Dimension(350, 25));
+        triggerATopPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
+
+        triggerStateALabel_.setText("State:");
+        triggerATopPanel_.add(triggerStateALabel_);
+
+        triggerStateALabel.setForeground(Color.blue);
+        triggerStateALabel.setHorizontalAlignment(SwingConstants.CENTER);
+        triggerStateALabel.setText("Stop");
+        triggerStateALabel.setBorder(BorderFactory.createTitledBorder(""));
+        triggerStateALabel.setPreferredSize(new Dimension(80, 19));
+        triggerATopPanel_.add(triggerStateALabel);
+
+        triggerAPanel_.add(triggerATopPanel_);
+
+        triggerAMiddleLeftPanel1_.setPreferredSize(new Dimension(220, 30));
+        triggerAMiddleLeftPanel1_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
+
+        triggerModeALabel_.setText("Mode:");
+        triggerModeALabel_.setPreferredSize(new Dimension(40, 14));
+        triggerAMiddleLeftPanel1_.add(triggerModeALabel_);
+
+        triggerModeAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.TRIGGER_MODES));
+        triggerModeAComboBox.setPreferredSize(new Dimension(135, 20));
+        triggerAMiddleLeftPanel1_.add(triggerModeAComboBox);
+
+        triggerAPanel_.add(triggerAMiddleLeftPanel1_);
+
+        triggerAMiddleRightPanel1_.setPreferredSize(new Dimension(155, 30));
+        triggerAMiddleRightPanel1_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 3));
+
+        forceTriggerAButton.setText("Force Trigger");
+        forceTriggerAButton.setFocusable(false);
+        forceTriggerAButton.setPreferredSize(new Dimension(130, 23));
+        triggerAMiddleRightPanel1_.add(forceTriggerAButton);
+
+        triggerAPanel_.add(triggerAMiddleRightPanel1_);
+
+        triggerAMiddleLeftPanel2_.setPreferredSize(new Dimension(220, 30));
+        triggerAMiddleLeftPanel2_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
+
+        triggerTypeALabel_.setText("Type:");
+        triggerTypeALabel_.setPreferredSize(new Dimension(40, 14));
+        triggerAMiddleLeftPanel2_.add(triggerTypeALabel_);
+
+        triggerTypeAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.TRIGGER_TYPES));
+        triggerTypeAComboBox.setPreferredSize(new Dimension(135, 20));
+        triggerAMiddleLeftPanel2_.add(triggerTypeAComboBox);
+
+        triggerAPanel_.add(triggerAMiddleLeftPanel2_);
+
+        triggerAMiddleRightPanel2_.setPreferredSize(new Dimension(155, 30));
+        triggerAMiddleRightPanel2_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 3));
+
+        rearmTriggerAButton.setText("Re-arm - OFF");
+        rearmTriggerAButton.setEnabled(false);
+        rearmTriggerAButton.setFocusable(false);
+        rearmTriggerAButton.setPreferredSize(new Dimension(130, 23));
+        triggerAMiddleRightPanel2_.add(rearmTriggerAButton);
+
+        triggerAPanel_.add(triggerAMiddleRightPanel2_);
+
+        triggerABottomLeftPanel3_.setPreferredSize(new Dimension(220, 30));
+        triggerABottomLeftPanel3_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
+
+        noOfSamplesALabel_.setText("No. of Samples:");
+        noOfSamplesALabel_.setPreferredSize(new Dimension(105, 14));
+        triggerABottomLeftPanel3_.add(noOfSamplesALabel_);
+
+        noOfSamplesASpinner.setPreferredSize(new Dimension(70, 20));
+        triggerABottomLeftPanel3_.add(noOfSamplesASpinner);
+
+        triggerAPanel_.add(triggerABottomLeftPanel3_);
+
+        triggerABottomRightPanel3_.setPreferredSize(new Dimension(155, 30));
+
+        triggerThresholdALabel_.setText("Threshold:");
+        triggerABottomRightPanel3_.add(triggerThresholdALabel_);
+
+        triggerThresholdASpinner.setPreferredSize(new Dimension(65, 20));
+        triggerABottomRightPanel3_.add(triggerThresholdASpinner);
+
+        triggerAPanel_.add(triggerABottomRightPanel3_);
+
+        channelAPanel_.add(triggerAPanel_);
+
         channelTabbedPane_.addTab("Channel A", channelAPanel_);
+
+        channelCouplingBPanel_.setPreferredSize(new Dimension(390, 30));
+        channelCouplingBPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 5));
+
+        channelCouplingBToggleButton.setText("AC");
+        channelCouplingBToggleButton.setFocusable(false);
+        channelCouplingBToggleButton.setPreferredSize(new Dimension(80, 23));
+        channelCouplingBPanel_.add(channelCouplingBToggleButton);
+
+        channelModeBToggleButton.setText("12-bit");
+        channelModeBToggleButton.setFocusable(false);
+        channelModeBToggleButton.setPreferredSize(new Dimension(80, 23));
+        channelCouplingBPanel_.add(channelModeBToggleButton);
+
+        channelBPanel_.add(channelCouplingBPanel_);
 
         horizontalBPanel_.setBorder(BorderFactory.createTitledBorder("Horizontal"));
         horizontalBPanel_.setPreferredSize(new Dimension(390, 55));
@@ -942,6 +1099,96 @@ public class MainWindowUi extends JFrame {
 
         channelBPanel_.add(measurementsBPanel_);
 
+        triggerBPanel_.setBorder(BorderFactory.createTitledBorder("Trigger"));
+        triggerBPanel_.setPreferredSize(new Dimension(390, 140));
+        triggerBPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
+
+        triggerBTopPanel_.setPreferredSize(new Dimension(350, 25));
+        triggerBTopPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
+
+        triggerStateBLabel_.setText("State:");
+        triggerBTopPanel_.add(triggerStateBLabel_);
+
+        triggerStateBLabel.setForeground(Color.blue);
+        triggerStateBLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        triggerStateBLabel.setText("Stop");
+        triggerStateBLabel.setBorder(BorderFactory.createTitledBorder(""));
+        triggerStateBLabel.setPreferredSize(new Dimension(80, 19));
+        triggerBTopPanel_.add(triggerStateBLabel);
+
+        triggerBPanel_.add(triggerBTopPanel_);
+
+        triggerBMiddleLeftPanel1_.setPreferredSize(new Dimension(220, 30));
+        triggerBMiddleLeftPanel1_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
+
+        triggerModeBLabel_.setText("Mode:");
+        triggerModeBLabel_.setPreferredSize(new Dimension(40, 14));
+        triggerBMiddleLeftPanel1_.add(triggerModeBLabel_);
+
+        triggerModeBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.TRIGGER_MODES));
+        triggerModeBComboBox.setPreferredSize(new Dimension(135, 20));
+        triggerBMiddleLeftPanel1_.add(triggerModeBComboBox);
+
+        triggerBPanel_.add(triggerBMiddleLeftPanel1_);
+
+        triggerBMiddleRightPanel1_.setPreferredSize(new Dimension(155, 30));
+        triggerBMiddleRightPanel1_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 3));
+
+        forceTriggerBButton.setText("Force Trigger");
+        forceTriggerBButton.setFocusable(false);
+        forceTriggerBButton.setPreferredSize(new Dimension(130, 23));
+        triggerBMiddleRightPanel1_.add(forceTriggerBButton);
+
+        triggerBPanel_.add(triggerBMiddleRightPanel1_);
+
+        triggerBMiddleLeftPanel2_.setPreferredSize(new Dimension(220, 30));
+        triggerBMiddleLeftPanel2_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
+
+        triggerTypeBLabel_.setText("Type:");
+        triggerTypeBLabel_.setPreferredSize(new Dimension(40, 14));
+        triggerBMiddleLeftPanel2_.add(triggerTypeBLabel_);
+
+        triggerTypeBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.TRIGGER_TYPES));
+        triggerTypeBComboBox.setPreferredSize(new Dimension(135, 20));
+        triggerBMiddleLeftPanel2_.add(triggerTypeBComboBox);
+
+        triggerBPanel_.add(triggerBMiddleLeftPanel2_);
+
+        triggerBMiddleRightPanel2_.setPreferredSize(new Dimension(155, 30));
+        triggerBMiddleRightPanel2_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 3));
+
+        rearmTriggerBButton.setText("Re-arm - OFF");
+        rearmTriggerBButton.setEnabled(false);
+        rearmTriggerBButton.setFocusable(false);
+        rearmTriggerBButton.setPreferredSize(new Dimension(130, 23));
+        triggerBMiddleRightPanel2_.add(rearmTriggerBButton);
+
+        triggerBPanel_.add(triggerBMiddleRightPanel2_);
+
+        triggerBBottomLeftPanel3_.setPreferredSize(new Dimension(220, 30));
+        triggerBBottomLeftPanel3_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
+
+        noOfSamplesBLabel_.setText("No. of Samples:");
+        noOfSamplesBLabel_.setPreferredSize(new Dimension(105, 14));
+        triggerBBottomLeftPanel3_.add(noOfSamplesBLabel_);
+
+        noOfSamplesBSpinner.setPreferredSize(new Dimension(70, 20));
+        triggerBBottomLeftPanel3_.add(noOfSamplesBSpinner);
+
+        triggerBPanel_.add(triggerBBottomLeftPanel3_);
+
+        triggerBBottomRightPanel3_.setPreferredSize(new Dimension(155, 30));
+
+        triggerThresholdBLabel_.setText("Threshold:");
+        triggerBBottomRightPanel3_.add(triggerThresholdBLabel_);
+
+        triggerThresholdBSpinner.setPreferredSize(new Dimension(65, 20));
+        triggerBBottomRightPanel3_.add(triggerThresholdBSpinner);
+
+        triggerBPanel_.add(triggerBBottomRightPanel3_);
+
+        channelBPanel_.add(triggerBPanel_);
+
         channelTabbedPane_.addTab("Channel B", channelBPanel_);
 
         expressionPannel_.setBorder(BorderFactory.createTitledBorder("Expression"));
@@ -968,16 +1215,19 @@ public class MainWindowUi extends JFrame {
 
         newExpressionButton.setText("New");
         newExpressionButton.setEnabled(false);
+        newExpressionButton.setFocusable(false);
         newExpressionButton.setPreferredSize(new Dimension(85, 23));
         expressionBottomPanel_.add(newExpressionButton);
 
         editExpressionButton.setText("Edit");
         editExpressionButton.setEnabled(false);
+        editExpressionButton.setFocusable(false);
         editExpressionButton.setPreferredSize(new Dimension(85, 23));
         expressionBottomPanel_.add(editExpressionButton);
 
         removeExpressionButton.setText("Remove");
         removeExpressionButton.setEnabled(false);
+        removeExpressionButton.setFocusable(false);
         removeExpressionButton.setPreferredSize(new Dimension(85, 23));
         expressionBottomPanel_.add(removeExpressionButton);
 
@@ -1167,6 +1417,7 @@ public class MainWindowUi extends JFrame {
 
         removeFilterButton.setText("Remove");
         removeFilterButton.setEnabled(false);
+        removeFilterButton.setFocusable(false);
         removeFilterButton.setPreferredSize(new Dimension(85, 23));
         inputTopPanel_.add(removeFilterButton);
 
@@ -1183,6 +1434,7 @@ public class MainWindowUi extends JFrame {
 
         browseButton.setText("Browse");
         browseButton.setEnabled(false);
+        browseButton.setFocusable(false);
         browseButton.setPreferredSize(new Dimension(85, 23));
         inputBottomPanel_.add(browseButton);
 
@@ -1365,6 +1617,7 @@ public class MainWindowUi extends JFrame {
         generatorControlTopPanel_.add(outputLabel_);
 
         outputToggleButton.setText("On");
+        outputToggleButton.setFocusable(false);
         outputToggleButton.setPreferredSize(new Dimension(80, 23));
         generatorControlTopPanel_.add(outputToggleButton);
 
@@ -1491,93 +1744,6 @@ public class MainWindowUi extends JFrame {
 
         leftPanel_.add(channelTabbedPane_);
 
-        triggerPanel_.setBorder(BorderFactory.createTitledBorder("Trigger"));
-        triggerPanel_.setPreferredSize(new Dimension(396, 140));
-        triggerPanel_.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
-
-        triggerTopPanel_.setPreferredSize(new Dimension(350, 25));
-        triggerTopPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
-
-        triggerStateLabel_.setText("State:");
-        triggerTopPanel_.add(triggerStateLabel_);
-
-        triggerStateLabel.setForeground(Color.blue);
-        triggerStateLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        triggerStateLabel.setText("Stop");
-        triggerStateLabel.setBorder(BorderFactory.createTitledBorder(""));
-        triggerStateLabel.setPreferredSize(new Dimension(80, 19));
-        triggerTopPanel_.add(triggerStateLabel);
-
-        triggerPanel_.add(triggerTopPanel_);
-
-        triggerMiddleLeftPanel1_.setPreferredSize(new Dimension(225, 30));
-        triggerMiddleLeftPanel1_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
-
-        triggerModeLabel_.setText("Mode:");
-        triggerModeLabel_.setPreferredSize(new Dimension(40, 14));
-        triggerMiddleLeftPanel1_.add(triggerModeLabel_);
-
-        triggerModeComboBox.setModel(new DefaultComboBoxModel<String>(Constant.TRIGGER_MODES));
-        triggerModeComboBox.setPreferredSize(new Dimension(135, 20));
-        triggerMiddleLeftPanel1_.add(triggerModeComboBox);
-
-        triggerPanel_.add(triggerMiddleLeftPanel1_);
-
-        triggerMiddleRightPanel1_.setPreferredSize(new Dimension(155, 30));
-        triggerMiddleRightPanel1_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 3));
-
-        forceTriggerButton.setText("Force Trigger");
-        forceTriggerButton.setPreferredSize(new Dimension(130, 23));
-        triggerMiddleRightPanel1_.add(forceTriggerButton);
-
-        triggerPanel_.add(triggerMiddleRightPanel1_);
-
-        triggerMiddleLeftPanel2_.setPreferredSize(new Dimension(225, 30));
-        triggerMiddleLeftPanel2_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
-
-        triggerTypeLabel_.setText("Type:");
-        triggerTypeLabel_.setPreferredSize(new Dimension(40, 14));
-        triggerMiddleLeftPanel2_.add(triggerTypeLabel_);
-
-        triggerTypeComboBox.setModel(new DefaultComboBoxModel<String>(Constant.TRIGGER_TYPES));
-        triggerTypeComboBox.setPreferredSize(new Dimension(135, 20));
-        triggerMiddleLeftPanel2_.add(triggerTypeComboBox);
-
-        triggerPanel_.add(triggerMiddleLeftPanel2_);
-
-        triggerMiddleRightPanel2_.setPreferredSize(new Dimension(155, 30));
-        triggerMiddleRightPanel2_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 3));
-
-        rearmTriggerButton.setText("Re-arm Trigger");
-        rearmTriggerButton.setPreferredSize(new Dimension(130, 23));
-        triggerMiddleRightPanel2_.add(rearmTriggerButton);
-
-        triggerPanel_.add(triggerMiddleRightPanel2_);
-
-        triggerBottomLeftPanel3_.setPreferredSize(new Dimension(225, 30));
-        triggerBottomLeftPanel3_.setLayout(new FlowLayout(FlowLayout.LEADING, 8, 5));
-
-        noOfSamplesLabel_.setText("No. of Samples:");
-        noOfSamplesLabel_.setPreferredSize(new Dimension(105, 14));
-        triggerBottomLeftPanel3_.add(noOfSamplesLabel_);
-
-        noOfSamplesSpinner.setPreferredSize(new Dimension(70, 20));
-        triggerBottomLeftPanel3_.add(noOfSamplesSpinner);
-
-        triggerPanel_.add(triggerBottomLeftPanel3_);
-
-        triggerBottomRightPanel3_.setPreferredSize(new Dimension(155, 30));
-
-        triggerThresholdLabel_.setText("Threshold:");
-        triggerBottomRightPanel3_.add(triggerThresholdLabel_);
-
-        triggerThresholdSpinner.setPreferredSize(new Dimension(65, 20));
-        triggerBottomRightPanel3_.add(triggerThresholdSpinner);
-
-        triggerPanel_.add(triggerBottomRightPanel3_);
-
-        leftPanel_.add(triggerPanel_);
-
         getContentPane().add(leftPanel_, BorderLayout.WEST);
 
         rightPanel_.setBorder(BorderFactory.createTitledBorder(""));
@@ -1663,18 +1829,23 @@ public class MainWindowUi extends JFrame {
             case CHANNEL_A:
                 channelTabbedPane_.setSelectedComponent(channelAPanel_);
                 break;
+                
             case CHANNEL_B:
                 channelTabbedPane_.setSelectedComponent(channelBPanel_);
                 break;
+                
             case MATH_CHANNEL:
                 channelTabbedPane_.setSelectedComponent(mathChannelPanel_);
                 break;
+                
             case FILTER_CHANNEL:
                 channelTabbedPane_.setSelectedComponent(filterChannelPanel_);
                 break;
+                
             case GENERATOR_CHANNEL:
                 channelTabbedPane_.setSelectedComponent(generatorPanel_);
                 break;
+                
             default:
                 channelTabbedPane_.setSelectedComponent(channelAPanel_);
         }
@@ -1744,15 +1915,13 @@ public class MainWindowUi extends JFrame {
      * @param enabled boolean
      */
     public void setEnabledChannelAControls(boolean enabled) {
-        if (rawXYSeries.containsKey(Constant.CHANNEL_A)) {
-            horizontalOffsetASpinner.setEnabled(enabled);
-            horizontalOffsetUnitAComboBox.setEnabled(enabled);
-            horizontalRangeAComboBox.setEnabled(enabled);
-            verticalOffsetASpinner.setEnabled(enabled);
-            verticalOffsetUnitAComboBox.setEnabled(enabled);
-            verticalRangeAComboBox.setEnabled(enabled);
-            aDivisionInfoLabel.setEnabled(enabled);
-        }
+        horizontalOffsetASpinner.setEnabled(enabled);
+        horizontalOffsetUnitAComboBox.setEnabled(enabled);
+        horizontalRangeAComboBox.setEnabled(enabled);
+        verticalOffsetASpinner.setEnabled(enabled);
+        verticalOffsetUnitAComboBox.setEnabled(enabled);
+        verticalRangeAComboBox.setEnabled(enabled);
+        aDivisionInfoLabel.setEnabled(enabled);
     }
 
     /**
@@ -1761,15 +1930,13 @@ public class MainWindowUi extends JFrame {
      * @param enabled boolean
      */
     public void setEnabledChannelBControls(boolean enabled) {
-        if (rawXYSeries.containsKey(Constant.CHANNEL_B)) {
-            horizontalOffsetBSpinner.setEnabled(enabled);
-            horizontalOffsetUnitBComboBox.setEnabled(enabled);
-            horizontalRangeBComboBox.setEnabled(enabled);
-            verticalOffsetBSpinner.setEnabled(enabled);
-            verticalOffsetUnitBComboBox.setEnabled(enabled);
-            verticalRangeBComboBox.setEnabled(enabled);
-            bDivisionInfoLabel.setEnabled(enabled);
-        }
+        horizontalOffsetBSpinner.setEnabled(enabled);
+        horizontalOffsetUnitBComboBox.setEnabled(enabled);
+        horizontalRangeBComboBox.setEnabled(enabled);
+        verticalOffsetBSpinner.setEnabled(enabled);
+        verticalOffsetUnitBComboBox.setEnabled(enabled);
+        verticalRangeBComboBox.setEnabled(enabled);
+        bDivisionInfoLabel.setEnabled(enabled);
     }
     
     /**

@@ -97,8 +97,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		previousVerticalRangeAIndex = verticalRangeAComboBox.getSelectedIndex();
 		previousVerticalRangeBIndex = verticalRangeBComboBox.getSelectedIndex();
 		previousHorizontalRangeIndex = horizontalRangeAComboBox.getSelectedIndex();
-		previousTriggerModeAIndex = triggerModeComboBox.getSelectedIndex();
-		previousTriggerTypeAIndex = triggerTypeComboBox.getSelectedIndex();
+		previousTriggerModeAIndex = triggerModeAComboBox.getSelectedIndex();
+		previousTriggerTypeAIndex = triggerTypeAComboBox.getSelectedIndex();
 		// test
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
@@ -184,11 +184,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 
 		verticalRangeGeneratorComboBox.addActionListener(this);
 		
-		forceTriggerButton.addActionListener(this);
+		forceTriggerAButton.addActionListener(this);
 		
-		triggerModeComboBox.addActionListener(this);
+		triggerModeAComboBox.addActionListener(this);
 		
-		triggerTypeComboBox.addActionListener(this);
+		triggerTypeAComboBox.addActionListener(this);
 		
 		
 		verticalOffsetASpinner.addChangeListener(new ChangeListener() {
@@ -373,7 +373,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			}
 		});
 		
-		channelCouplingToggleButton.addItemListener(new ItemListener() {
+		channelCouplingAToggleButton.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				channelCouplingToggleButtonItemStateChaned();
@@ -383,10 +383,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 
 
 	private void channelCouplingToggleButtonItemStateChaned() {
-		if(channelCouplingToggleButton.isSelected()) {
-			channelCouplingToggleButton.setText("DC");
+		if(channelCouplingAToggleButton.isSelected()) {
+			channelCouplingAToggleButton.setText("DC");
 		} else {
-			channelCouplingToggleButton.setText("AC");
+			channelCouplingAToggleButton.setText("AC");
 		}
 	}
 
@@ -628,7 +628,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		CommandPacket commandPacket = new CommandPacket(packetType, Constant.REQUEST, argument);
 		try {
 			packetWriter_.writePacket(commandPacket);
-			System.out.println("Sent trigger command: " + argument);
+			System.out.println("Sent trigger command: Type " + commandPacket.getType() + " argument " + argument);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1600,9 +1600,9 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	public void setTriggerMode(String channelName, int triggerMode) {
 		if(triggerMode >= 0 && triggerMode <= 2) {
 			if(channelName.equals(Constant.CHANNEL_A)) {
-				triggerModeComboBox.removeActionListener(this);
-				triggerModeComboBox.setSelectedIndex(triggerMode);
-				triggerModeComboBox.addActionListener(this);
+				triggerModeAComboBox.removeActionListener(this);
+				triggerModeAComboBox.setSelectedIndex(triggerMode);
+				triggerModeAComboBox.addActionListener(this);
 				previousTriggerModeAIndex = triggerMode;
 			} else if(channelName.equals(Constant.CHANNEL_B)) {
 				//TODO
@@ -1619,9 +1619,9 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	public void setTriggerType(String channelName, int triggerType) {
 		if(triggerType >= 0 && triggerType <= 2) {
 			if(channelName.equals(Constant.CHANNEL_A)) {
-				triggerTypeComboBox.removeActionListener(this);
-				triggerTypeComboBox.setSelectedIndex(triggerType);
-				triggerTypeComboBox.addActionListener(this);
+				triggerTypeAComboBox.removeActionListener(this);
+				triggerTypeAComboBox.setSelectedIndex(triggerType);
+				triggerTypeAComboBox.addActionListener(this);
 				previousTriggerTypeAIndex = triggerType;
 			} else if(channelName.equals(Constant.CHANNEL_B)) {
 				//TODO:
@@ -1637,9 +1637,9 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 */
 	public void setChannelCoupling(int channelCoupling) {
 		if(channelCoupling == Constant.DC) {
-			channelCouplingToggleButton.setSelected(true);
+			channelCouplingAToggleButton.setSelected(true);
 		} else {
-			channelCouplingToggleButton.setSelected(false);
+			channelCouplingAToggleButton.setSelected(false);
 		}
 	}
 	
@@ -1841,21 +1841,21 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			}
 			generatorDivisionInfoLabel.setText("Generator: " + selectedItem + "/div");
 
-		} else if(source == forceTriggerButton) {
+		} else if(source == forceTriggerAButton) {
 			sendTriggerCommand(PacketType.TRIGGER_FORCE_A, Constant.IGNORE);
 
-		} else if (source == triggerModeComboBox) {
-			int mode = triggerModeComboBox.getSelectedIndex();
-			triggerModeComboBox.removeActionListener(this);
-			triggerModeComboBox.setSelectedIndex(previousTriggerModeAIndex);
-			triggerModeComboBox.addActionListener(this);
+		} else if (source == triggerModeAComboBox) {
+			int mode = triggerModeAComboBox.getSelectedIndex();
+			triggerModeAComboBox.removeActionListener(this);
+			triggerModeAComboBox.setSelectedIndex(previousTriggerModeAIndex);
+			triggerModeAComboBox.addActionListener(this);
 			sendTriggerCommand(PacketType.TRIGGER_MODE_A, mode);
 			
-		} else if (source == triggerTypeComboBox) {
-			int mode = triggerTypeComboBox.getSelectedIndex();
-			triggerTypeComboBox.removeActionListener(this);
-			triggerTypeComboBox.setSelectedIndex(previousTriggerTypeAIndex);
-			triggerTypeComboBox.addActionListener(this);
+		} else if (source == triggerTypeAComboBox) {
+			int mode = triggerTypeAComboBox.getSelectedIndex();
+			triggerTypeAComboBox.removeActionListener(this);
+			triggerTypeAComboBox.setSelectedIndex(previousTriggerTypeAIndex);
+			triggerTypeAComboBox.addActionListener(this);
 			sendTriggerCommand(PacketType.TRIGGER_TYPE_A, mode);
 			
 		}
