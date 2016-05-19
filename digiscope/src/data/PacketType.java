@@ -23,6 +23,8 @@ public class PacketType {
 	public static final byte TRIGGER_FORCE_B = (byte) 0xBF;
 	public static final byte CHANNEL_COUPLING_A = (byte) 0xAC;
 	public static final byte CHANNEL_COUPLING_B = (byte) 0xBC;
+	public static final byte CHANNEL_MODE_A = (byte) 0xA7;
+	public static final byte CHANNEL_MODE_B = (byte) 0xB7;
 	public static final byte FUNCTION_GENERATOR_OUTPUT = (byte) 0xF0;
 	public static final byte WAVE_TYPE = (byte) 0xF1;
 	public static final byte FUNCTION_GENERATOR_VOLTAGE = (byte) 0xF2;

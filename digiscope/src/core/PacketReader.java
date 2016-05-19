@@ -82,6 +82,12 @@ public class PacketReader {
 
 			case PacketType.CHANNEL_COUPLING_B :
 				// Fallthrough
+			
+			case PacketType.CHANNEL_MODE_A :
+				// Fallthrough
+				
+			case PacketType.CHANNEL_MODE_B :
+				// Fallthrough
 
 			case PacketType.FUNCTION_GENERATOR_OUTPUT :
 				// Fallthrough

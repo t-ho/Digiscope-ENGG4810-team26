@@ -138,11 +138,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 //		rawXYSeries_.put(Constant.FILTER_CHANNEL, filterSeries);
 
 		//Math Channel
-		XYSeries generatorSeries = new XYSeries(Constant.GENERATOR_CHANNEL);
-		for(double i = -20; i <= 20; i = i + 0.1) {
-			generatorSeries.add(i, 0.8 * Math.sin(i));
-		}
-		rawXYSeries.put(Constant.GENERATOR_CHANNEL, generatorSeries);
+//		XYSeries generatorSeries = new XYSeries(Constant.GENERATOR_CHANNEL);
+//		for(double i = -20; i <= 20; i = i + 0.1) {
+//			generatorSeries.add(i, 0.8 * Math.sin(i));
+//		}
+//		rawXYSeries.put(Constant.GENERATOR_CHANNEL, generatorSeries);
 	}
 
 	private void addListenersToComponents() {
@@ -163,6 +163,14 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		generatorCheckBox.addItemListener(this);
 
 		cursorComboBox.addItemListener(this);
+		
+		channelCouplingAToggleButton.addActionListener(this);
+		
+		channelCouplingBToggleButton.addActionListener(this);
+		
+		channelModeAToggleButton.addActionListener(this);
+		
+		channelModeBToggleButton.addActionListener(this);
 
 		horizontalRangeAComboBox.addActionListener(this);
 		
@@ -372,22 +380,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				removeFilterButtonActionPerformed();
 			}
 		});
-		
-		channelCouplingAToggleButton.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				channelCouplingToggleButtonItemStateChaned();
-			}
-		});
-	}
-
-
-	private void channelCouplingToggleButtonItemStateChaned() {
-		if(channelCouplingAToggleButton.isSelected()) {
-			channelCouplingAToggleButton.setText("DC");
-		} else {
-			channelCouplingAToggleButton.setText("AC");
-		}
 	}
 
 	private void removeFilterButtonActionPerformed() {
@@ -620,15 +612,15 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	}
 	
 	/**
-	 * Send trigger command packet to the device
+	 * Send command packet to the device
 	 * @param packetType packet type
 	 * @param argument
 	 */
-	private void sendTriggerCommand(byte packetType, int argument) {
+	private void sendCommand(byte packetType, int argument) {
 		CommandPacket commandPacket = new CommandPacket(packetType, Constant.REQUEST, argument);
 		try {
 			packetWriter_.writePacket(commandPacket);
-			System.out.println("Sent trigger command: Type " + commandPacket.getType() + " argument " + argument);
+			System.out.println("Sent command: Type " + commandPacket.getType() + " argument " + argument);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1100,19 +1092,23 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 * @param verticalOffset The vertical offset
 	 * @return a XYSeries with given offset or null if the given xYSeries is null.
 	 */
-	private XYSeries createXYSeriesWithOffsets(String channelName, XYSeries xYSeries,
-			int horizontalOffset, double verticalOffset) {
-		XYSeries result = new XYSeries(channelName);
-		if(xYSeries != null) {
-			for(int i = 0; i < xYSeries.getItemCount(); i++) {
-				double xValue = xYSeries.getDataItem(i).getXValue() + horizontalOffset;
-				double yValue = xYSeries.getDataItem(i).getYValue() + verticalOffset;
-				result.add(xValue, yValue);
-			}
+	private XYSeries createXYSeriesWithOffsets(String channelName, XYSeries xYSeries, int horizontalOffset,
+			double verticalOffset) {
+		if (horizontalOffset == 0 && verticalOffset == 0) {
+			return xYSeries;
 		} else {
-			result = null;
+			XYSeries result = new XYSeries(channelName);
+			if (xYSeries != null) {
+				for (int i = 0; i < xYSeries.getItemCount(); i++) {
+					double xValue = xYSeries.getDataItem(i).getXValue() + horizontalOffset;
+					double yValue = xYSeries.getDataItem(i).getYValue() + verticalOffset;
+					result.add(xValue, yValue);
+				}
+			} else {
+				result = null;
+			}
+			return result;
 		}
-		return result;
 	}
 
 	/**
@@ -1139,17 +1135,25 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			double verticalOffset = 0;
 			int channelIndex = 0;
 			if (channelName == Constant.CHANNEL_A) {
-				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetASpinner.getValue(),
-						(String) horizontalOffsetUnitAComboBox.getSelectedItem());
-				verticalOffset = getVerticalOffsetValue((int) verticalOffsetASpinner.getValue(),
-						(String) verticalOffsetUnitAComboBox.getSelectedItem());
 				channelIndex = Constant.A_INDEX;
+				String expression = expressionTextArea.getText().trim();
+				if(expression.contains("A")) {
+					calculateMathChannel();
+				}
+				String inputChannelForFilter = (String) inputChannelComboBox.getSelectedItem();
+				if(inputChannelForFilter.equals(Constant.CHANNEL_A)) {
+					calculateFilterChannel();
+				}
 			} else if (channelName == Constant.CHANNEL_B) {
-				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetBSpinner.getValue(),
-						(String) horizontalOffsetUnitBComboBox.getSelectedItem());
-				verticalOffset = getVerticalOffsetValue((int) verticalOffsetBSpinner.getValue(),
-						(String) verticalOffsetUnitBComboBox.getSelectedItem());
 				channelIndex = Constant.B_INDEX;
+				String expression = expressionTextArea.getText().trim();
+				if(expression.contains("B")) {
+					calculateMathChannel();
+				}
+				String inputChannelForFilter = (String) inputChannelComboBox.getSelectedItem();
+				if(inputChannelForFilter.equals(Constant.CHANNEL_B)) {
+					calculateFilterChannel();
+				}
 			} else if (channelName == Constant.MATH_CHANNEL) {
 				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetMathSpinner.getValue(),
 						(String) horizontalOffsetUnitMathComboBox.getSelectedItem());
@@ -1163,10 +1167,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 						(String) verticalOffsetUnitFilterComboBox.getSelectedItem());
 				channelIndex = Constant.FILTER_INDEX;
 			} else if (channelName == Constant.GENERATOR_CHANNEL) {
-				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetGeneratorSpinner.getValue(),
-						(String) horizontalOffsetUnitGeneratorComboBox.getSelectedItem());
-				verticalOffset = getVerticalOffsetValue((int) verticalOffsetGeneratorSpinner.getValue(),
-						(String) verticalOffsetUnitGeneratorComboBox.getSelectedItem());
 				channelIndex = Constant.GENERATOR_INDEX;
 			}
 			XYSeries xYSeries = createXYSeriesWithOffsets(channelName, rawSeries, horizontalOffset, verticalOffset);
@@ -1614,6 +1614,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	
 	/**
 	 * Set trigger type
+	 * @param channelName
 	 * @param triggerType
 	 */
 	public void setTriggerType(String channelName, int triggerType) {
@@ -1633,13 +1634,53 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	
 	/**
 	 * Set channel coupling
+	 * @param channelName
 	 * @param channelCoupling
 	 */
-	public void setChannelCoupling(int channelCoupling) {
-		if(channelCoupling == Constant.DC) {
-			channelCouplingAToggleButton.setSelected(true);
-		} else {
-			channelCouplingAToggleButton.setSelected(false);
+	public void setChannelCoupling(String channelName, int channelCoupling) {
+		if (channelName.equals(Constant.CHANNEL_A)) {
+			if (channelCoupling == Constant.DC) {
+				channelCouplingAToggleButton.setSelected(true);
+				channelCouplingAToggleButton.setText("DC");
+			} else {
+				channelCouplingAToggleButton.setSelected(false);
+				channelCouplingAToggleButton.setText("AC");
+			}
+
+		} else if(channelName.equals(Constant.CHANNEL_B)){
+			if(channelCoupling == Constant.DC) {
+				channelCouplingBToggleButton.setSelected(true);
+				channelCouplingBToggleButton.setText("DC");
+			} else {
+				channelCouplingBToggleButton.setSelected(false);
+				channelCouplingBToggleButton.setText("AC");
+			}
+		}
+	}
+	
+	/**
+	 * Set channel mode
+	 * @param channelName
+	 * @param mode
+	 */
+	public void setChannelMode(String channelName, int mode) {
+		System.out.println("mode in setChannel: " + mode);
+		if(channelName.equals(Constant.CHANNEL_A)) {
+			if(mode == Constant.MODE_8BIT) {
+				channelModeAToggleButton.setSelected(true);
+				channelModeAToggleButton.setText("8-bit");
+			} else {
+				channelModeAToggleButton.setSelected(false);
+				channelModeAToggleButton.setText("12-bit");
+			}
+		} else if(channelName.equals(Constant.CHANNEL_B)) {
+			if(mode == Constant.MODE_8BIT) {
+				channelModeBToggleButton.setSelected(true);
+				channelModeBToggleButton.setText("8-bit");
+			} else {
+				channelModeBToggleButton.setSelected(false);
+				channelModeBToggleButton.setText("12-bit");
+			}
 		}
 	}
 	
@@ -1763,7 +1804,52 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	public void actionPerformed(ActionEvent event) {
 		// TODO Auto-generated method stub
 		Object source = event.getSource();
-		if (source == horizontalRangeAComboBox) {
+
+		if(source == channelCouplingAToggleButton) {
+			int coupling;
+			if(channelCouplingAToggleButton.isSelected()) {
+				coupling = Constant.DC;
+				channelCouplingAToggleButton.setSelected(false);
+			} else {
+				coupling = Constant.AC;
+				channelCouplingAToggleButton.setSelected(true);
+			}
+			sendCommand(PacketType.CHANNEL_COUPLING_A, coupling);
+		
+		} else if(source == channelCouplingBToggleButton) {
+			int coupling;
+			if(channelCouplingBToggleButton.isSelected()) {
+				coupling = Constant.DC;
+				channelCouplingBToggleButton.setSelected(false);
+			} else {
+				coupling = Constant.AC;
+				channelCouplingBToggleButton.setSelected(true);
+			}
+			sendCommand(PacketType.CHANNEL_COUPLING_B, coupling);
+		
+		} else if(source == channelModeAToggleButton) {
+			int mode;
+			if(channelModeAToggleButton.isSelected()) {
+				mode = Constant.MODE_8BIT;
+				channelModeAToggleButton.setSelected(false);
+			} else {
+				mode = Constant.MODE_12_BIT;
+				channelModeAToggleButton.setSelected(true);
+			}
+			sendCommand(PacketType.CHANNEL_MODE_A, mode);
+			
+		}else if(source == channelModeBToggleButton) {
+			int mode;
+			if(channelModeBToggleButton.isSelected()) {
+				mode = Constant.MODE_8BIT;
+				channelModeBToggleButton.setSelected(false);
+			} else {
+				mode = Constant.MODE_12_BIT;
+				channelModeBToggleButton.setSelected(true);
+			}
+			sendCommand(PacketType.CHANNEL_MODE_B, mode);
+			
+		} else if (source == horizontalRangeAComboBox) {
 			String timeString = (String) horizontalRangeAComboBox.getSelectedItem();
 			horizontalRangeAComboBox.removeActionListener(this);
 			horizontalRangeAComboBox.setSelectedIndex(previousHorizontalRangeIndex);
@@ -1842,21 +1928,21 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			generatorDivisionInfoLabel.setText("Generator: " + selectedItem + "/div");
 
 		} else if(source == forceTriggerAButton) {
-			sendTriggerCommand(PacketType.TRIGGER_FORCE_A, Constant.IGNORE);
+			sendCommand(PacketType.TRIGGER_FORCE_A, Constant.IGNORE);
 
 		} else if (source == triggerModeAComboBox) {
 			int mode = triggerModeAComboBox.getSelectedIndex();
 			triggerModeAComboBox.removeActionListener(this);
 			triggerModeAComboBox.setSelectedIndex(previousTriggerModeAIndex);
 			triggerModeAComboBox.addActionListener(this);
-			sendTriggerCommand(PacketType.TRIGGER_MODE_A, mode);
+			sendCommand(PacketType.TRIGGER_MODE_A, mode);
 			
 		} else if (source == triggerTypeAComboBox) {
 			int mode = triggerTypeAComboBox.getSelectedIndex();
 			triggerTypeAComboBox.removeActionListener(this);
 			triggerTypeAComboBox.setSelectedIndex(previousTriggerTypeAIndex);
 			triggerTypeAComboBox.addActionListener(this);
-			sendTriggerCommand(PacketType.TRIGGER_TYPE_A, mode);
+			sendCommand(PacketType.TRIGGER_TYPE_A, mode);
 			
 		}
 	}

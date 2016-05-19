@@ -46,6 +46,7 @@ public class Server {
 						if (packet != null) {
 							if (packet instanceof CommandPacket) {
 								CommandPacket commandPacket = (CommandPacket) packet;
+								System.out.println("Received command packet");
 								if (commandPacket.getIndicator() == Constant.REQUEST) {
 									commandPacket.setIndicator(Constant.CONFIRMATION);
 									packetWriter.writePacket(commandPacket);
@@ -69,6 +70,22 @@ public class Server {
 
 									case PacketType.TRIGGER_TYPE_A:
 										message = "Trigger type A: " + commandPacket.getArgument();
+										break;
+										
+									case PacketType.CHANNEL_MODE_A:
+										message = "Channel mode A: " + commandPacket.getArgument();
+										break;
+										
+									case PacketType.CHANNEL_MODE_B:
+										message = "Channel mode B: " + commandPacket.getArgument();
+										break;
+										
+									case PacketType.CHANNEL_COUPLING_A:
+										message = "Channel coupling A; " + commandPacket.getArgument();
+										break;
+										
+									case PacketType.CHANNEL_COUPLING_B:
+										message = "Channel coupling B: " + commandPacket.getArgument();
 										break;
 									}
 									System.out.println("Sent confirmation: " + message);

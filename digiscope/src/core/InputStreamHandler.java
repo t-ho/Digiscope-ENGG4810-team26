@@ -77,7 +77,21 @@ public class InputStreamHandler implements Runnable {
 								break;
 
 							case PacketType.CHANNEL_COUPLING_A:
-								mainWindow_.setChannelCoupling(commandPacket.getArgument());
+								mainWindow_.setChannelCoupling(Constant.CHANNEL_A, commandPacket.getArgument());
+								break;
+							
+							case PacketType.CHANNEL_COUPLING_B:
+								mainWindow_.setChannelCoupling(Constant.CHANNEL_B, commandPacket.getArgument());
+								break;
+								
+							case PacketType.CHANNEL_MODE_A:
+								mainWindow_.setChannelMode(Constant.CHANNEL_A, commandPacket.getArgument());
+								break;
+								
+							case PacketType.CHANNEL_MODE_B:
+								mainWindow_.setChannelMode(Constant.CHANNEL_B, commandPacket.getArgument());
+								break;
+								
 							}
 						}
 					} else if (packet instanceof DataPacket) {

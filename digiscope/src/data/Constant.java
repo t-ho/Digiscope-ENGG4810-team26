@@ -120,6 +120,9 @@ public class Constant {
 	public static final int DC = 0;
 	public static final int AC = 1;
 	
+	public static final int MODE_8BIT = 0;
+	public static final int MODE_12_BIT = 1;
+
 	public static final int ERROR = 1;
 
 	public static final int NORMAL = 0;
