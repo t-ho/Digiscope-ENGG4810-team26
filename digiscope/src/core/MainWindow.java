@@ -587,7 +587,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		CommandPacket commandPacket = new CommandPacket(PacketType.HORIZONTAL_RANGE, Constant.REQUEST, horizontalRange);
 		try {
 			packetWriter_.writePacket(commandPacket);
-			System.out.println("Sent horizontal range: " + horizontalRange);
+			System.out.printf("Sent:     Type %x Argument %d\n", commandPacket.getType(), horizontalRange);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -605,7 +605,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		CommandPacket commandPacket = new CommandPacket(packetType, Constant.REQUEST, verticalRange);
 		try {
 			packetWriter_.writePacket(commandPacket);
-			System.out.println("Sent Vertical range: " + verticalRange);
+			System.out.printf("Sent:     Type %x Argument %d\n", commandPacket.getType(), verticalRange);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -620,7 +620,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		CommandPacket commandPacket = new CommandPacket(packetType, Constant.REQUEST, argument);
 		try {
 			packetWriter_.writePacket(commandPacket);
-			System.out.println("Sent command: Type " + commandPacket.getType() + " argument " + argument);
+			System.out.printf("Sent:     Type %x Argument %d\n", commandPacket.getType(), argument);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1128,7 +1128,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 * Refresh the plot of specified channel on the chart panel
 	 * @param channelName The channel's name
 	 */
-	private void refreshChannelPlotOnChartPanel(String channelName) {
+	private synchronized void refreshChannelPlotOnChartPanel(String channelName) {
 		XYSeries rawSeries = rawXYSeries.get(channelName);
 		if (rawSeries != null) {
 			int horizontalOffset = 0;
@@ -1136,24 +1136,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			int channelIndex = 0;
 			if (channelName == Constant.CHANNEL_A) {
 				channelIndex = Constant.A_INDEX;
-				String expression = expressionTextArea.getText().trim();
-				if(expression.contains("A")) {
-					calculateMathChannel();
-				}
-				String inputChannelForFilter = (String) inputChannelComboBox.getSelectedItem();
-				if(inputChannelForFilter.equals(Constant.CHANNEL_A)) {
-					calculateFilterChannel();
-				}
 			} else if (channelName == Constant.CHANNEL_B) {
 				channelIndex = Constant.B_INDEX;
-				String expression = expressionTextArea.getText().trim();
-				if(expression.contains("B")) {
-					calculateMathChannel();
-				}
-				String inputChannelForFilter = (String) inputChannelComboBox.getSelectedItem();
-				if(inputChannelForFilter.equals(Constant.CHANNEL_B)) {
-					calculateFilterChannel();
-				}
 			} else if (channelName == Constant.MATH_CHANNEL) {
 				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetMathSpinner.getValue(),
 						(String) horizontalOffsetUnitMathComboBox.getSelectedItem());
@@ -1256,6 +1240,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				channelNames.put("F", Constant.FILTER_CHANNEL);
 			}
 			int noOfItems = getMinNoOfItems(channelNames);
+			double maxHorizontalRange = visualizer_.getHorizontalRange().getUpperBound();
 			if (noOfItems != Integer.MAX_VALUE) {
 				Evaluator evaluator = new Evaluator();
 				XYSeries mathSeries = new XYSeries(Constant.MATH_CHANNEL);
@@ -1266,7 +1251,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 						evaluator.setVariableValue(entry.getKey(), dataItem.getYValue());
 						x = dataItem.getXValue();
 					}
-					mathSeries.add(x, evaluator.evaluate(expression, evaluator.getVariables()));
+					if(x <= maxHorizontalRange) {
+						mathSeries.add(x, evaluator.evaluate(expression, evaluator.getVariables()));
+					} else {
+						break;
+					}
 				}
 				rawXYSeries.put(Constant.MATH_CHANNEL, mathSeries);
 				if(mathChannelCheckBox.isSelected()) {
@@ -1289,39 +1278,48 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				ArrayList<Double> firstColumn = filterFile_.getFirstColumn();
 				XYSeries derivedSeries = rawXYSeries.get(inputChannel);
 				XYSeries filterSeries = new XYSeries(Constant.FILTER_CHANNEL);
+				double maxHorizontalRange = visualizer_.getHorizontalRange().getUpperBound();
 				if (filterFile_.getType() == Constant.FIR) {
 					for (int n = 0; n < derivedSeries.getItemCount(); n++) {
-						Double result = 0.0;
-						for (int i = 0; i < firstColumn.size(); i++) {
-							Double x = 0.0;
-							if (n - i >= 0) {
-								x = derivedSeries.getDataItem(n - i).getYValue();
+						if (derivedSeries.getDataItem(n).getXValue() <= maxHorizontalRange) {
+							Double result = 0.0;
+							for (int i = 0; i < firstColumn.size(); i++) {
+								Double x = 0.0;
+								if (n - i >= 0) {
+									x = derivedSeries.getDataItem(n - i).getYValue();
+								}
+								result = result + firstColumn.get(i) * x;
 							}
-							result = result + firstColumn.get(i) * x;
+							filterSeries.add(derivedSeries.getDataItem(n).getX(), result);
+						} else {
+							break;
 						}
-						filterSeries.add(derivedSeries.getDataItem(n).getX(), result);
 					}
 				} else if (filterFile_.getType() == Constant.IIR) {
 					ArrayList<Double> secondColumn = filterFile_.getSecondColumn();
 					for (int n = 0; n < derivedSeries.getItemCount(); n++) {
-						Double firstSum = 0.0;
-						Double secondSum = 0.0;
-						for (int i = 0; i < firstColumn.size(); i++) {
-							Double x = 0.0;
-							if (n - i >= 0) {
-								x = derivedSeries.getDataItem(n - i).getYValue();
+						if (derivedSeries.getDataItem(n).getXValue() <= maxHorizontalRange) {
+							Double firstSum = 0.0;
+							Double secondSum = 0.0;
+							for (int i = 0; i < firstColumn.size(); i++) {
+								Double x = 0.0;
+								if (n - i >= 0) {
+									x = derivedSeries.getDataItem(n - i).getYValue();
+								}
+								firstSum += firstColumn.get(i) * x;
 							}
-							firstSum += firstColumn.get(i) * x;
-						}
-						for (int j = 1; j < secondColumn.size(); j++) {
-							Double y = 0.0;
-							if (n - j >= 0) {
-								y = filterSeries.getDataItem(n - j).getYValue();
+							for (int j = 1; j < secondColumn.size(); j++) {
+								Double y = 0.0;
+								if (n - j >= 0) {
+									y = filterSeries.getDataItem(n - j).getYValue();
+								}
+								secondSum += secondColumn.get(j) * y;
 							}
-							secondSum += secondColumn.get(j) * y;
+							Double result = (1 / secondColumn.get(0)) * (firstSum - secondSum);
+							filterSeries.add(derivedSeries.getDataItem(n).getX(), result);
+						} else {
+							break;
 						}
-						Double result = (1 / secondColumn.get(0)) * (firstSum - secondSum);
-						filterSeries.add(derivedSeries.getDataItem(n).getX(), result);
 					}
 				}
 				rawXYSeries.put(Constant.FILTER_CHANNEL, filterSeries);
@@ -1546,6 +1544,12 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 
 		int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
+		if(rawXYSeries.containsKey(Constant.MATH_CHANNEL)) {
+			calculateMathChannel();
+		}
+		if(rawXYSeries.containsKey(Constant.FILTER_CHANNEL)) {
+			calculateFilterChannel();
+		}
 		showMeasurementResults(Constant.A_INDEX);
 		showMeasurementResults(Constant.B_INDEX);
 		showMeasurementResults(Constant.MATH_INDEX);
@@ -1688,20 +1692,39 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 * Set XYSeries for the specified channel
 	 * @param channelName channel's name
 	 * @param xYSeries
+	 * @param isUpdatePlot flag indicates update Math and Filter channel
 	 */
-	public void setXYSeriesForChannel(String channelName, XYSeries xYSeries) {
+	public void setXYSeries(String channelName, XYSeries xYSeries, boolean isUpdatePlot) {
 		rawXYSeries.put(channelName, xYSeries);
-		if(channelName.equals(Constant.CHANNEL_A)) {
-			if(channelACheckBox.isSelected()) {
-				refreshChannelPlotOnChartPanel(channelName);
-			}
-		} else if(channelName.equals(Constant.CHANNEL_B)) {
-			if(channelBCheckBox.isSelected()) {
-				refreshChannelPlotOnChartPanel(channelName);
+		if (isUpdatePlot= true) {
+			if (channelName.equals(Constant.CHANNEL_A)) {
+				String expression = expressionTextArea.getText().trim();
+				if (expression.contains("A")) {
+					calculateMathChannel();
+				}
+				String inputChannelForFilter = (String) inputChannelComboBox.getSelectedItem();
+				if (inputChannelForFilter.equals(Constant.CHANNEL_A)) {
+					calculateFilterChannel();
+				}
+				if (channelACheckBox.isSelected()) {
+					refreshChannelPlotOnChartPanel(channelName);
+				}
+			} else if (channelName.equals(Constant.CHANNEL_B)) {
+				String expression = expressionTextArea.getText().trim();
+				if (expression.contains("B")) {
+					calculateMathChannel();
+				}
+				String inputChannelForFilter = (String) inputChannelComboBox.getSelectedItem();
+				if (inputChannelForFilter.equals(Constant.CHANNEL_B)) {
+					calculateFilterChannel();
+				}
+				if (channelBCheckBox.isSelected()) {
+					refreshChannelPlotOnChartPanel(channelName);
+				}
 			}
 		}
 	}
-
+	
 	/**
 	 * Get maximum voltage displayed on screen
 	 * @param channelIndex
@@ -1718,6 +1741,29 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 */
 	public double getMinDisplayVoltage(int channelIndex) {
 		return visualizer_.getVerticalRange(channelIndex).getLowerBound();
+	}
+	
+	/**
+	 * Get maximum time displayed on screen
+	 * @return
+	 */
+	public double getMaxDisplayTime() {
+		return visualizer_.getHorizontalRange().getUpperBound();
+	}
+	
+	/**
+	 * Get number of samples of specified channel
+	 * @param channelName
+	 * @return number of samples or -1 if channel name is neither channel A or B
+	 */
+	public int getNoOfSamples(String channelName) {
+		if(channelName.equals(Constant.CHANNEL_A)) {
+			return (int) noOfSamplesASpinner.getValue();
+		} else if(channelName.equals(Constant.CHANNEL_B)) {
+			return (int) noOfSamplesBSpinner.getValue();
+		} else {
+			return -1;
+		}
 	}
 	
 	@Override
