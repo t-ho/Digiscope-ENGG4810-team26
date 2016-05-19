@@ -302,7 +302,7 @@ void VertRangeChange(uint32_t newVal, uint8_t channel)
 		vdiv_vals[channel] = newVal;
 
 		Command cmd;
-		cmd.type = channel ? COMMAND_VERTICAL_RANGE_A : COMMAND_VERTICAL_RANGE_B;
+		cmd.type = channel ? COMMAND_VERTICAL_RANGE_B : COMMAND_VERTICAL_RANGE_A;
 		cmd.args[0] = newVal;
 		cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
 		NetSend(&cmd, 0);
@@ -476,6 +476,10 @@ screenDemo(UArg arg0, UArg arg1)
     		case COMMAND_VERTICAL_RANGE_B:
 				VertRangeChange(cmd.args[0], 1);
 				break;
+    		case COMMAND_TRIGGER_FORCE_A:
+    		case COMMAND_TRIGGER_FORCE_B:
+    			ForceTrigger();
+    			break;
     		case _COMMAND_UNKNOWN:
     			/* Fallthrough */
     		default:

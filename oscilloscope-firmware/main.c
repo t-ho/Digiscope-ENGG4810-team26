@@ -80,6 +80,7 @@
 #include "net.h"
 #include "adc.h"
 #include "overvolt.h"
+#include "wavegen.h"
 #include "drivers/SSD1289_driver.h"
 #include "drivers/XPT2046_driver.h"
 
@@ -93,6 +94,10 @@ void heartBeatFxn(UArg arg0, UArg arg1)
     while (1) {
         Task_sleep((unsigned int)arg0);
         GPIO_toggle(Board_LED0);
+        if (Semaphore_getCount(clients_connected_h) > 0)
+        {
+//        	ForceTrigger();
+        }
         System_flush();
     }
 }

@@ -120,7 +120,8 @@ Void tcpWorker(UArg arg0, UArg arg1)
 		}
 
 		Command cmd;
-		while(Mailbox_pend(NetCommandMailbox, &cmd, 0)) {
+		while(Mailbox_pend(NetCommandMailbox, &cmd, 0))
+		{
 
 			if (cmd.type == SAMPLE_PACKET_A_8 || cmd.type == SAMPLE_PACKET_B_8
 					|| cmd.type == SAMPLE_PACKET_A_12 || cmd.type == SAMPLE_PACKET_B_12)
@@ -153,6 +154,7 @@ Void tcpWorker(UArg arg0, UArg arg1)
 				}
 			}
     	}
+		ADCResume();
     }
 
 clientlost:

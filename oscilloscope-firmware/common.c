@@ -42,6 +42,8 @@ ForceTrigger(void)
 
 	int seqnum = 0;
 
+	ADCPause();
+
 	while (seqnum * scmd.num_samples < ADC_BUF_SIZE)
 	{
 		scmd.seq_num = seqnum;

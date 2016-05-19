@@ -79,19 +79,44 @@ ADCprocess(uint32_t ch)
 }
 
 void
+ADCPause(void)
+{
+	ADCSequenceDisable(ADC0_BASE, 0);
+}
+
+void
+ADCResume(void)
+{
+	ADCSequenceEnable(ADC0_BASE, 0);
+}
+
+void
 adcDmaCallback(unsigned int arg)
 {
 	ADCIntClear(ADC0_BASE, 0);
 
-	adc_pos += ADC_SAMPLE_BUF_SIZE;
-
-    if (adc_pos >= ADC_BUF_SIZE)
+    if ((((tDMAControlTable *) udmaCtrlTable)[UDMA_CHANNEL_ADC0 | UDMA_PRI_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
     {
-    	adc_pos = 0;
-    }
+    	adc_pos += ADC_SAMPLE_BUF_SIZE;
 
-    ADCprocess(UDMA_CHANNEL_ADC0 | UDMA_PRI_SELECT);
-    ADCprocess(UDMA_CHANNEL_ADC0 | UDMA_ALT_SELECT);
+    	if (adc_pos >= ADC_BUF_SIZE)
+    	{
+    		adc_pos = 0;
+    	}
+
+	    uDMAChannelTransferSet(UDMA_CHANNEL_ADC0 | UDMA_PRI_SELECT, UDMA_MODE_PINGPONG, (void *)(ADC0_BASE + ADC_O_SSFIFO0), &adc_buffer[adc_pos], ADC_SAMPLE_BUF_SIZE);
+    }
+    else if ((((tDMAControlTable *) udmaCtrlTable)[UDMA_CHANNEL_ADC0 | UDMA_ALT_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
+    {
+    	adc_pos += ADC_SAMPLE_BUF_SIZE;
+
+    	if (adc_pos >= ADC_BUF_SIZE)
+    	{
+    		adc_pos = 0;
+    	}
+
+		uDMAChannelTransferSet(UDMA_CHANNEL_ADC0 | UDMA_ALT_SELECT, UDMA_MODE_PINGPONG, (void *)(ADC0_BASE + ADC_O_SSFIFO0), &adc_buffer[adc_pos], ADC_SAMPLE_BUF_SIZE);
+    }
 
     uDMAChannelEnable(UDMA_CHANNEL_ADC0);
 }

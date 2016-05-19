@@ -25,6 +25,8 @@
 #define ADC_BUF_SIZE 1024 * 25
 
 extern void ADC_Init(void);
+extern void ADCPause(void);
+extern void ACDResume(void);
 
 extern uint16_t adc_pos;
 extern uint16_t adc_buffer[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
