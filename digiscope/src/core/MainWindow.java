@@ -59,7 +59,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	private Socket socket_;
 	private PacketWriter packetWriter_;
 	private PacketReader packetReader_;
-	private Thread inputStreamHandlerThread_;
+	private InputStreamHandler inputStreamHandler_;
 
 	private int previousVerticalRangeAIndex;
 	private int previousVerticalRangeBIndex;
@@ -83,9 +83,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		packetWriter_ = new PacketWriter(socket.getOutputStream());
 		packetReader_ = new PacketReader(socket.getInputStream());
 		// Create a new thread to handle input stream
-		InputStreamHandler inputStreamHandler = new InputStreamHandler(this, packetReader_, packetWriter_);
-		inputStreamHandlerThread_ = new Thread(inputStreamHandler);
-		inputStreamHandlerThread_.start();
+		inputStreamHandler_ = new InputStreamHandler(this, packetReader_, packetWriter_);
+		inputStreamHandler_.start();
 		addComponentToCanvasPanel(chartPanel_);
 		addListenersToComponents();
 	}
@@ -578,40 +577,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	}
 
 	/**
-	 * Send horizontal range command packet to the device
-	 * @param timeString 
-	 */
-	private void sendHorizontalRangeCommandPacket(String timeString) {
-		// TODO 
-		int horizontalRange = convertTimeStringToMicroSeconds(timeString);
-		CommandPacket commandPacket = new CommandPacket(PacketType.HORIZONTAL_RANGE, Constant.REQUEST, horizontalRange);
-		try {
-			packetWriter_.writePacket(commandPacket);
-			System.out.printf("Sent:     Type %x Argument %d\n", commandPacket.getType(), horizontalRange);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	
-	/**
-	 * Send vertical range command packet to the device
-	 * @param packetType packet type
-	 * @param voltageString the voltage string
-	 */
-	private void sendVerticalRangeCommandPacket(byte packetType, String voltageString) {
-		// TODO:
-		int verticalRange = convertVoltageStringToMicrovolts(voltageString);
-		CommandPacket commandPacket = new CommandPacket(packetType, Constant.REQUEST, verticalRange);
-		try {
-			packetWriter_.writePacket(commandPacket);
-			System.out.printf("Sent:     Type %x Argument %d\n", commandPacket.getType(), verticalRange);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/**
 	 * Send command packet to the device
 	 * @param packetType packet type
 	 * @param argument
@@ -622,7 +587,9 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			packetWriter_.writePacket(commandPacket);
 			System.out.printf("Sent:     Type %x Argument %d\n", commandPacket.getType(), argument);
 		} catch (IOException e) {
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Connection has been lost! Please reconnect!", "Error",
+					JOptionPane.ERROR_MESSAGE);
+			this.dispose();
 		}
 	}
 
@@ -1006,7 +973,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			e.printStackTrace();
 		}
 	}
-
+	
 	public LaunchWindow getLaunchWindow() {
 		return launchWindow_;
 	}
@@ -1900,49 +1867,56 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			horizontalRangeAComboBox.removeActionListener(this);
 			horizontalRangeAComboBox.setSelectedIndex(previousHorizontalRangeIndex);
 			horizontalRangeAComboBox.addActionListener(this);
-			sendHorizontalRangeCommandPacket(timeString);
+			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
+			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
 			
 		} else if (source == horizontalRangeBComboBox) {
 			String timeString = (String) horizontalRangeBComboBox.getSelectedItem();
 			horizontalRangeBComboBox.removeActionListener(this);
 			horizontalRangeBComboBox.setSelectedIndex(previousHorizontalRangeIndex);
 			horizontalRangeBComboBox.addActionListener(this);
-			sendHorizontalRangeCommandPacket(timeString);
+			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
+			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
 			
 		} else if (source == horizontalRangeMathComboBox) {
 			String timeString = (String) horizontalRangeMathComboBox.getSelectedItem();
 			horizontalRangeMathComboBox.removeActionListener(this);
 			horizontalRangeMathComboBox.setSelectedIndex(previousHorizontalRangeIndex);
 			horizontalRangeMathComboBox.addActionListener(this);
-			sendHorizontalRangeCommandPacket(timeString);
+			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
+			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
 			
 		} else if (source == horizontalRangeFilterComboBox) {
 			String timeString = (String) horizontalRangeFilterComboBox.getSelectedItem();
 			horizontalRangeFilterComboBox.removeActionListener(this);
 			horizontalRangeFilterComboBox.setSelectedIndex(previousHorizontalRangeIndex);
 			horizontalRangeFilterComboBox.addActionListener(this);
-			sendHorizontalRangeCommandPacket(timeString);
+			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
+			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
 			
 		} else if (source == horizontalRangeGeneratorComboBox) {
 			String timeString = (String) horizontalRangeGeneratorComboBox.getSelectedItem();
 			horizontalRangeGeneratorComboBox.removeActionListener(this);
 			horizontalRangeGeneratorComboBox.setSelectedIndex(previousHorizontalRangeIndex);
 			horizontalRangeGeneratorComboBox.addActionListener(this);
-			sendHorizontalRangeCommandPacket(timeString);
+			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
+			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
 			
 		} else if (source == verticalRangeAComboBox) {
 			String voltageString = (String) verticalRangeAComboBox.getSelectedItem();
 			verticalRangeAComboBox.removeActionListener(this);
 			verticalRangeAComboBox.setSelectedIndex(previousVerticalRangeAIndex);
 			verticalRangeAComboBox.addActionListener(this);
-			sendVerticalRangeCommandPacket(PacketType.VERTICAL_RANGE_A, voltageString);
+			int verticalRange = convertVoltageStringToMicrovolts(voltageString);
+			sendCommand(PacketType.VERTICAL_RANGE_A, verticalRange);
 
 		} else if (source == verticalRangeBComboBox) {
 			String voltageString = (String) verticalRangeBComboBox.getSelectedItem();
 			verticalRangeBComboBox.removeItemListener(this);
 			verticalRangeBComboBox.setSelectedIndex(previousVerticalRangeBIndex);
 			verticalRangeBComboBox.addItemListener(this);
-			sendVerticalRangeCommandPacket(PacketType.VERTICAL_RANGE_B, voltageString);
+			int verticalRange = convertVoltageStringToMicrovolts(voltageString);
+			sendCommand(PacketType.VERTICAL_RANGE_B, verticalRange);
 
 		} else if (source == verticalRangeMathComboBox) {
 			String selectedItem = (String) verticalRangeMathComboBox.getSelectedItem();

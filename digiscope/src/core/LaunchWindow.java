@@ -121,11 +121,9 @@ public class LaunchWindow extends LaunchWindowUi {
 							setMainWindow(new MainWindow(that, clientSocket));
 							getMainWindow().setVisible(true);
 						} catch (UnknownHostException e) {
-							e.printStackTrace();
 							setStatus(e.getMessage(), Constant.ERROR);
 							setEnabled(true);
 						} catch (IOException e) {
-							e.printStackTrace();
 							setStatus(e.getMessage(), Constant.ERROR);
 							setEnabled(true);
 						}

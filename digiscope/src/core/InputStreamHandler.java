@@ -1,7 +1,8 @@
 package core;
 
-import java.io.EOFException;
 import java.io.IOException;
+
+import javax.swing.JOptionPane;
 
 import org.jfree.data.xy.XYSeries;
 
@@ -16,23 +17,24 @@ import data.PacketType;
  *
  * @author ToanHo
  */
-public class InputStreamHandler implements Runnable {
+public class InputStreamHandler extends Thread {
 
 	private MainWindow mainWindow_;
 	private PacketWriter packetWriter_;
 	private PacketReader packetReader_;
+	private boolean isComplete_;
 
 	public InputStreamHandler(MainWindow mainWindow, PacketReader packetReader, PacketWriter packetWriter) {
 		mainWindow_ = mainWindow;
 		packetReader_ = packetReader;
 		packetWriter_ = packetWriter;
+		isComplete_ = false;
 	}
 
 	@Override
 	public void run() {
 		// TODO
 		try {
-			boolean isComplete = false;
 			int aCurrentTime = 0;
 			int aPeriod = 0;
 			int bCurrentTime = 0;
@@ -48,7 +50,7 @@ public class InputStreamHandler implements Runnable {
 			int bTotalOfSamples = 0;
 			XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
 			XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
-			while (isComplete == false) {
+			while (isComplete_ == false) {
 				Packet packet = packetReader_.nextPacket();
 				if (packet != null) {
 					byte type = packet.getType();
@@ -253,8 +255,21 @@ public class InputStreamHandler implements Runnable {
 		} catch (PacketFormatException pfe) {
 			pfe.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
+			if(e.getMessage() == null) { // lost connection
+				JOptionPane.showMessageDialog(mainWindow_, "Connection has been lost! Please reconnect!", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				mainWindow_.dispose();
+			}
 		}
+	}
+	
+	/**
+	 * Stop the thread
+	 */
+	public void stopExecute() {
+		isComplete_ = true;
+		packetReader_.close();
+		packetWriter_.close();
 	}
 
 }
