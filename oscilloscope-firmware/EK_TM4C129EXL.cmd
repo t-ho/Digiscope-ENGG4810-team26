@@ -54,4 +54,5 @@ SECTIONS
     .bss    :   > SRAM
     .sysmem :   > SRAM
     .stack  :   > SRAM
+    .hwi: { *.*(.text:*ti_sysbios*_Hwi_*) } > SRAM, PAGE = 0
 }
