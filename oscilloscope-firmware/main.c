@@ -84,6 +84,15 @@
 #include "drivers/SSD1289_driver.h"
 #include "drivers/XPT2046_driver.h"
 
+extern unsigned int _HwiLoadStart;
+extern unsigned int _HwiLoadSize;
+extern unsigned int _HwiLoadEnd;
+extern unsigned int _HwiRunStart;
+extern unsigned int _WaveGenLoadStart;
+extern unsigned int _WaveGenLoadSize;
+extern unsigned int _WaveGenLoadEnd;
+extern unsigned int _WaveGenRunStart;
+
 /*
  *  ======== heartBeatFxn ========
  *  Toggle the Board_LED0. The Task_sleep is determined by arg0 which
@@ -91,6 +100,8 @@
  */
 void heartBeatFxn(UArg arg0, UArg arg1)
 {
+	int freq = 500;
+
     while (1) {
         Task_sleep((unsigned int)arg0);
         GPIO_toggle(Board_LED0);
@@ -99,6 +110,14 @@ void heartBeatFxn(UArg arg0, UArg arg1)
 //        	ForceTrigger();
         }
         System_flush();
+        WaveGenSetFreq(freq);
+
+        if (freq == 500) {
+        	freq = 2000;
+        }
+        else {
+        	freq = 500;
+        }
     }
 }
 
@@ -149,4 +168,11 @@ int main(void)
     BIOS_start();
 
     return (0);
+}
+
+void
+FlashToRam(void)
+{
+    memcpy(&_HwiRunStart, &_HwiLoadStart, (uint32_t)&_HwiLoadSize);
+    memcpy(&_WaveGenRunStart, &_WaveGenLoadStart, (uint32_t)&_WaveGenLoadSize);
 }

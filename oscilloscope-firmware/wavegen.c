@@ -12,6 +12,7 @@
 #include "driverlib/rom_map.h"
 #include "driverlib/gpio.h"
 #include "driverlib/timer.h"
+#include "driverlib/sysctl.h"
 
 #include "inc/hw_memmap.h"
 #include "inc/hw_timer.h"
@@ -28,7 +29,7 @@
 
 #include "wavegen.h"
 
-#define WAVEGEN_TIMER TIMER2_BASE
+static Timer_Handle th;
 
 /* MATLAB Code:
  * 		transpose(reshape(round((cos(0:2*pi/256:2*pi*255/256) * 127.5) + 127.5), [8 32]))
@@ -75,7 +76,10 @@ static uint32_t frequency = 1000000;
 void
 WaveGenSetFreq(uint32_t freq)
 {
-
+	Hwi_disable();
+	Timer_setPeriod(th, (120000000 / 255) / freq);
+    Timer_start(th);
+	Hwi_enable();
 }
 
 uint32_t
@@ -87,23 +91,32 @@ WaveGenGetFreq(void)
 void
 WaveGenEnableSet(uint8_t on)
 {
+	Hwi_disable();
 	if (on)
 	{
-		MAP_TimerEnable(WAVEGEN_TIMER, TIMER_BOTH);
+		Timer_start(th);
 	}
 	else
 	{
-		MAP_TimerDisable(WAVEGEN_TIMER, TIMER_BOTH);
+		Timer_stop(th);
+		HWREG(GPIO_PORTA_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = 0;
 	}
+	Hwi_enable();
+}
+
+int
+WaveGenEnableGet(void)
+{
+	return Timer_getStatus(2);
 }
 
 static void
-wavegenCallback(unsigned int arg)
+WaveGenISR(unsigned int arg)
 {
-	static uint8_t pos;
-	static uint8_t inc = 10;
+	volatile static uint8_t pos;
+	volatile static uint8_t inc = 1;
     HWREG(TIMER2_BASE + TIMER_O_ICR) = TIMER_TIMA_TIMEOUT;
-	HWREG(GPIO_PORTA_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = sine[pos];
+	HWREG(GPIO_PORTA_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = signal_lookup[pos];
 	pos += inc;
 }
 
@@ -113,27 +126,27 @@ WaveGen_Init(void)
 	MAP_GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, 0xFF);
 	MAP_GPIOPadConfigSet(GPIO_PORTA_BASE, 0xFF, GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
 
-	SysCtlPeripheralEnable(TIMER2_BASE);
-	while(!SysCtlPeripheralReady(TIMER2_BASE));
-
-	TimerIntEnable(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
+	MAP_SysCtlPeripheralEnable(TIMER2_BASE);
+	while(!MAP_SysCtlPeripheralReady(TIMER2_BASE));
 
     Hwi_Params hwiParams;
 	Timer_Params TimerParams;
-	Timer_Handle th;
 
     Error_Block eb;
     Error_init(&eb);
 
-//	Timer_Params_init(&TimerParams);
-//	TimerParams.period = 2;
-//	TimerParams.periodType = Timer_PeriodType_MICROSECS;
-//    th = Timer_create(2, NULL, &TimerParams, &eb);
+	Timer_Params_init(&TimerParams);
+	TimerParams.period = 12000;
+	TimerParams.periodType = Timer_PeriodType_COUNTS;
+    th = Timer_create(2, NULL, &TimerParams, &eb);
+
+    Timer_start(th);
 
     Hwi_Params_init(&hwiParams);
     hwiParams.useDispatcher = false;
 	hwiParams.priority = 0;       //zero latency interrupt, priority 0
-//    TimerParams.hwiParams = &hwiParams;
-	Hwi_create(39, wavegenCallback, &hwiParams, &eb);
+	Hwi_create(39, WaveGenISR, &hwiParams, &eb);
+
+	TimerIntEnable(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
 //
 }
