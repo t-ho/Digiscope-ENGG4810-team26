@@ -88,7 +88,7 @@ public class Server {
 										message = "Channel coupling B: " + commandPacket.getArgument();
 										break;
 									}
-									System.out.println("Sent confirmation: " + message);
+									System.out.println("Sent confirmation: " + message + "\n");
 								}
 							}
 						}

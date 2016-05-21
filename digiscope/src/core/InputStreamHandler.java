@@ -58,7 +58,7 @@ public class InputStreamHandler extends Thread {
 						CommandPacket commandPacket = (CommandPacket) packet;
 						/// Test
 						if(type != PacketType.KEEP_ALIVE) {
-							System.out.printf("Received: Type %x argument %d\n\n",commandPacket.getType(), commandPacket.getArgument());
+							System.out.printf("Received: Type %2x Indicator %2x argument %d\n\n",commandPacket.getType(), commandPacket.getIndicator(), commandPacket.getArgument());
 						}
 						/// Test
 						byte indicator = commandPacket.getIndicator();
