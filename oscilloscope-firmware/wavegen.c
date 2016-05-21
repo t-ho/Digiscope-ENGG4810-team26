@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
@@ -29,6 +30,7 @@
 #include <ti/sysbios/family/arm/lm4/Timer.h>
 
 #include "wavegen.h"
+#include "ui/wavegen_menu.h"
 
 static Timer_Handle th;
 

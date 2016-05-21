@@ -34,6 +34,7 @@
  *  ======== main.c ========
  */
 
+#include <command.h>
 #include <string.h>
 
 /* XDCtools Header files */
@@ -76,13 +77,13 @@
 #include "grlib/grlib.h"
 #include "grlib/widget.h"
 
-#include "common.h"
 #include "net.h"
 #include "adc.h"
 #include "overvolt.h"
 #include "wavegen.h"
 #include "drivers/SSD1289_driver.h"
 #include "drivers/XPT2046_driver.h"
+#include "ui/graphics_thread.h"
 
 extern unsigned int _HwiLoadStart;
 extern unsigned int _HwiLoadSize;
@@ -105,7 +106,7 @@ void heartBeatFxn(UArg arg0, UArg arg1)
     while (1) {
         Task_sleep((unsigned int)arg0);
         GPIO_toggle(Board_LED0);
-        if (Semaphore_getCount(clients_connected_h) > 0)
+        if (NetGetClients() > 0)
         {
 //        	ForceTrigger();
         }
@@ -147,8 +148,8 @@ int main(void)
 	MAP_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_1);
 	MAP_GPIOPadConfigSet(GPIO_PORTN_BASE, GPIO_PIN_1, GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
 
-    Init_Semaphores();
-    Init_SendQueue();
+    Init_Net();
+    Init_UI();
 
     SSD1289_Init();
     XPT2046_Init();

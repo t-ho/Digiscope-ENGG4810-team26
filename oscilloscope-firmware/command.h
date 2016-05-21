@@ -1,5 +1,5 @@
 /*
- * common.h
+ * command.h
  *
  *  Created on: 30 Apr 2016
  *      Author: Ryan
@@ -12,19 +12,8 @@
 #include <ti/sysbios/knl/Semaphore.h>
 #include <ti/sysbios/knl/Mailbox.h>
 
-#ifndef COMMON_H_
-#define COMMON_H_
-
-extern void Init_Semaphores(void);
-
-extern uint32_t Standard_Step(uint32_t, int8_t);
-extern void SI_Micro_Print(char* line1, char* line2, int32_t val, char* suffix);
-
-extern Semaphore_Handle clients_connected_h;
-
-extern Mailbox_Handle GraphicsMailbox;
-
-extern void ForceTrigger(void);
+#ifndef COMMAND_H_
+#define COMMAND_H_
 
 #define COMMAND_IS_CONFIRMATION 0xFF
 #define COMMAND_IS_COMMAND 0x00
@@ -90,4 +79,4 @@ typedef struct __attribute__((__packed__)) SampleCommand
 	void* buffer;
 } SampleCommand;
 
-#endif /* COMMON_H_ */
+#endif /* COMMAND_H_ */

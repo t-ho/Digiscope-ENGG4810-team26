@@ -5,6 +5,7 @@
  *      Author: Ryan
  */
 
+#include <command.h>
 #include <ti/sysbios/knl/Clock.h>
 
 #include <ti/drivers/GPIO.h>
@@ -24,7 +25,7 @@
 #include "driverlib/rom_map.h"
 #include "utils/uartstdio.h"
 
-#include "common.h"
+#include "ui/graphics_thread.h"
 
 #define T_CLK_B		GPIO_PORTL_BASE
 #define T_CS_B		GPIO_PORTL_BASE
@@ -198,7 +199,7 @@ static void
 TouchReenable(void)
 {
 	cmd.type = _COMMAND_PTR_UP;
-	Mailbox_post(GraphicsMailbox, &cmd, 0);
+	UISend(&cmd, 0);
 	MAP_GPIOIntClear(T_IRQ_B, T_IRQ_P);
 	MAP_GPIOIntEnable(T_IRQ_B, T_IRQ_P);
 }
@@ -212,7 +213,7 @@ TouchCallback(unsigned int index)
 	cmd.type = _COMMAND_PTR_DOWN;
 	Touch_Read(&cmd.args[0], &cmd.args[1]);
 
-	Mailbox_post(GraphicsMailbox, &cmd, 0);
+	UISend(&cmd, 0);
 
 	Clock_start(TouchClkHandle);
 }

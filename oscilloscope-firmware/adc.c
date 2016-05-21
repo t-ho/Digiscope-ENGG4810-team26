@@ -5,7 +5,9 @@
  *      Author: Ryan
  */
 
+#include <command.h>
 #include "adc.h"
+#include "net.h"
 
 uint16_t adc_pos = 0;
 uint16_t adc_buffer[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
@@ -76,6 +78,27 @@ void
 ADCResume(void)
 {
 	ADCSequenceEnable(ADC0_BASE, 0);
+}
+
+void
+ForceTrigger(void)
+{
+	SampleCommand scmd;
+	scmd.type = SAMPLE_PACKET_A_12;
+	scmd.num_samples = (1024 - COMMANDLENGTH) / 2;
+	scmd.period = 1;
+
+	int seqnum = 0;
+
+	ADCPause();
+
+	while (seqnum * scmd.num_samples < ADC_BUF_SIZE)
+	{
+		scmd.seq_num = seqnum;
+		scmd.buffer = &adc_buffer[seqnum * scmd.num_samples];
+		NetSend((Command *) &scmd, 0);
+		seqnum++;
+	}
 }
 
 void

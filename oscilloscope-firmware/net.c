@@ -44,8 +44,10 @@
 
 #include <sys/socket.h>
 
-#include "common.h"
 #include "net.h"
+#include "adc.h"
+#include "command.h"
+#include "ui/graphics_thread.h"
 
 #define TCPPORT 4810
 
@@ -61,13 +63,29 @@ void tcpHandler(UArg arg0, UArg arg1);
 
 static Mailbox_Handle NetCommandMailbox;
 
+static Semaphore_Handle clients_connected_h;
+static Semaphore_Struct clients_connected;
+
 void
-Init_SendQueue(void)
+Init_Net(void)
 {
 	Mailbox_Params mbparams;
 	Mailbox_Params_init(&mbparams);
 	static Error_Block eb;
 	NetCommandMailbox = Mailbox_create(sizeof(Command),50,&mbparams,&eb);
+
+    Semaphore_Params params;
+    Semaphore_Params_init(&params);
+
+    params.mode = Semaphore_Mode_COUNTING;
+    Semaphore_construct(&clients_connected, 0, &params);
+    clients_connected_h = Semaphore_handle(&clients_connected);
+}
+
+int
+NetGetClients(void)
+{
+	return Semaphore_getCount(clients_connected_h);
 }
 
 int
@@ -94,7 +112,7 @@ Void tcpWorker(UArg arg0, UArg arg1)
 
 	Command msg;
 	msg.type = _COMMAND_CONN_UPDATE;
-	Mailbox_post(GraphicsMailbox, &msg, 0);
+	UISend(&msg, 0);
 
     while (1)
     {
@@ -105,7 +123,7 @@ Void tcpWorker(UArg arg0, UArg arg1)
 			Command *cmd = (Command*) buffer;
 			cmd->args[0] = ntohl(cmd->args[0]);
 			System_printf("C: %x - %d\n", cmd->type, cmd->args[0]);
-			Mailbox_post(GraphicsMailbox, cmd, 0);
+			UISend(cmd, 0);
 		}
 		else if (bytesRcvd > 0)
 		{
@@ -169,7 +187,7 @@ clientlost:
 
 	Command connupdate;
 	connupdate.type = _COMMAND_CONN_UPDATE;
-	Mailbox_post(GraphicsMailbox, &connupdate, 0);
+	UISend(&connupdate, 0);
 }
 
 /*
@@ -296,7 +314,7 @@ ipAddrHook(uint32_t IPAddr, uint32_t IfIdx, uint32_t fAdd)
 	msg.type = _COMMAND_IP_UPDATE;
 	msg.args[0] = ntohl(IPAddr);
 
-	Mailbox_post(GraphicsMailbox, &msg, 0);
+	UISend(&msg, 0);
 
 //    System_printf("mynetworkIPAddrHook:\tIf-%d:%d.%d.%d.%d\n", IfIdx,
 //            (uint8_t)(IpAddrVal>>24)&0xFF, (uint8_t)(IpAddrVal>>16)&0xFF,
