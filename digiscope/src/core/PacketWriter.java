@@ -14,10 +14,19 @@ import data.CommandPacket;
 public class PacketWriter {
 	private DataOutputStream dos_;
 
-	public PacketWriter(OutputStream os) {
-		dos_ = new DataOutputStream(new BufferedOutputStream(os));
+	/**
+	 * Constructor
+	 * @param outputStream
+	 */
+	public PacketWriter(OutputStream outputStream) {
+		dos_ = new DataOutputStream(new BufferedOutputStream(outputStream));
 	}
 
+	/**
+	 * Write the specified packet to the output stream
+	 * @param commandPacket
+	 * @throws IOException
+	 */
 	public synchronized void writePacket(CommandPacket commandPacket) throws IOException {
 		dos_.writeByte(commandPacket.getType());
 		dos_.writeByte(commandPacket.getIndicator());
@@ -25,6 +34,9 @@ public class PacketWriter {
 		dos_.flush();
 	}
 
+	/**
+	 * Close the packet writer
+	 */
 	public void close() {
 		if (dos_ != null) {
 			try {

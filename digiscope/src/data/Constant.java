@@ -3,8 +3,7 @@ package data;
 import java.awt.Color;
 import java.awt.Image;
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -215,10 +214,13 @@ public class Constant {
 		}
 	}
 	
-	public static double round(double value, int places) {
-	    if (places < 0) throw new IllegalArgumentException();
-	    BigDecimal bigDecimal = new BigDecimal(value);
-	    bigDecimal = bigDecimal.setScale(places, RoundingMode.HALF_UP);
-	    return bigDecimal.doubleValue();
+	/**
+	 * Return round string with 4 decimal places
+	 * @param value
+	 * @return
+	 */
+	public static String roundString(double value) {
+	    DecimalFormat decimalFormat = new DecimalFormat("#.####");
+	    return decimalFormat.format(value);
 	}
 }

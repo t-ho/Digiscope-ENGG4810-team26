@@ -18,10 +18,20 @@ import data.PacketType;
 public class PacketReader {
 	private DataInputStream dis_;
 
-	public PacketReader(InputStream is) {
-		dis_ = new DataInputStream(new BufferedInputStream(is)) ;
+	/**
+	 * Constructor
+	 * @param inputStream
+	 */
+	public PacketReader(InputStream inputStream) {
+		dis_ = new DataInputStream(new BufferedInputStream(inputStream)) ;
 	}
 	
+	/**
+	 * Read next packet from the input stream
+	 * @return next packet from the input stream. Otherwise, null 
+	 * @throws IOException
+	 * @throws PacketFormatException
+	 */
 	public synchronized Packet nextPacket() throws IOException, PacketFormatException {
 		//TODO:
 		Packet packet = null;
@@ -161,6 +171,9 @@ public class PacketReader {
 		return packet;
 	}
 	
+	/**
+	 * Close packet reader
+	 */
 	public void close() {
 		if(dis_ != null) {
 			try {
