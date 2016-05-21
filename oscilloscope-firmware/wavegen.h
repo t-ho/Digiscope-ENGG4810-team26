@@ -8,7 +8,9 @@
 #ifndef WAVEGEN_H_
 #define WAVEGEN_H_
 
-extern void WaveGenEnableSet(uint8_t on);
+extern void WaveGenEnableSet(bool on);
+extern bool WaveGenEnableGet(void);
+
 extern void WaveGen_Init(void);
 
 extern void WaveGenSetFreq(uint32_t freq);

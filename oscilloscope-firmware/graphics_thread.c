@@ -122,6 +122,8 @@ void OnRange_B(tWidget *psWidget)
     WidgetPaint(WIDGET_ROOT);
 }
 
+void OnWaveGenEnable(tWidget *psWidget);
+void OnWaveGenFreq(tWidget *psWidget);
 void OnCoupling(tWidget *psWidget);
 void EnterSleep(tWidget *psWidget);
 void OnPrevious(tWidget *psWidget);
@@ -228,26 +230,27 @@ tPushButtonWidget trigger_menu_buttons[] =
 						  ClrWhite, &g_sFontCm18b, "Threshold", 0, 0, 0, 0, OnPrevious),
 };
 
+RectangularButton(WaveGenOnOff, &menus[WAVEGEN_MENU], 0, 0, &SSD1289_Display, 110, 30,
+				  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
+				  ClrWhite, &g_sFontCm18b, "On/Off", 0, 0, 0, 0, OnWaveGenEnable);
+RectangularButton(WaveGenFreq, &menus[WAVEGEN_MENU], &WaveGenOnOff, 0, &SSD1289_Display, 220, 120,
+				  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
+				  ClrWhite, &g_sFontCm18b, "Freq", 0, 0, 0, 0, OnWaveGenFreq);
+
 tPushButtonWidget wavegen_menu_buttons[] =
 {
 		RectangularButtonStruct(&menus[WAVEGEN_MENU], wavegen_menu_buttons + 1, 0, &SSD1289_Display, 0, 30,
 		                  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrGray, ClrYellow, ClrWhite,
 						  ClrWhite, &g_sFontCm18b, "Back", 0, 0, 0, 0, OnMAIN),
-		RectangularButtonStruct(&menus[WAVEGEN_MENU], wavegen_menu_buttons + 2, 0, &SSD1289_Display, 110, 30,
-						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
-						  ClrWhite, &g_sFontCm18b, "On/Off", 0, 0, 0, 0, OnPrevious),
-		RectangularButtonStruct(&menus[WAVEGEN_MENU], wavegen_menu_buttons + 3, 0, &SSD1289_Display, 220, 30,
+		RectangularButtonStruct(&menus[WAVEGEN_MENU], wavegen_menu_buttons + 2, 0, &SSD1289_Display, 220, 30,
 		                  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
 						  ClrWhite, &g_sFontCm18b, "Type", 0, 0, 0, 0, OnPrevious),
-		RectangularButtonStruct(&menus[WAVEGEN_MENU], wavegen_menu_buttons + 4, 0, &SSD1289_Display, 0, 120,
+		RectangularButtonStruct(&menus[WAVEGEN_MENU], wavegen_menu_buttons + 3, 0, &SSD1289_Display, 0, 120,
 						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
 						  ClrWhite, &g_sFontCm18b, "Vpp", 0, 0, 0, 0, OnPrevious),
-		RectangularButtonStruct(&menus[WAVEGEN_MENU], wavegen_menu_buttons + 5, 0, &SSD1289_Display, 110, 120,
+		RectangularButtonStruct(&menus[WAVEGEN_MENU], &WaveGenFreq, 0, &SSD1289_Display, 110, 120,
 						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
 						  ClrWhite, &g_sFontCm18b, "Offset", 0, 0, 0, 0, OnPrevious),
-		RectangularButtonStruct(&menus[WAVEGEN_MENU], 0, 0, &SSD1289_Display, 220, 120,
-						  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
-						  ClrWhite, &g_sFontCm18b, "Freq", 0, 0, 0, 0, OnPrevious),
 };
 
 char brightness_text[] = "5";
@@ -279,6 +282,16 @@ tPushButtonWidget overvoltage_menu_buttons[] =
 		                  300, 100, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrRed, ClrYellow, ClrWhite,
 						  ClrWhite, &g_sFontCm24b, "Acknowledge", 0, 0, 0, 0, OverVoltageAcknowledge),
 };
+
+void
+Repaint(tWidget *psWidget)
+{
+	static Command cmd;
+	cmd.type = _COMMAND_REPAINT;
+	cmd.args[0] = (uint32_t)psWidget;
+
+	Mailbox_post(GraphicsMailbox, &cmd, 0);
+}
 
 void
 SetCoupling(uint8_t channel, uint8_t coupling)
@@ -373,6 +386,47 @@ void VertRangeChange(uint32_t newVal, uint8_t channel)
 		WidgetPaint((tWidget *)&vert_div_label1);
 		WidgetPaint((tWidget *)&vert_div_label2);
 	}
+}
+
+void
+WaveGenOnOffSetText(const char* text)
+{
+	PushButtonTextSet(&WaveGenOnOff, text);
+
+	if (current_menu == WAVEGEN_MENU)
+	{
+		Repaint((tWidget *)&WaveGenOnOff);
+	}
+}
+
+void
+WaveGenFreqSetText(const char* text)
+{
+	PushButtonTextSet(&WaveGenFreq, text);
+
+	if (current_menu == WAVEGEN_MENU)
+	{
+		Repaint((tWidget *)&WaveGenFreq);
+	}
+}
+
+void
+OnWaveGenEnable(tWidget *psWidget)
+{
+	WaveGenEnableSet(!WaveGenEnableGet());
+}
+
+void
+OnWaveGenFreq(tWidget *psWidget)
+{
+	uint32_t newfreq = Standard_Step(WaveGenGetFreq(), 1);
+
+	if (newfreq > 2000)
+	{
+		newfreq = 100;
+	}
+
+	WaveGenSetFreq(newfreq);
 }
 
 void
@@ -543,6 +597,9 @@ screenDemo(UArg arg0, UArg arg1)
     			break;
     		case COMMAND_COUPLING_B:
     			SetCoupling(CHANNEL_B, 1 ^ current_coupling[CHANNEL_A]);
+    			break;
+    		case _COMMAND_REPAINT:
+    			WidgetPaint((tWidget *)cmd.args[0]);
     			break;
     		case _COMMAND_UNKNOWN:
     			/* Fallthrough */

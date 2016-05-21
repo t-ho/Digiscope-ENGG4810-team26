@@ -118,6 +118,8 @@ void heartBeatFxn(UArg arg0, UArg arg1)
         else {
         	freq = 500;
         }
+
+        WaveGenEnableGet();
     }
 }
 

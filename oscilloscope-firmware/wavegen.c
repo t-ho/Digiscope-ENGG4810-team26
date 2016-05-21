@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
@@ -72,14 +73,32 @@ static uint8_t sine[] =
 
 static uint8_t *signal_lookup = sine;
 static uint32_t frequency = 1000000;
+static bool enabled;
 
 void
 WaveGenSetFreq(uint32_t freq)
 {
+	static char freq_display[8] = "500 Hz";
+
+	frequency = freq;
+
 	Hwi_disable();
 	Timer_setPeriod(th, (120000000 / 255) / freq);
-    Timer_start(th);
+	if (enabled)
+	{
+		Timer_start(th);
+	}
 	Hwi_enable();
+
+	if (frequency < 1000)
+	{
+		snprintf(freq_display, sizeof(freq_display), "%d Hz", frequency);
+	}
+	else
+	{
+		snprintf(freq_display, sizeof(freq_display), "%d kHz", frequency/1000);
+	}
+	WaveGenFreqSetText(freq_display);
 }
 
 uint32_t
@@ -89,25 +108,29 @@ WaveGenGetFreq(void)
 }
 
 void
-WaveGenEnableSet(uint8_t on)
+WaveGenEnableSet(bool on)
 {
 	Hwi_disable();
 	if (on)
 	{
+		enabled = true;
 		Timer_start(th);
 	}
 	else
 	{
+		enabled = false;
 		Timer_stop(th);
 		HWREG(GPIO_PORTA_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = 0;
 	}
 	Hwi_enable();
+
+	WaveGenOnOffSetText(enabled?"On":"Off");
 }
 
-int
+bool
 WaveGenEnableGet(void)
 {
-	return Timer_getStatus(2);
+	return enabled;
 }
 
 static void
@@ -140,13 +163,13 @@ WaveGen_Init(void)
 	TimerParams.periodType = Timer_PeriodType_COUNTS;
     th = Timer_create(2, NULL, &TimerParams, &eb);
 
-    Timer_start(th);
-
     Hwi_Params_init(&hwiParams);
     hwiParams.useDispatcher = false;
 	hwiParams.priority = 0;       //zero latency interrupt, priority 0
 	Hwi_create(39, WaveGenISR, &hwiParams, &eb);
 
 	TimerIntEnable(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
+
+	WaveGenEnableSet(false);
 //
 }
