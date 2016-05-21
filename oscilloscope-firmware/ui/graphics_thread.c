@@ -16,6 +16,7 @@
 #include "adc.h"
 #include "overvolt.h"
 #include "frontend.h"
+#include "wavegen.h"
 
 #include "graphics_thread.h"
 #include "overvoltage_menu.h"
@@ -307,6 +308,12 @@ UI_Task(UArg arg0, UArg arg1)
     			break;
     		case COMMAND_COUPLING_B:
     			FrontEndSetCoupling(1, !FrontEndGetCoupling(1));
+    			break;
+    		case COMMAND_FUNCTION_GEN_OUT:
+    			WaveGenEnableSet(cmd.args[0]);
+    			break;
+    		case COMMAND_FUNCTION_GEN_FREQUENCY:
+    			WaveGenSetFreq(cmd.args[0]);
     			break;
     		case _COMMAND_REPAINT:
     			WidgetPaint((tWidget *)cmd.args[0]);

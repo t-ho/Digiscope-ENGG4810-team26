@@ -93,6 +93,10 @@ extern unsigned int _WaveGenLoadStart;
 extern unsigned int _WaveGenLoadSize;
 extern unsigned int _WaveGenLoadEnd;
 extern unsigned int _WaveGenRunStart;
+extern unsigned int _IncLoadStart;
+extern unsigned int _IncLoadSize;
+extern unsigned int _IncLoadEnd;
+extern unsigned int _IncRunStart;
 
 /*
  *  ======== heartBeatFxn ========
@@ -101,7 +105,10 @@ extern unsigned int _WaveGenRunStart;
  */
 void heartBeatFxn(UArg arg0, UArg arg1)
 {
-	int freq = 500;
+//	int freq = 500;
+
+	Command cmd;
+	cmd.type = _COMMAND_UNKNOWN;
 
     while (1) {
         Task_sleep((unsigned int)arg0);
@@ -111,15 +118,8 @@ void heartBeatFxn(UArg arg0, UArg arg1)
 //        	ForceTrigger();
         }
         System_flush();
-        WaveGenSetFreq(freq);
 
-        if (freq == 500) {
-        	freq = 2000;
-        }
-        else {
-        	freq = 500;
-        }
-
+        UISend(&cmd, 0);
         WaveGenEnableGet();
     }
 }

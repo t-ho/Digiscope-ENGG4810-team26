@@ -32,7 +32,23 @@
 #include "wavegen.h"
 #include "ui/wavegen_menu.h"
 
+#define NOISE_PERIOD 300
+
+static char* WaveNames[] =
+{
+	"Sine",
+	"Square",
+	"Triangle",
+	"Ramp",
+	"Noise",
+};
+
 static Timer_Handle th;
+
+static void WaveGenISR(unsigned int arg);
+
+#pragma location=0x20030000
+volatile static int8_t inc = 1;
 
 /* MATLAB Code:
  * 		transpose(reshape(round((cos(0:2*pi/256:2*pi*255/256) * 127.5) + 127.5), [8 32]))
@@ -73,33 +89,62 @@ static uint8_t sine[] =
    253,  253,  254,  254,  254,  255,  255,  255,
 };
 
-static uint8_t *signal_lookup = sine;
+static uint8_t signal_lookup[256];
+
 static uint32_t frequency = 1000000;
 static bool enabled;
+static WaveType shape = SINE;
 
 void
 WaveGenSetFreq(uint32_t freq)
 {
 	static char freq_display[8] = "500 Hz";
+	int period;
 
-	frequency = freq;
+	if (shape == NOISE)
+	{
+		inc = 0;
+		period = 300;
+		snprintf(freq_display, sizeof(freq_display), "N/A");
+	}
+	else
+	{
+		if (freq > 25000)
+		{
+			frequency = 25000;
+		}
+		else
+		{
+			frequency = freq;
+		}
+
+		period = (120000000 / 255) / frequency;
+		inc = 1;
+
+		while (period < 100)
+		{
+			inc++;
+			period = (inc * 120000000 / 255) / frequency;
+		}
+
+		if (frequency < 1000)
+		{
+			snprintf(freq_display, sizeof(freq_display), "%d Hz", frequency);
+		}
+		else
+		{
+			snprintf(freq_display, sizeof(freq_display), "%d kHz", frequency/1000);
+		}
+	}
 
 	Hwi_disable();
-	Timer_setPeriod(th, (120000000 / 255) / freq);
+	Timer_setPeriod(th, period);
 	if (enabled)
 	{
 		Timer_start(th);
 	}
 	Hwi_enable();
 
-	if (frequency < 1000)
-	{
-		snprintf(freq_display, sizeof(freq_display), "%d Hz", frequency);
-	}
-	else
-	{
-		snprintf(freq_display, sizeof(freq_display), "%d kHz", frequency/1000);
-	}
 	WaveGenFreqSetText(freq_display);
 }
 
@@ -136,13 +181,85 @@ WaveGenEnableGet(void)
 }
 
 static void
+WaveGenUpdateShape()
+{
+	int i;
+
+	WaveGenShapeSetText(WaveNames[shape]);
+
+	switch (shape)
+	{
+	case SINE:
+		for (i = 0; i < 256; i++)
+		{
+			signal_lookup[i] = sine[i];
+		}
+		WaveGenSetFreq(WaveGenGetFreq());
+		break;
+	case SQUARE:
+		for (i = 0; i < 256; i++)
+		{
+			signal_lookup[i] = i > 127 ? 255 : 0;
+		}
+		WaveGenSetFreq(WaveGenGetFreq());
+		break;
+	case TRIANGLE:
+		for (i = 0; i < 128; i++)
+		{
+			signal_lookup[i] = i * 2;
+			signal_lookup[255 - i] = i * 2;
+		}
+		WaveGenSetFreq(WaveGenGetFreq());
+		break;
+	case RAMP:
+		for (i = 0; i < 256; i++)
+		{
+			signal_lookup[i] = i;
+		}
+		WaveGenSetFreq(WaveGenGetFreq());
+		break;
+	case NOISE:
+		WaveGenSetFreq(0);
+		break;
+	}
+}
+
+void WaveGenSetShape(WaveType newshape)
+{
+	shape = newshape;
+	WaveGenUpdateShape();
+}
+
+WaveType
+WaveGenGetShape(void)
+{
+	return shape;
+}
+
+static void
 WaveGenISR(unsigned int arg)
 {
 	volatile static uint8_t pos;
-	volatile static uint8_t inc = 1;
+	volatile static uint16_t lfsr = 0xACE1;
+
     HWREG(TIMER2_BASE + TIMER_O_ICR) = TIMER_TIMA_TIMEOUT;
-	HWREG(GPIO_PORTA_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = signal_lookup[pos];
-	pos += inc;
+
+    if (inc == 0)
+    {
+        HWREG(TIMER2_BASE + TIMER_O_ICR) = TIMER_TIMA_TIMEOUT;
+
+        unsigned lsb = lfsr & 1;   /* Get LSB (i.e., the output bit). */
+        lfsr >>= 1;                /* Shift register */
+        lfsr ^= (-lsb) & 0xB400;  /* If the output bit is 1, apply toggle mask.
+                                    * The value has 1 at bits corresponding
+                                    * to taps, 0 elsewhere. */
+    	HWREG(GPIO_PORTA_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = (0xFF & lfsr);
+    }
+    else
+    {
+        HWREG(GPIO_PORTA_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = signal_lookup[pos];
+    	pos += inc;
+    }
 }
 
 void
@@ -154,14 +271,14 @@ WaveGen_Init(void)
 	MAP_SysCtlPeripheralEnable(TIMER2_BASE);
 	while(!MAP_SysCtlPeripheralReady(TIMER2_BASE));
 
-    Hwi_Params hwiParams;
 	Timer_Params TimerParams;
+	Hwi_Params hwiParams;
 
     Error_Block eb;
     Error_init(&eb);
 
 	Timer_Params_init(&TimerParams);
-	TimerParams.period = 12000;
+	TimerParams.period = 1000;
 	TimerParams.periodType = Timer_PeriodType_COUNTS;
     th = Timer_create(2, NULL, &TimerParams, &eb);
 

@@ -55,6 +55,17 @@ WaveGenFreqSetText(const char* text)
 	}
 }
 
+void
+WaveGenShapeSetText(const char* text)
+{
+	PushButtonTextSet(&WaveGenShape, text);
+
+	if (current_menu == WAVEGEN_MENU)
+	{
+		Repaint((tWidget *)&WaveGenShape);
+	}
+}
+
 static void
 OnWaveGenEnable(tWidget *psWidget)
 {
@@ -66,9 +77,13 @@ OnWaveGenFreq(tWidget *psWidget)
 {
 	uint32_t newfreq = Standard_Step(WaveGenGetFreq(), 1);
 
-	if (newfreq > 2000)
+	if (WaveGenGetFreq() == 25000)
 	{
-		newfreq = 100;
+		newfreq = 10;
+	}
+	else if (newfreq > 25000)
+	{
+		newfreq = 25000;
 	}
 
 	WaveGenSetFreq(newfreq);
@@ -87,4 +102,5 @@ OnWaveGenAmplitude(tWidget *psWidget)
 static void
 OnWaveGenShape(tWidget *psWidget)
 {
+	WaveGenSetShape((WaveGenGetShape() + 1) % 5);
 }
