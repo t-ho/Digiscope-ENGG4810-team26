@@ -51,7 +51,7 @@ FrontEndSetHorDiv(uint32_t us)
 
 	Command cmd;
 	cmd.type = COMMAND_HORIZONTAL_RANGE;
-	cmd.args[0] = us;
+	cmd.args[0] = hor_div;
 	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
 	NetSend(&cmd, 0);
 
@@ -95,7 +95,7 @@ FrontEndSetVerDiv(uint32_t channel, uint32_t uV)
 
 		Command cmd;
 		cmd.type = channel ? COMMAND_VERTICAL_RANGE_B : COMMAND_VERTICAL_RANGE_A;
-		cmd.args[0] = uV;
+		cmd.args[0] = vert_divs[channel];
 		cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
 		NetSend(&cmd, 0);
 
