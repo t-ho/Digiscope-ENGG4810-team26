@@ -1211,7 +1211,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			if (noOfItems != Integer.MAX_VALUE) {
 				Evaluator evaluator = new Evaluator();
 				XYSeries mathSeries = new XYSeries(Constant.MATH_CHANNEL);
-				Double x = 0.0;
+				Double x = Double.MAX_VALUE;
+				Double lastX = Double.MAX_VALUE;
 				for (int i = 0; i < noOfItems; i++) {
 					for (Map.Entry<String, String> entry : channelNames.entrySet()) {
 						XYDataItem dataItem = rawXYSeries.get(entry.getValue()).getDataItem(i);
@@ -1220,7 +1221,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 					}
 					if(x <= maxHorizontalRange) {
 						mathSeries.add(x, evaluator.evaluate(expression, evaluator.getVariables()));
+						lastX = x;
 					} else {
+						if(lastX < maxHorizontalRange) {
+							mathSeries.add(x, evaluator.evaluate(expression, evaluator.getVariables()));
+						}
 						break;
 					}
 				}
@@ -1247,44 +1252,58 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				XYSeries filterSeries = new XYSeries(Constant.FILTER_CHANNEL);
 				double maxHorizontalRange = visualizer_.getHorizontalRange().getUpperBound();
 				if (filterFile_.getType() == Constant.FIR) {
+					double xValue = Double.MAX_VALUE;
+					double lastXValue = Double.MAX_VALUE;
 					for (int n = 0; n < derivedSeries.getItemCount(); n++) {
-						if (derivedSeries.getDataItem(n).getXValue() <= maxHorizontalRange) {
-							Double result = 0.0;
-							for (int i = 0; i < firstColumn.size(); i++) {
-								Double x = 0.0;
-								if (n - i >= 0) {
-									x = derivedSeries.getDataItem(n - i).getYValue();
-								}
-								result = result + firstColumn.get(i) * x;
+						Double result = 0.0;
+						for (int i = 0; i < firstColumn.size(); i++) {
+							Double x = 0.0;
+							if (n - i >= 0) {
+								x = derivedSeries.getDataItem(n - i).getYValue();
 							}
-							filterSeries.add(derivedSeries.getDataItem(n).getXValue(), result);
+							result = result + firstColumn.get(i) * x;
+						}
+						xValue = derivedSeries.getDataItem(n).getXValue();
+						if (xValue <= maxHorizontalRange) {
+							filterSeries.add(xValue, result);
+							lastXValue = xValue;
 						} else {
+							if (lastXValue < maxHorizontalRange) {
+								filterSeries.add(xValue, result);
+							}
 							break;
 						}
 					}
 				} else if (filterFile_.getType() == Constant.IIR) {
 					ArrayList<Double> secondColumn = filterFile_.getSecondColumn();
+					double xValue = Double.MAX_VALUE;
+					double lastXValue = Double.MAX_VALUE;
 					for (int n = 0; n < derivedSeries.getItemCount(); n++) {
-						if (derivedSeries.getDataItem(n).getXValue() <= maxHorizontalRange) {
-							Double firstSum = 0.0;
-							Double secondSum = 0.0;
-							for (int i = 0; i < firstColumn.size(); i++) {
-								Double x = 0.0;
-								if (n - i >= 0) {
-									x = derivedSeries.getDataItem(n - i).getYValue();
-								}
-								firstSum += firstColumn.get(i) * x;
+						Double firstSum = 0.0;
+						Double secondSum = 0.0;
+						for (int i = 0; i < firstColumn.size(); i++) {
+							Double x = 0.0;
+							if (n - i >= 0) {
+								x = derivedSeries.getDataItem(n - i).getYValue();
 							}
-							for (int j = 1; j < secondColumn.size(); j++) {
-								Double y = 0.0;
-								if (n - j >= 0) {
-									y = filterSeries.getDataItem(n - j).getYValue();
-								}
-								secondSum += secondColumn.get(j) * y;
+							firstSum += firstColumn.get(i) * x;
+						}
+						for (int j = 1; j < secondColumn.size(); j++) {
+							Double y = 0.0;
+							if (n - j >= 0) {
+								y = filterSeries.getDataItem(n - j).getYValue();
 							}
-							Double result = (1 / secondColumn.get(0)) * (firstSum - secondSum);
-							filterSeries.add(derivedSeries.getDataItem(n).getXValue(), result);
+							secondSum += secondColumn.get(j) * y;
+						}
+						Double result = (1 / secondColumn.get(0)) * (firstSum - secondSum);
+						xValue = derivedSeries.getDataItem(n).getXValue();
+						if (xValue <= maxHorizontalRange) {
+							filterSeries.add(xValue, result);
+							lastXValue = xValue;
 						} else {
+							if (lastXValue < maxHorizontalRange) {
+								filterSeries.add(xValue, result);
+							}
 							break;
 						}
 					}
