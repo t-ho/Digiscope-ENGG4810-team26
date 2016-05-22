@@ -175,10 +175,10 @@ public class InputStreamHandler extends Thread {
 							}
 							if (isUpdateB == false) {
 								if (bCurrentTime >= maxDisplayTime) {
-									mainWindow_.setXYSeries(Constant.CHANNEL_B, aSeries, true);
+									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, true);
 									isUpdateB = true;
 								} else if (bTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_B)) {
-									mainWindow_.setXYSeries(Constant.CHANNEL_B, aSeries, true);
+									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, true);
 									isUpdateB = false;
 								}
 							}
@@ -239,10 +239,10 @@ public class InputStreamHandler extends Thread {
 							}
 							if (isUpdateB == false) {
 								if (bCurrentTime >= maxDisplayTime) {
-									mainWindow_.setXYSeries(Constant.CHANNEL_B, aSeries, true);
+									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, true);
 									isUpdateB = true;
 								} else if (bTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_B)) {
-									mainWindow_.setXYSeries(Constant.CHANNEL_B, aSeries, true);
+									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, true);
 									isUpdateB = false;
 								}
 							}
