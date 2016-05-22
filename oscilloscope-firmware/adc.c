@@ -4,8 +4,11 @@
  *  Created on: 12 May 2016
  *      Author: Ryan
  */
+#include <xdc/runtime/Error.h>
 
-#include <command.h>
+#include <ti/sysbios/family/arm/m3/Hwi.h>
+
+#include "command.h"
 #include "adc.h"
 #include "net.h"
 
@@ -16,6 +19,9 @@ uint16_t adc_buffer_B[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
 
 
 static uint32_t udmaCtrlTable[4096/sizeof(uint32_t)] __attribute__(( aligned(1024) ));
+
+static void adcDmaCallback_A_ISR(unsigned int arg);
+static void adcDmaCallback_B_ISR(unsigned int arg);
 
 void
 ADC_Init(void)
@@ -95,6 +101,17 @@ ADC_Init(void)
 	uDMAChannelEnable(14);
 	uDMAChannelEnable(24);
 
+	Hwi_Params hwiParams;
+    Error_Block eb1, eb2;
+    Error_init(&eb1);
+    Error_init(&eb2);
+
+    Hwi_Params_init(&hwiParams);
+	hwiParams.priority = 3;
+	Hwi_create(30, adcDmaCallback_A_ISR, &hwiParams, &eb1);
+	hwiParams.priority = 4;
+	Hwi_create(62, adcDmaCallback_B_ISR, &hwiParams, &eb2);
+
 	ADCIntEnable(ADC0_BASE, 0);
 	ADCIntEnable(ADC1_BASE, 0);
 }
@@ -145,7 +162,7 @@ ForceTrigger(void)
 	}
 }
 
-void
+static void
 adcDmaCallback_A_ISR(unsigned int arg)
 {
 	ADCIntClear(ADC0_BASE, 0);
@@ -179,7 +196,7 @@ adcDmaCallback_A_ISR(unsigned int arg)
     uDMAChannelEnable(14);
 }
 
-void
+static void
 adcDmaCallback_B_ISR(unsigned int arg)
 {
 	ADCIntClear(ADC1_BASE, 0);
