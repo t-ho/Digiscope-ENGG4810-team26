@@ -30,7 +30,10 @@ extern void ACDResume(void);
 extern void ForceTrigger(void);
 extern void ADCResume(void);
 
-extern uint16_t adc_pos;
-extern uint16_t adc_buffer[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
+extern uint16_t adc_pos_A;
+extern uint16_t adc_pos_B;
+extern uint16_t adc_buffer_A[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
+extern uint16_t adc_buffer_B[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
+
 
 #endif /* ADC_H_ */

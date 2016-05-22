@@ -62,7 +62,7 @@ SECTIONS
 		LOAD_SIZE(_HwiLoadSize),
     	LOAD_END(_HwiLoadEnd),
     	RUN_START(_HwiRunStart)
-    .wavegen: { *.*(.text:*WaveGenISR*) }
+    .wavegen: { *.*(.text:*ISR*) }
     	LOAD = FLASH PAGE = 0,
     	RUN = SRAM, PAGE = 0,
     	LOAD_START(_WaveGenLoadStart),

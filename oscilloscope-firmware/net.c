@@ -53,7 +53,7 @@
 
 #define TCPHANDLERSTACK 1024
 
-#define SOCKET_TIMEOUT 500000
+#define SOCKET_TIMEOUT 100000
 
 /* Prototypes */
 void tcpHandler(UArg arg0, UArg arg1);
@@ -72,7 +72,7 @@ Init_Net(void)
 	Mailbox_Params mbparams;
 	Mailbox_Params_init(&mbparams);
 	static Error_Block eb;
-	NetCommandMailbox = Mailbox_create(sizeof(Command),50,&mbparams,&eb);
+	NetCommandMailbox = Mailbox_create(sizeof(Command),128,&mbparams,&eb);
 
     Semaphore_Params params;
     Semaphore_Params_init(&params);

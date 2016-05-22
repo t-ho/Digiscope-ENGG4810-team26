@@ -294,10 +294,10 @@ UI_Task(UArg arg0, UArg arg1)
     			FrontEndSetHorDiv(cmd.args[0]);
     			break;
     		case COMMAND_VERTICAL_RANGE_A:
-    			FrontEndSetVerDiv(cmd.args[0], 0);
+    			FrontEndSetVerDiv(0, cmd.args[0]);
 				break;
     		case COMMAND_VERTICAL_RANGE_B:
-    			FrontEndSetVerDiv(cmd.args[0], 1);
+    			FrontEndSetVerDiv(1, cmd.args[0]);
 				break;
     		case COMMAND_TRIGGER_FORCE_A:
     		case COMMAND_TRIGGER_FORCE_B:
