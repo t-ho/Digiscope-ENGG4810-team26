@@ -33,6 +33,7 @@
 #include "ui/wavegen_menu.h"
 
 #define NOISE_PERIOD 300
+#define APPARENT_CLOCK_FREQ 118400000
 
 static char* WaveNames[] =
 {
@@ -118,13 +119,13 @@ WaveGenSetFreq(uint32_t freq)
 			frequency = freq;
 		}
 
-		period = (120000000 / 255) / frequency;
+		period = (APPARENT_CLOCK_FREQ / 255) / frequency;
 		inc = 1;
 
-		while (period < 100)
+		while (period < 150)
 		{
 			inc++;
-			period = (inc * 120000000 / 255) / frequency;
+			period = (inc * APPARENT_CLOCK_FREQ / 255) / (frequency);
 		}
 
 		if (frequency < 1000)
