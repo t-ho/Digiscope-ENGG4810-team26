@@ -8,6 +8,8 @@
 
 #include <ti/sysbios/family/arm/m3/Hwi.h>
 
+#include "inc/hw_types.h"
+
 #include "command.h"
 #include "adc.h"
 #include "net.h"
@@ -36,8 +38,8 @@ ADC_Init(void)
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC1));
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_UDMA));
 
-    ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 16);
-    ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 16);
+    ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 8);
+    ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 8);
 
 //    ADCSequenceConfigure(ADC0_BASE, 0 /*SS0*/, ADC_TRIGGER_PROCESSOR, 3 /*priority*/);  // SS0-SS3 priorities must always be different
 //    ADCSequenceConfigure(ADC0_BASE, 3 /*SS3*/, ADC_TRIGGER_PROCESSOR, 0 /*priority*/);  // so change SS3 to prio0 when SS0 gets set to prio3
@@ -142,90 +144,88 @@ ForceTrigger(void)
 
 	ADCPause();
 
-	while (seqnum * scmd.num_samples < ADC_BUF_SIZE)
+	while ((seqnum + 1) * scmd.num_samples < ADC_BUF_SIZE)
 	{
 		scmd.seq_num = seqnum;
 		scmd.buffer = &adc_buffer_A[seqnum * scmd.num_samples];
 		NetSend((Command *) &scmd, 100);
 		seqnum++;
 	}
+	scmd.seq_num = seqnum;
+	scmd.buffer = &adc_buffer_A[seqnum * scmd.num_samples];
+	scmd.num_samples = ADC_BUF_SIZE - seqnum * scmd.num_samples;
+	NetSend((Command *) &scmd, 100);
 
 	scmd.type = SAMPLE_PACKET_B_12;
 	seqnum = 0;
 
-	while (seqnum * scmd.num_samples < ADC_BUF_SIZE)
+	while ((seqnum + 1) * scmd.num_samples < ADC_BUF_SIZE)
 	{
 		scmd.seq_num = seqnum;
 		scmd.buffer = &adc_buffer_B[seqnum * scmd.num_samples];
 		NetSend((Command *) &scmd, 100);
 		seqnum++;
 	}
+	scmd.seq_num = seqnum;
+	scmd.buffer = &adc_buffer_B[seqnum * scmd.num_samples];
+	scmd.num_samples = ADC_BUF_SIZE - seqnum * scmd.num_samples;
+	NetSend((Command *) &scmd, 100);
 }
 
 static void
 adcDmaCallback_A_ISR(unsigned int arg)
 {
-	ADCIntClear(ADC0_BASE, 0);
-
-	int pri = (((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_PRI_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M);
-	int alt = (((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_ALT_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M);
+	// Clear ADC0 Interrupt
+    HWREG(ADC0_BASE + ADC_O_ISC) = (1 << 0);
 
     if ((((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_PRI_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
     {
-    	adc_pos_A += ADC_SAMPLE_BUF_SIZE;
+    	uint32_t ui32Control = (((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_PRI_SELECT].ui32Control &
+                       ~(UDMA_CHCTL_XFERSIZE_M | UDMA_CHCTL_XFERMODE_M));
 
-    	if (adc_pos_A >= ADC_BUF_SIZE)
-    	{
-    		adc_pos_A = 0;
-    	}
+        ui32Control |= UDMA_MODE_PINGPONG | ((ADC_SAMPLE_BUF_SIZE - 1) << 4);
 
-	    uDMAChannelTransferSet(14 | UDMA_PRI_SELECT, UDMA_MODE_PINGPONG, (void *)(ADC0_BASE + ADC_O_SSFIFO0), &adc_buffer_A[adc_pos_A], ADC_SAMPLE_BUF_SIZE);
+    	((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_PRI_SELECT].ui32Control = ui32Control;
     }
     else if ((((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_ALT_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
     {
-    	adc_pos_A += ADC_SAMPLE_BUF_SIZE;
+        uint32_t ui32Control = (((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_ALT_SELECT].ui32Control &
+                       ~(UDMA_CHCTL_XFERSIZE_M | UDMA_CHCTL_XFERMODE_M));
 
-    	if (adc_pos_A >= ADC_BUF_SIZE)
-    	{
-    		adc_pos_A = 0;
-    	}
+        ui32Control |= UDMA_MODE_PINGPONG | ((ADC_SAMPLE_BUF_SIZE - 1) << 4);
 
-		uDMAChannelTransferSet(14 | UDMA_ALT_SELECT, UDMA_MODE_PINGPONG, (void *)(ADC0_BASE + ADC_O_SSFIFO0), &adc_buffer_A[adc_pos_A], ADC_SAMPLE_BUF_SIZE);
+    	((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_ALT_SELECT].ui32Control = ui32Control;
     }
 
-    uDMAChannelEnable(14);
+    // Enable uDMA channel 14
+    HWREG(UDMA_ENASET) = 1 << (14 & 0x1f);
 }
 
 static void
 adcDmaCallback_B_ISR(unsigned int arg)
 {
-	ADCIntClear(ADC1_BASE, 0);
-
-	int pri = (((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_PRI_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M);
-	int alt = (((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_ALT_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M);
+	// Clear ADC1 Interrupt
+    HWREG(ADC1_BASE + ADC_O_ISC) = (1 << 0);
 
     if ((((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_PRI_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
     {
-    	adc_pos_B += ADC_SAMPLE_BUF_SIZE;
+    	uint32_t ui32Control = (((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_PRI_SELECT].ui32Control &
+                       ~(UDMA_CHCTL_XFERSIZE_M | UDMA_CHCTL_XFERMODE_M));
 
-    	if (adc_pos_B >= ADC_BUF_SIZE)
-    	{
-    		adc_pos_B = 0;
-    	}
+        ui32Control |= UDMA_MODE_PINGPONG | ((ADC_SAMPLE_BUF_SIZE - 1) << 4);
 
-	    uDMAChannelTransferSet(24 | UDMA_PRI_SELECT, UDMA_MODE_PINGPONG, (void *)(ADC1_BASE + ADC_O_SSFIFO0), &adc_buffer_B[adc_pos_B], ADC_SAMPLE_BUF_SIZE);
+    	((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_PRI_SELECT].ui32Control = ui32Control;
     }
     else if ((((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_ALT_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
     {
-    	adc_pos_B += ADC_SAMPLE_BUF_SIZE;
+        uint32_t ui32Control = (((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_ALT_SELECT].ui32Control &
+                       ~(UDMA_CHCTL_XFERSIZE_M | UDMA_CHCTL_XFERMODE_M));
 
-    	if (adc_pos_B >= ADC_BUF_SIZE)
-    	{
-    		adc_pos_B = 0;
-    	}
+        ui32Control |= UDMA_MODE_PINGPONG | ((ADC_SAMPLE_BUF_SIZE - 1) << 4);
 
-		uDMAChannelTransferSet(24 | UDMA_ALT_SELECT, UDMA_MODE_PINGPONG, (void *)(ADC1_BASE + ADC_O_SSFIFO0), &adc_buffer_B[adc_pos_B], ADC_SAMPLE_BUF_SIZE);
+    	((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_ALT_SELECT].ui32Control = ui32Control;
     }
 
-    uDMAChannelEnable(24);
+    // Enable uDMA channel 24
+    HWREG(UDMA_ENASET) = 1 << (24 & 0x1f);
 }

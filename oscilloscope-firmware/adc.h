@@ -22,7 +22,7 @@
 #define ADC_H_
 
 #define ADC_SAMPLE_BUF_SIZE 1024
-#define ADC_BUF_SIZE 1024 * 28
+#define ADC_BUF_SIZE 1024
 
 extern void ADC_Init(void);
 extern void ADCPause(void);
