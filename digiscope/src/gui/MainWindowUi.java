@@ -1174,7 +1174,7 @@ public class MainWindowUi extends JFrame {
         triggerBBottomLeftPanel3_.add(noOfSamplesBLabel_);
 
         noOfSamplesBSpinner.setPreferredSize(new Dimension(70, 20));
-        noOfSamplesASpinner.setValue(Constant.DEFAULT_NUMBER_OF_SAMPLES);
+        noOfSamplesBSpinner.setValue(Constant.DEFAULT_NUMBER_OF_SAMPLES);
         triggerBBottomLeftPanel3_.add(noOfSamplesBSpinner);
 
         triggerBPanel_.add(triggerBBottomLeftPanel3_);

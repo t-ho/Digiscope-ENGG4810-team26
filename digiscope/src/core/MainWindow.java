@@ -61,11 +61,13 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	private PacketReader packetReader_;
 	private InputStreamHandler inputStreamHandler_;
 
-	private int previousVerticalRangeAIndex;
-	private int previousVerticalRangeBIndex;
-	private int previousHorizontalRangeIndex;
-	private int previousTriggerModeAIndex;
-	private int previousTriggerTypeAIndex;
+	private int previousVerticalRangeAIndex_;
+	private int previousVerticalRangeBIndex_;
+	private int previousHorizontalRangeIndex_;
+	private int previousTriggerModeAIndex_;
+	private int previousTriggerModeBIndex_;
+	private int previousTriggerTypeAIndex_;
+	private int previousTriggerTypeBIndex_;
 	
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
@@ -93,11 +95,13 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		visualizer_ = new Visualizer();
 		chartPanel_ = createDefaultChartPanel(visualizer_.getChart());
 		filterFile_ = new FilterFile();
-		previousVerticalRangeAIndex = verticalRangeAComboBox.getSelectedIndex();
-		previousVerticalRangeBIndex = verticalRangeBComboBox.getSelectedIndex();
-		previousHorizontalRangeIndex = horizontalRangeAComboBox.getSelectedIndex();
-		previousTriggerModeAIndex = triggerModeAComboBox.getSelectedIndex();
-		previousTriggerTypeAIndex = triggerTypeAComboBox.getSelectedIndex();
+		previousVerticalRangeAIndex_ = verticalRangeAComboBox.getSelectedIndex();
+		previousVerticalRangeBIndex_ = verticalRangeBComboBox.getSelectedIndex();
+		previousHorizontalRangeIndex_ = horizontalRangeAComboBox.getSelectedIndex();
+		previousTriggerModeAIndex_ = triggerModeAComboBox.getSelectedIndex();
+		previousTriggerModeBIndex_ = triggerModeBComboBox.getSelectedIndex();
+		previousTriggerTypeAIndex_ = triggerTypeAComboBox.getSelectedIndex();
+		previousTriggerTypeBIndex_ = triggerTypeBComboBox.getSelectedIndex();
 		// test
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
@@ -192,10 +196,16 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		verticalRangeGeneratorComboBox.addActionListener(this);
 		
 		forceTriggerAButton.addActionListener(this);
+
+		forceTriggerBButton.addActionListener(this);
 		
 		triggerModeAComboBox.addActionListener(this);
+
+		triggerModeBComboBox.addActionListener(this);
 		
 		triggerTypeAComboBox.addActionListener(this);
+		
+		triggerTypeBComboBox.addActionListener(this);
 		
 		
 		verticalOffsetASpinner.addChangeListener(new ChangeListener() {
@@ -1530,7 +1540,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 
 		int horizontalRange = microSeconds;
 		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
-		if(horizontalRangeAComboBox.getSelectedIndex() > previousHorizontalRangeIndex) {
+		if(horizontalRangeAComboBox.getSelectedIndex() > previousHorizontalRangeIndex_) {
 			if (rawXYSeries.containsKey(Constant.MATH_CHANNEL)) {
 				calculateMathChannel();
 			}
@@ -1544,7 +1554,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		showMeasurementResults(Constant.FILTER_INDEX);
 		showMeasurementResults(Constant.GENERATOR_INDEX);
 		horizontalDivisionInfoLabel.setText("Horizontal: " + timeString + "/div");
-		previousHorizontalRangeIndex = horizontalRangeAComboBox.getSelectedIndex();
+		previousHorizontalRangeIndex_ = horizontalRangeAComboBox.getSelectedIndex();
 	}
 	
 	/**
@@ -1558,7 +1568,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			verticalRangeAComboBox.removeActionListener(this);
 			verticalRangeAComboBox.setSelectedItem(voltageString);
 			verticalRangeAComboBox.addActionListener(this);
-			previousVerticalRangeAIndex = verticalRangeAComboBox.getSelectedIndex();
+			previousVerticalRangeAIndex_ = verticalRangeAComboBox.getSelectedIndex();
 			double verticalRange = convertVoltageStringToVolts(voltageString);
 			visualizer_.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
 			showMeasurementResults(Constant.A_INDEX);
@@ -1571,7 +1581,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			verticalRangeBComboBox.removeActionListener(this);
 			verticalRangeBComboBox.setSelectedItem(voltageString);
 			verticalRangeBComboBox.addActionListener(this);
-			previousVerticalRangeBIndex = verticalRangeBComboBox.getSelectedIndex();
+			previousVerticalRangeBIndex_ = verticalRangeBComboBox.getSelectedIndex();
 			double verticalRange = convertVoltageStringToVolts(voltageString);
 			visualizer_.setValueForVerticalGridSpacing(Constant.B_INDEX, verticalRange);
 			showMeasurementResults(Constant.B_INDEX);
@@ -1595,9 +1605,22 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				triggerModeAComboBox.removeActionListener(this);
 				triggerModeAComboBox.setSelectedIndex(triggerMode);
 				triggerModeAComboBox.addActionListener(this);
-				previousTriggerModeAIndex = triggerMode;
+				previousTriggerModeAIndex_ = triggerMode;
+				if(triggerMode == Constant.SINGLE_MODE) {
+					rearmTriggerAButton.setEnabled(true);
+				} else {
+					rearmTriggerAButton.setEnabled(false);
+				}
 			} else if(channelName.equals(Constant.CHANNEL_B)) {
-				//TODO
+				triggerModeBComboBox.removeActionListener(this);
+				triggerModeBComboBox.setSelectedIndex(triggerMode);
+				triggerModeBComboBox.addActionListener(this);
+				previousTriggerModeBIndex_ = triggerMode;
+				if(triggerMode == Constant.SINGLE_MODE) {
+					rearmTriggerBButton.setEnabled(true);
+				} else {
+					rearmTriggerBButton.setEnabled(false);
+				}
 			}
 		} else {
 			System.err.println("Trigger mode is out of range.");
@@ -1615,9 +1638,12 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				triggerTypeAComboBox.removeActionListener(this);
 				triggerTypeAComboBox.setSelectedIndex(triggerType);
 				triggerTypeAComboBox.addActionListener(this);
-				previousTriggerTypeAIndex = triggerType;
+				previousTriggerTypeAIndex_ = triggerType;
 			} else if(channelName.equals(Constant.CHANNEL_B)) {
-				//TODO:
+				triggerTypeBComboBox.removeActionListener(this);
+				triggerTypeBComboBox.setSelectedIndex(triggerType);
+				triggerTypeBComboBox.addActionListener(this);
+				previousTriggerTypeBIndex_ = triggerType;
 			}
 		} else {
 			System.err.println("Trigger type is out of range.");
@@ -1885,7 +1911,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == horizontalRangeAComboBox) {
 			String timeString = (String) horizontalRangeAComboBox.getSelectedItem();
 			horizontalRangeAComboBox.removeActionListener(this);
-			horizontalRangeAComboBox.setSelectedIndex(previousHorizontalRangeIndex);
+			horizontalRangeAComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
 			horizontalRangeAComboBox.addActionListener(this);
 			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
@@ -1893,7 +1919,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == horizontalRangeBComboBox) {
 			String timeString = (String) horizontalRangeBComboBox.getSelectedItem();
 			horizontalRangeBComboBox.removeActionListener(this);
-			horizontalRangeBComboBox.setSelectedIndex(previousHorizontalRangeIndex);
+			horizontalRangeBComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
 			horizontalRangeBComboBox.addActionListener(this);
 			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
@@ -1901,7 +1927,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == horizontalRangeMathComboBox) {
 			String timeString = (String) horizontalRangeMathComboBox.getSelectedItem();
 			horizontalRangeMathComboBox.removeActionListener(this);
-			horizontalRangeMathComboBox.setSelectedIndex(previousHorizontalRangeIndex);
+			horizontalRangeMathComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
 			horizontalRangeMathComboBox.addActionListener(this);
 			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
@@ -1909,7 +1935,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == horizontalRangeFilterComboBox) {
 			String timeString = (String) horizontalRangeFilterComboBox.getSelectedItem();
 			horizontalRangeFilterComboBox.removeActionListener(this);
-			horizontalRangeFilterComboBox.setSelectedIndex(previousHorizontalRangeIndex);
+			horizontalRangeFilterComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
 			horizontalRangeFilterComboBox.addActionListener(this);
 			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
@@ -1917,7 +1943,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == horizontalRangeGeneratorComboBox) {
 			String timeString = (String) horizontalRangeGeneratorComboBox.getSelectedItem();
 			horizontalRangeGeneratorComboBox.removeActionListener(this);
-			horizontalRangeGeneratorComboBox.setSelectedIndex(previousHorizontalRangeIndex);
+			horizontalRangeGeneratorComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
 			horizontalRangeGeneratorComboBox.addActionListener(this);
 			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
@@ -1925,7 +1951,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == verticalRangeAComboBox) {
 			String voltageString = (String) verticalRangeAComboBox.getSelectedItem();
 			verticalRangeAComboBox.removeActionListener(this);
-			verticalRangeAComboBox.setSelectedIndex(previousVerticalRangeAIndex);
+			verticalRangeAComboBox.setSelectedIndex(previousVerticalRangeAIndex_);
 			verticalRangeAComboBox.addActionListener(this);
 			int verticalRange = convertVoltageStringToMicrovolts(voltageString);
 			sendCommand(PacketType.VERTICAL_RANGE_A, verticalRange);
@@ -1933,7 +1959,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == verticalRangeBComboBox) {
 			String voltageString = (String) verticalRangeBComboBox.getSelectedItem();
 			verticalRangeBComboBox.removeItemListener(this);
-			verticalRangeBComboBox.setSelectedIndex(previousVerticalRangeBIndex);
+			verticalRangeBComboBox.setSelectedIndex(previousVerticalRangeBIndex_);
 			verticalRangeBComboBox.addItemListener(this);
 			int verticalRange = convertVoltageStringToMicrovolts(voltageString);
 			sendCommand(PacketType.VERTICAL_RANGE_B, verticalRange);
@@ -1970,19 +1996,36 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if(source == forceTriggerAButton) {
 			sendCommand(PacketType.TRIGGER_FORCE_A, Constant.IGNORE);
 
+		} else if(source == forceTriggerBButton) {
+			sendCommand(PacketType.TRIGGER_FORCE_B, Constant.IGNORE);
+
 		} else if (source == triggerModeAComboBox) {
 			int mode = triggerModeAComboBox.getSelectedIndex();
 			triggerModeAComboBox.removeActionListener(this);
-			triggerModeAComboBox.setSelectedIndex(previousTriggerModeAIndex);
+			triggerModeAComboBox.setSelectedIndex(previousTriggerModeAIndex_);
 			triggerModeAComboBox.addActionListener(this);
 			sendCommand(PacketType.TRIGGER_MODE_A, mode);
+			
+		}else if(source == triggerModeBComboBox) {
+			int mode = triggerModeBComboBox.getSelectedIndex();
+			triggerModeBComboBox.removeActionListener(this);
+			triggerModeBComboBox.setSelectedIndex(previousTriggerModeBIndex_);
+			triggerModeBComboBox.addActionListener(this);
+			sendCommand(PacketType.TRIGGER_MODE_B, mode);
 			
 		} else if (source == triggerTypeAComboBox) {
 			int mode = triggerTypeAComboBox.getSelectedIndex();
 			triggerTypeAComboBox.removeActionListener(this);
-			triggerTypeAComboBox.setSelectedIndex(previousTriggerTypeAIndex);
+			triggerTypeAComboBox.setSelectedIndex(previousTriggerTypeAIndex_);
 			triggerTypeAComboBox.addActionListener(this);
 			sendCommand(PacketType.TRIGGER_TYPE_A, mode);
+			
+		} else if (source == triggerTypeBComboBox) {
+			int mode = triggerTypeBComboBox.getSelectedIndex();
+			triggerTypeBComboBox.removeActionListener(this);
+			triggerTypeBComboBox.setSelectedIndex(previousTriggerTypeBIndex_);
+			triggerTypeBComboBox.addActionListener(this);
+			sendCommand(PacketType.TRIGGER_TYPE_B, mode);
 			
 		}
 	}
