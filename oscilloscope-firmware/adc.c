@@ -14,8 +14,10 @@
 #include "adc.h"
 #include "trigger.h"
 
-uint16_t adc_buffer_A[ADC_TRANSFER_SIZE * ADC_TRANSFERS] __attribute__(( aligned(8) ));
-uint16_t adc_buffer_B[ADC_TRANSFER_SIZE * ADC_TRANSFERS] __attribute__(( aligned(8) ));
+uint16_t adc_buffer_A_PRI[ADC_TRANSFER_SIZE] __attribute__(( aligned(8) ));
+uint16_t adc_buffer_A_ALT[ADC_TRANSFER_SIZE] __attribute__(( aligned(8) ));
+uint16_t adc_buffer_B_PRI[ADC_TRANSFER_SIZE] __attribute__(( aligned(8) ));
+uint16_t adc_buffer_B_ALT[ADC_TRANSFER_SIZE] __attribute__(( aligned(8) ));
 
 //TODO shrink to 1024?
 static uint32_t _udmaCtrlTable[1024/sizeof(uint32_t)] __attribute__(( aligned(1024) ));
@@ -27,8 +29,10 @@ static void adcDmaCallback_B_ISR(unsigned int arg);
 void
 ADC_Init(void)
 {
-    memset(&adc_buffer_A, 0, sizeof(adc_buffer_A));
-    memset(&adc_buffer_B, 0, sizeof(adc_buffer_B));
+    memset(&adc_buffer_A_PRI, 0, sizeof(adc_buffer_A_PRI));
+    memset(&adc_buffer_A_ALT, 0, sizeof(adc_buffer_A_ALT));
+	memset(&adc_buffer_B_PRI, 0, sizeof(adc_buffer_B_PRI));
+    memset(&adc_buffer_B_ALT, 0, sizeof(adc_buffer_B_ALT));
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);
@@ -37,8 +41,8 @@ ADC_Init(void)
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC1));
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_UDMA));
 
-    ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 8);
-    ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 8);
+    ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 16);
+    ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 16);
 
 //    ADCSequenceConfigure(ADC0_BASE, 0 /*SS0*/, ADC_TRIGGER_PROCESSOR, 3 /*priority*/);  // SS0-SS3 priorities must always be different
 //    ADCSequenceConfigure(ADC0_BASE, 3 /*SS3*/, ADC_TRIGGER_PROCESSOR, 0 /*priority*/);  // so change SS3 to prio0 when SS0 gets set to prio3
@@ -90,14 +94,14 @@ ADC_Init(void)
     uDMAChannelControlSet(24 | UDMA_ALT_SELECT, UDMA_SIZE_16 | UDMA_SRC_INC_NONE | UDMA_DST_INC_16 | UDMA_ARB_8);
 
     uDMAChannelTransferSet(UDMA_CHANNEL_ADC0 | UDMA_PRI_SELECT, UDMA_MODE_PINGPONG,
-    		(void *)(ADC0_BASE + ADC_O_SSFIFO0), &adc_buffer_A[0], ADC_TRANSFER_SIZE);
+    		(void *)(ADC0_BASE + ADC_O_SSFIFO0), adc_buffer_A_PRI, ADC_TRANSFER_SIZE);
     uDMAChannelTransferSet(UDMA_CHANNEL_ADC0 | UDMA_ALT_SELECT, UDMA_MODE_PINGPONG,
-    		(void *)(ADC0_BASE + ADC_O_SSFIFO0), &adc_buffer_A[ADC_TRANSFER_SIZE], ADC_TRANSFER_SIZE);
+    		(void *)(ADC0_BASE + ADC_O_SSFIFO0), adc_buffer_A_ALT, ADC_TRANSFER_SIZE);
 
     uDMAChannelTransferSet(24 | UDMA_PRI_SELECT, UDMA_MODE_PINGPONG,
-    		(void *)(ADC1_BASE + ADC_O_SSFIFO0), &adc_buffer_B[0], ADC_TRANSFER_SIZE);
+    		(void *)(ADC1_BASE + ADC_O_SSFIFO0), adc_buffer_B_PRI, ADC_TRANSFER_SIZE);
     uDMAChannelTransferSet(24 | UDMA_ALT_SELECT, UDMA_MODE_PINGPONG,
-    		(void *)(ADC1_BASE + ADC_O_SSFIFO0), &adc_buffer_B[ADC_TRANSFER_SIZE], ADC_TRANSFER_SIZE);
+    		(void *)(ADC1_BASE + ADC_O_SSFIFO0), adc_buffer_B_ALT, ADC_TRANSFER_SIZE);
 
 	uDMAChannelEnable(14);
 	uDMAChannelEnable(24);
@@ -134,8 +138,6 @@ ADCResume(void)
 static void
 adcDmaCallback_A_ISR(unsigned int arg)
 {
-	static int pos_a = 0;
-
 	// Clear ADC0 SS0 DMA Interrupt
     HWREG(ADC0_BASE + ADC_O_ISC) = ADC_INT_DMA_SS0;
 
@@ -147,9 +149,7 @@ adcDmaCallback_A_ISR(unsigned int arg)
         ui32Control |= UDMA_MODE_PINGPONG | ((ADC_TRANSFER_SIZE - 1) << 4);
     	udmaCtrlTable[14 | UDMA_PRI_SELECT].ui32Control = ui32Control;
 
-    	// Increment destination address
-    	udmaCtrlTable[14 | UDMA_PRI_SELECT].pvDstEndAddr = ((uint32_t)&adc_buffer_A[pos_a]) + 2047;
-		//udmaCtrlTable[14 | UDMA_PRI_SELECT].pvDstEndAddr = &adc_buffer_A[pos_a + ADC_TRANSFER_SIZE];
+    	Event_post(AcqEvent, EVENT_ID_A_PRI);
     }
     // Otherwise check alt mode stopped
     //TODO Might be able to assume this and change to just "else"?
@@ -160,22 +160,7 @@ adcDmaCallback_A_ISR(unsigned int arg)
         ui32Control |= UDMA_MODE_PINGPONG | ((ADC_TRANSFER_SIZE - 1) << 4);
     	udmaCtrlTable[14 | UDMA_ALT_SELECT].ui32Control = ui32Control;
 
-    	// Increment destination address
-    	pos_a += ADC_TRANSFER_SIZE;
-    	udmaCtrlTable[14 | UDMA_ALT_SELECT].pvDstEndAddr = ((uint32_t)&adc_buffer_A[pos_a]) + 2047;
-    	//udmaCtrlTable[14 | UDMA_ALT_SELECT].pvDstEndAddr = &adc_buffer_A[pos_a + ADC_TRANSFER_SIZE];
-    	pos_a += ADC_TRANSFER_SIZE;
-
-    	// Post relevant events
-    	if (pos_a == (ADC_TRANSFERS / 2) * ADC_TRANSFER_SIZE)
-    	{
-        	Event_post(AcqEvent, EVENT_ID_A_HALF);
-    	}
-    	else if (pos_a == ADC_TRANSFERS * ADC_TRANSFER_SIZE)
-    	{
-        	Event_post(AcqEvent, EVENT_ID_A_FULL);
-        	pos_a = 0;
-    	}
+    	Event_post(AcqEvent, EVENT_ID_A_ALT);
     }
 
     // Enable uDMA channel 14
@@ -185,8 +170,6 @@ adcDmaCallback_A_ISR(unsigned int arg)
 static void
 adcDmaCallback_B_ISR(unsigned int arg)
 {
-	static int pos_b = 0;
-
 	// Clear ADC1 SS0 DMA Interrupt
     HWREG(ADC1_BASE + ADC_O_ISC) = ADC_INT_DMA_SS0;
 
@@ -198,8 +181,7 @@ adcDmaCallback_B_ISR(unsigned int arg)
         ui32Control |= UDMA_MODE_PINGPONG | ((ADC_TRANSFER_SIZE - 1) << 4);
     	udmaCtrlTable[24 | UDMA_PRI_SELECT].ui32Control = ui32Control;
 
-    	// Increment destination address
-    	udmaCtrlTable[24 | UDMA_PRI_SELECT].pvDstEndAddr = ((uint32_t)&adc_buffer_B[pos_b]) + 2047;
+    	Event_post(AcqEvent, EVENT_ID_B_PRI);
     }
     // Otherwise check alt mode stopped
     //TODO Might be able to assume this and change to just "else"?
@@ -210,21 +192,7 @@ adcDmaCallback_B_ISR(unsigned int arg)
         ui32Control |= UDMA_MODE_PINGPONG | ((ADC_TRANSFER_SIZE - 1) << 4);
     	udmaCtrlTable[24 | UDMA_ALT_SELECT].ui32Control = ui32Control;
 
-    	// Increment destination address
-    	pos_b += ADC_TRANSFER_SIZE;
-    	udmaCtrlTable[24 | UDMA_ALT_SELECT].pvDstEndAddr = ((uint32_t)&adc_buffer_B[pos_b]) + 2047;
-    	pos_b += ADC_TRANSFER_SIZE;
-
-    	// Post relevant events
-    	if (pos_b == (ADC_TRANSFERS / 2) * ADC_TRANSFER_SIZE)
-    	{
-        	Event_post(AcqEvent, EVENT_ID_B_HALF);
-    	}
-    	else if (pos_b == ADC_TRANSFERS * ADC_TRANSFER_SIZE)
-    	{
-        	Event_post(AcqEvent, EVENT_ID_B_FULL);
-        	pos_b = 0;
-    	}
+    	Event_post(AcqEvent, EVENT_ID_B_ALT);
     }
 
     // Enable uDMA channel 24

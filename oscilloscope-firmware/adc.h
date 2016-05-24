@@ -22,14 +22,15 @@
 #define ADC_H_
 
 #define ADC_TRANSFER_SIZE 1024
-#define ADC_TRANSFERS 6
 
 extern void ADC_Init(void);
 extern void ADCPause(void);
 extern void ACDResume(void);
 extern void ADCResume(void);
 
-extern uint16_t adc_buffer_A[ADC_TRANSFER_SIZE * ADC_TRANSFERS] __attribute__(( aligned(8) ));
-extern uint16_t adc_buffer_B[ADC_TRANSFER_SIZE * ADC_TRANSFERS] __attribute__(( aligned(8) ));
+extern uint16_t adc_buffer_A_PRI[ADC_TRANSFER_SIZE] __attribute__(( aligned(8) ));
+extern uint16_t adc_buffer_A_ALT[ADC_TRANSFER_SIZE] __attribute__(( aligned(8) ));
+extern uint16_t adc_buffer_B_PRI[ADC_TRANSFER_SIZE] __attribute__(( aligned(8) ));
+extern uint16_t adc_buffer_B_ALT[ADC_TRANSFER_SIZE] __attribute__(( aligned(8) ));
 
 #endif /* ADC_H_ */
