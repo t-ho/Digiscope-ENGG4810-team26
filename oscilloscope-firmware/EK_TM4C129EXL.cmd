@@ -54,8 +54,7 @@ SECTIONS
     .bss    :   > SRAM
     .sysmem :   > SRAM
     .stack  :   > SRAM
-//    .hwi: { *.*(.text:*ti_sysbios*_Hwi_*) } > SRAM, PAGE = 0
-    .hwi: { *.*(.text:*ti_sysbios*_Hwi_*) }
+    .hwi: { *.*(.text:*ti_sysbios*) }
     	LOAD = FLASH PAGE = 0,
     	RUN = SRAM, PAGE = 0,
     	LOAD_START(_HwiLoadStart),

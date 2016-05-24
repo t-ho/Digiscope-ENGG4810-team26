@@ -12,15 +12,14 @@
 
 #include "command.h"
 #include "adc.h"
-#include "net.h"
+#include "trigger.h"
 
-uint16_t adc_pos_A = 0;
-uint16_t adc_pos_B = 0;
-uint16_t adc_buffer_A[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
-uint16_t adc_buffer_B[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
+uint16_t adc_buffer_A[ADC_TRANSFER_SIZE * ADC_TRANSFERS] __attribute__(( aligned(8) ));
+uint16_t adc_buffer_B[ADC_TRANSFER_SIZE * ADC_TRANSFERS] __attribute__(( aligned(8) ));
 
-
-static uint32_t udmaCtrlTable[4096/sizeof(uint32_t)] __attribute__(( aligned(1024) ));
+//TODO shrink to 1024?
+static uint32_t _udmaCtrlTable[1024/sizeof(uint32_t)] __attribute__(( aligned(1024) ));
+static tDMAControlTable *udmaCtrlTable = (tDMAControlTable *)_udmaCtrlTable;
 
 static void adcDmaCallback_A_ISR(unsigned int arg);
 static void adcDmaCallback_B_ISR(unsigned int arg);
@@ -68,7 +67,7 @@ ADC_Init(void)
     ADCIntClear(ADC1_BASE, 0);
 
     uDMAEnable();
-    uDMAControlBaseSet(udmaCtrlTable);
+    uDMAControlBaseSet(_udmaCtrlTable);
 
     ADCSequenceDMAEnable(ADC0_BASE, 0);
     ADCSequenceDMAEnable(ADC1_BASE, 0);
@@ -91,14 +90,14 @@ ADC_Init(void)
     uDMAChannelControlSet(24 | UDMA_ALT_SELECT, UDMA_SIZE_16 | UDMA_SRC_INC_NONE | UDMA_DST_INC_16 | UDMA_ARB_8);
 
     uDMAChannelTransferSet(UDMA_CHANNEL_ADC0 | UDMA_PRI_SELECT, UDMA_MODE_PINGPONG,
-    		(void *)(ADC0_BASE + ADC_O_SSFIFO0), adc_buffer_A, ADC_SAMPLE_BUF_SIZE);
+    		(void *)(ADC0_BASE + ADC_O_SSFIFO0), &adc_buffer_A[0], ADC_TRANSFER_SIZE);
     uDMAChannelTransferSet(UDMA_CHANNEL_ADC0 | UDMA_ALT_SELECT, UDMA_MODE_PINGPONG,
-    		(void *)(ADC0_BASE + ADC_O_SSFIFO0), adc_buffer_A, ADC_SAMPLE_BUF_SIZE);
+    		(void *)(ADC0_BASE + ADC_O_SSFIFO0), &adc_buffer_A[ADC_TRANSFER_SIZE], ADC_TRANSFER_SIZE);
 
     uDMAChannelTransferSet(24 | UDMA_PRI_SELECT, UDMA_MODE_PINGPONG,
-    		(void *)(ADC1_BASE + ADC_O_SSFIFO0), adc_buffer_B, ADC_SAMPLE_BUF_SIZE);
+    		(void *)(ADC1_BASE + ADC_O_SSFIFO0), &adc_buffer_B[0], ADC_TRANSFER_SIZE);
     uDMAChannelTransferSet(24 | UDMA_ALT_SELECT, UDMA_MODE_PINGPONG,
-    		(void *)(ADC1_BASE + ADC_O_SSFIFO0), adc_buffer_B, ADC_SAMPLE_BUF_SIZE);
+    		(void *)(ADC1_BASE + ADC_O_SSFIFO0), &adc_buffer_B[ADC_TRANSFER_SIZE], ADC_TRANSFER_SIZE);
 
 	uDMAChannelEnable(14);
 	uDMAChannelEnable(24);
@@ -109,13 +108,13 @@ ADC_Init(void)
     Error_init(&eb2);
 
     Hwi_Params_init(&hwiParams);
-	hwiParams.priority = 3;
+	hwiParams.priority = 33;
 	Hwi_create(30, adcDmaCallback_A_ISR, &hwiParams, &eb1);
-	hwiParams.priority = 4;
+	hwiParams.priority = 34;
 	Hwi_create(62, adcDmaCallback_B_ISR, &hwiParams, &eb2);
 
-	ADCIntEnable(ADC0_BASE, 0);
-	ADCIntEnable(ADC1_BASE, 0);
+	ADCIntEnableEx(ADC0_BASE, ADC_INT_DMA_SS0);
+	ADCIntEnableEx(ADC1_BASE, ADC_INT_DMA_SS0);
 }
 
 void
@@ -132,69 +131,51 @@ ADCResume(void)
 	ADCSequenceEnable(ADC1_BASE, 0);
 }
 
-void
-ForceTrigger(void)
-{
-	SampleCommand scmd;
-	scmd.type = SAMPLE_PACKET_A_12;
-	scmd.num_samples = (1024 - COMMANDLENGTH) / 2;
-	scmd.period = 1;
-
-	int seqnum = 0;
-
-	ADCPause();
-
-	while ((seqnum + 1) * scmd.num_samples < ADC_BUF_SIZE)
-	{
-		scmd.seq_num = seqnum;
-		scmd.buffer = &adc_buffer_A[seqnum * scmd.num_samples];
-		NetSend((Command *) &scmd, 100);
-		seqnum++;
-	}
-	scmd.seq_num = seqnum;
-	scmd.buffer = &adc_buffer_A[seqnum * scmd.num_samples];
-	scmd.num_samples = ADC_BUF_SIZE - seqnum * scmd.num_samples;
-	NetSend((Command *) &scmd, 100);
-
-	scmd.type = SAMPLE_PACKET_B_12;
-	seqnum = 0;
-
-	while ((seqnum + 1) * scmd.num_samples < ADC_BUF_SIZE)
-	{
-		scmd.seq_num = seqnum;
-		scmd.buffer = &adc_buffer_B[seqnum * scmd.num_samples];
-		NetSend((Command *) &scmd, 100);
-		seqnum++;
-	}
-	scmd.seq_num = seqnum;
-	scmd.buffer = &adc_buffer_B[seqnum * scmd.num_samples];
-	scmd.num_samples = ADC_BUF_SIZE - seqnum * scmd.num_samples;
-	NetSend((Command *) &scmd, 100);
-}
-
 static void
 adcDmaCallback_A_ISR(unsigned int arg)
 {
-	// Clear ADC0 Interrupt
-    HWREG(ADC0_BASE + ADC_O_ISC) = (1 << 0);
+	static int pos_a = 0;
 
-    if ((((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_PRI_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
+	// Clear ADC0 SS0 DMA Interrupt
+    HWREG(ADC0_BASE + ADC_O_ISC) = ADC_INT_DMA_SS0;
+
+    // Check if primary mode stopped
+    if ((udmaCtrlTable[14 | UDMA_PRI_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
     {
-    	uint32_t ui32Control = (((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_PRI_SELECT].ui32Control &
-                       ~(UDMA_CHCTL_XFERSIZE_M | UDMA_CHCTL_XFERMODE_M));
+    	// Set udma mode (ping pong) and transfer size
+    	uint32_t ui32Control = (udmaCtrlTable[14 | UDMA_PRI_SELECT].ui32Control & ~(UDMA_CHCTL_XFERSIZE_M | UDMA_CHCTL_XFERMODE_M));
+        ui32Control |= UDMA_MODE_PINGPONG | ((ADC_TRANSFER_SIZE - 1) << 4);
+    	udmaCtrlTable[14 | UDMA_PRI_SELECT].ui32Control = ui32Control;
 
-        ui32Control |= UDMA_MODE_PINGPONG | ((ADC_SAMPLE_BUF_SIZE - 1) << 4);
-
-    	((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_PRI_SELECT].ui32Control = ui32Control;
+    	// Increment destination address
+    	udmaCtrlTable[14 | UDMA_PRI_SELECT].pvDstEndAddr = ((uint32_t)&adc_buffer_A[pos_a]) + 2047;
+		//udmaCtrlTable[14 | UDMA_PRI_SELECT].pvDstEndAddr = &adc_buffer_A[pos_a + ADC_TRANSFER_SIZE];
     }
-    else if ((((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_ALT_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
+    // Otherwise check alt mode stopped
+    //TODO Might be able to assume this and change to just "else"?
+    else if ((udmaCtrlTable[14 | UDMA_ALT_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
     {
-        uint32_t ui32Control = (((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_ALT_SELECT].ui32Control &
-                       ~(UDMA_CHCTL_XFERSIZE_M | UDMA_CHCTL_XFERMODE_M));
+    	// Set udma mode (ping pong) and transfer size
+        uint32_t ui32Control = (udmaCtrlTable[14 | UDMA_ALT_SELECT].ui32Control & ~(UDMA_CHCTL_XFERSIZE_M | UDMA_CHCTL_XFERMODE_M));
+        ui32Control |= UDMA_MODE_PINGPONG | ((ADC_TRANSFER_SIZE - 1) << 4);
+    	udmaCtrlTable[14 | UDMA_ALT_SELECT].ui32Control = ui32Control;
 
-        ui32Control |= UDMA_MODE_PINGPONG | ((ADC_SAMPLE_BUF_SIZE - 1) << 4);
+    	// Increment destination address
+    	pos_a += ADC_TRANSFER_SIZE;
+    	udmaCtrlTable[14 | UDMA_ALT_SELECT].pvDstEndAddr = ((uint32_t)&adc_buffer_A[pos_a]) + 2047;
+    	//udmaCtrlTable[14 | UDMA_ALT_SELECT].pvDstEndAddr = &adc_buffer_A[pos_a + ADC_TRANSFER_SIZE];
+    	pos_a += ADC_TRANSFER_SIZE;
 
-    	((tDMAControlTable *) udmaCtrlTable)[14 | UDMA_ALT_SELECT].ui32Control = ui32Control;
+    	// Post relevant events
+    	if (pos_a == (ADC_TRANSFERS / 2) * ADC_TRANSFER_SIZE)
+    	{
+        	Event_post(AcqEvent, EVENT_ID_A_HALF);
+    	}
+    	else if (pos_a == ADC_TRANSFERS * ADC_TRANSFER_SIZE)
+    	{
+        	Event_post(AcqEvent, EVENT_ID_A_FULL);
+        	pos_a = 0;
+    	}
     }
 
     // Enable uDMA channel 14
@@ -204,26 +185,46 @@ adcDmaCallback_A_ISR(unsigned int arg)
 static void
 adcDmaCallback_B_ISR(unsigned int arg)
 {
-	// Clear ADC1 Interrupt
-    HWREG(ADC1_BASE + ADC_O_ISC) = (1 << 0);
+	static int pos_b = 0;
 
-    if ((((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_PRI_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
+	// Clear ADC1 SS0 DMA Interrupt
+    HWREG(ADC1_BASE + ADC_O_ISC) = ADC_INT_DMA_SS0;
+
+    // Check if primary mode stopped
+    if ((udmaCtrlTable[24 | UDMA_PRI_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
     {
-    	uint32_t ui32Control = (((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_PRI_SELECT].ui32Control &
-                       ~(UDMA_CHCTL_XFERSIZE_M | UDMA_CHCTL_XFERMODE_M));
+    	// Set udma mode (ping pong) and transfer size
+    	uint32_t ui32Control = (udmaCtrlTable[24 | UDMA_PRI_SELECT].ui32Control & ~(UDMA_CHCTL_XFERSIZE_M | UDMA_CHCTL_XFERMODE_M));
+        ui32Control |= UDMA_MODE_PINGPONG | ((ADC_TRANSFER_SIZE - 1) << 4);
+    	udmaCtrlTable[24 | UDMA_PRI_SELECT].ui32Control = ui32Control;
 
-        ui32Control |= UDMA_MODE_PINGPONG | ((ADC_SAMPLE_BUF_SIZE - 1) << 4);
-
-    	((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_PRI_SELECT].ui32Control = ui32Control;
+    	// Increment destination address
+    	udmaCtrlTable[24 | UDMA_PRI_SELECT].pvDstEndAddr = ((uint32_t)&adc_buffer_B[pos_b]) + 2047;
     }
-    else if ((((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_ALT_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
+    // Otherwise check alt mode stopped
+    //TODO Might be able to assume this and change to just "else"?
+    else if ((udmaCtrlTable[24 | UDMA_ALT_SELECT].ui32Control & UDMA_CHCTL_XFERMODE_M) == UDMA_MODE_STOP)
     {
-        uint32_t ui32Control = (((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_ALT_SELECT].ui32Control &
-                       ~(UDMA_CHCTL_XFERSIZE_M | UDMA_CHCTL_XFERMODE_M));
+    	// Set udma mode (ping pong) and transfer size
+        uint32_t ui32Control = (udmaCtrlTable[24 | UDMA_ALT_SELECT].ui32Control & ~(UDMA_CHCTL_XFERSIZE_M | UDMA_CHCTL_XFERMODE_M));
+        ui32Control |= UDMA_MODE_PINGPONG | ((ADC_TRANSFER_SIZE - 1) << 4);
+    	udmaCtrlTable[24 | UDMA_ALT_SELECT].ui32Control = ui32Control;
 
-        ui32Control |= UDMA_MODE_PINGPONG | ((ADC_SAMPLE_BUF_SIZE - 1) << 4);
+    	// Increment destination address
+    	pos_b += ADC_TRANSFER_SIZE;
+    	udmaCtrlTable[24 | UDMA_ALT_SELECT].pvDstEndAddr = ((uint32_t)&adc_buffer_B[pos_b]) + 2047;
+    	pos_b += ADC_TRANSFER_SIZE;
 
-    	((tDMAControlTable *) udmaCtrlTable)[24 | UDMA_ALT_SELECT].ui32Control = ui32Control;
+    	// Post relevant events
+    	if (pos_b == (ADC_TRANSFERS / 2) * ADC_TRANSFER_SIZE)
+    	{
+        	Event_post(AcqEvent, EVENT_ID_B_HALF);
+    	}
+    	else if (pos_b == ADC_TRANSFERS * ADC_TRANSFER_SIZE)
+    	{
+        	Event_post(AcqEvent, EVENT_ID_B_FULL);
+        	pos_b = 0;
+    	}
     }
 
     // Enable uDMA channel 24

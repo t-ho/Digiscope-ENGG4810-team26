@@ -21,19 +21,15 @@
 #ifndef ADC_H_
 #define ADC_H_
 
-#define ADC_SAMPLE_BUF_SIZE 1024
-#define ADC_BUF_SIZE 1024
+#define ADC_TRANSFER_SIZE 1024
+#define ADC_TRANSFERS 6
 
 extern void ADC_Init(void);
 extern void ADCPause(void);
 extern void ACDResume(void);
-extern void ForceTrigger(void);
 extern void ADCResume(void);
 
-extern uint16_t adc_pos_A;
-extern uint16_t adc_pos_B;
-extern uint16_t adc_buffer_A[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
-extern uint16_t adc_buffer_B[ADC_BUF_SIZE] __attribute__(( aligned(8) ));
-
+extern uint16_t adc_buffer_A[ADC_TRANSFER_SIZE * ADC_TRANSFERS] __attribute__(( aligned(8) ));
+extern uint16_t adc_buffer_B[ADC_TRANSFER_SIZE * ADC_TRANSFERS] __attribute__(( aligned(8) ));
 
 #endif /* ADC_H_ */

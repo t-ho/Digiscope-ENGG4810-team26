@@ -81,6 +81,7 @@
 #include "adc.h"
 #include "overvolt.h"
 #include "wavegen.h"
+#include "trigger.h"
 #include "drivers/SSD1289_driver.h"
 #include "drivers/XPT2046_driver.h"
 #include "ui/graphics_thread.h"
@@ -154,6 +155,7 @@ int main(void)
     SSD1289_Init();
     XPT2046_Init();
 
+    Trigger_Init();
     ADC_Init();
     WaveGen_Init();
 
