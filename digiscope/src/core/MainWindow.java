@@ -121,7 +121,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		// Channel B
 		XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
 		for(double i = 0; i <= 50000; i = i + 0.1) {
-			bSeries.add(i * 500, 1.5 * Math.sin(i));
+			bSeries.add(i * 500, 1.5 + 1.5 * Math.sin(i));
 		}
 		rawXYSeries.put(Constant.CHANNEL_B, bSeries);
 
@@ -484,7 +484,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		String expression = expressionTextArea.getText();
 		ExpressionDialog expressionDialog = new ExpressionDialog(this, expression);
 		expressionDialog.setVisible(true);
-		calculateMathChannel();
+		calculateMathChannel(expressionTextArea.getText().trim());
 	}
 
 	private void newExpressionButtonActionPerformed() {
@@ -1201,53 +1201,59 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	}
 	
 	/**
-	 * Calculate the MATH channel
+	 * Calculate the MATH channel and store MATH channel data into rawXYSeries
+	 * @param expression the expression string
+	 * @return false if the expression produce infinity number. Otherwise, true
+	 * @throws IllegalArgumentException
 	 */
-	public void calculateMathChannel() {
-		String expression = expressionTextArea.getText().trim();
-		if (!expression.equals("")) {
-			Map<String, String> channelNames = new HashMap<String, String>();
-			if (expression.contains("A")) {
-				channelNames.put("A", Constant.CHANNEL_A);
-			}
-			if (expression.contains("B")) {
-				channelNames.put("B", Constant.CHANNEL_B);
-			}
-			if (expression.contains("F")) {
-				channelNames.put("F", Constant.FILTER_CHANNEL);
-			}
-			int noOfItems = getMinNoOfItems(channelNames);
-			double maxHorizontalRange = visualizer_.getHorizontalRange().getUpperBound();
-			if (noOfItems != Integer.MAX_VALUE) {
-				Evaluator evaluator = new Evaluator();
-				XYSeries mathSeries = new XYSeries(Constant.MATH_CHANNEL);
-				Double x = Double.MAX_VALUE;
-				Double lastX = Double.MAX_VALUE;
-				for (int i = 0; i < noOfItems; i++) {
-					for (Map.Entry<String, String> entry : channelNames.entrySet()) {
-						XYDataItem dataItem = rawXYSeries.get(entry.getValue()).getDataItem(i);
-						evaluator.setVariableValue(entry.getKey(), dataItem.getYValue());
-						x = dataItem.getXValue();
-					}
-					if(x <= maxHorizontalRange) {
-						mathSeries.add(x, evaluator.evaluate(expression, evaluator.getVariables()));
+	public boolean calculateMathChannel(String expression) throws IllegalArgumentException{
+		Map<String, String> channelNames = new HashMap<String, String>();
+		if (expression.contains("A")) {
+			channelNames.put("A", Constant.CHANNEL_A);
+		}
+		if (expression.contains("B")) {
+			channelNames.put("B", Constant.CHANNEL_B);
+		}
+		if (expression.contains("F")) {
+			channelNames.put("F", Constant.FILTER_CHANNEL);
+		}
+		int noOfItems = getMinNoOfItems(channelNames);
+		double maxHorizontalRange = visualizer_.getHorizontalRange().getUpperBound();
+		if (noOfItems != Integer.MAX_VALUE) {
+			Evaluator evaluator = new Evaluator();
+			XYSeries mathSeries = new XYSeries(Constant.MATH_CHANNEL);
+			Double x = Double.MAX_VALUE;
+			Double lastX = Double.MAX_VALUE;
+			for (int i = 0; i < noOfItems; i++) {
+				for (Map.Entry<String, String> entry : channelNames.entrySet()) {
+					XYDataItem dataItem = rawXYSeries.get(entry.getValue()).getDataItem(i);
+					evaluator.setVariableValue(entry.getKey(), dataItem.getYValue());
+					x = dataItem.getXValue();
+				}
+				Double y = evaluator.evaluate(expression, evaluator.getVariables());
+				if (y != Double.POSITIVE_INFINITY && y != Double.NEGATIVE_INFINITY) {
+					if (x <= maxHorizontalRange) {
+						mathSeries.add(x, y);
 						lastX = x;
 					} else {
-						if(lastX < maxHorizontalRange) {
-							mathSeries.add(x, evaluator.evaluate(expression, evaluator.getVariables()));
+						if (lastX < maxHorizontalRange) {
+							mathSeries.add(x, y);
 						}
 						break;
 					}
+				} else {
+					return false;
 				}
-				rawXYSeries.put(Constant.MATH_CHANNEL, mathSeries);
-				if(mathChannelCheckBox.isSelected()) {
-					showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
-				}
-			} else {
-				System.out.print("There is no input channels (A, B or Filter) in the expression");
 			}
+			rawXYSeries.put(Constant.MATH_CHANNEL, mathSeries);
+			if (mathChannelCheckBox.isSelected()) {
+				showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
+			}
+			return true;
+		} else {
+			System.out.print("There is no input channels (A, B or Filter) in the expression");
+			return false;
 		}
-
 	}
 	
 	/**
@@ -1542,7 +1548,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
 		if(horizontalRangeAComboBox.getSelectedIndex() > previousHorizontalRangeIndex_) {
 			if (rawXYSeries.containsKey(Constant.MATH_CHANNEL)) {
-				calculateMathChannel();
+				calculateMathChannel(expressionTextArea.getText().trim());
 			}
 			if (rawXYSeries.containsKey(Constant.FILTER_CHANNEL)) {
 				calculateFilterChannel();
@@ -1713,7 +1719,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			if (channelName.equals(Constant.CHANNEL_A)) {
 				String expression = expressionTextArea.getText().trim();
 				if (expression.contains("A")) {
-					calculateMathChannel();
+					calculateMathChannel(expressionTextArea.getText().trim());
 				}
 				String inputChannelForFilter = (String) inputChannelComboBox.getSelectedItem();
 				if (inputChannelForFilter.equals(Constant.CHANNEL_A)) {
@@ -1725,7 +1731,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			} else if (channelName.equals(Constant.CHANNEL_B)) {
 				String expression = expressionTextArea.getText().trim();
 				if (expression.contains("B")) {
-					calculateMathChannel();
+					calculateMathChannel(expressionTextArea.getText().trim());
 				}
 				String inputChannelForFilter = (String) inputChannelComboBox.getSelectedItem();
 				if (inputChannelForFilter.equals(Constant.CHANNEL_B)) {
