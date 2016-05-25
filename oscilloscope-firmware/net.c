@@ -133,7 +133,7 @@ Void tcpWorker(UArg arg0, UArg arg1)
 		if (Mailbox_getNumPendingMsgs(NetCommandMailbox) == 0)
 		{
 			Command keepalive;
-			keepalive.type = _COMMAND_KEEPALIVE;
+			keepalive.type = COMMAND_KEEPALIVE;
 			NetSend(&keepalive, 0);
 		}
 

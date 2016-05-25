@@ -21,16 +21,23 @@
 #include "ui/graphics_thread.h"
 #include "ui/trigger_menu.h"
 
+#define MIN_TRIGGER_PERIOD 500
+
 Event_Handle AcqEvent;
 static Error_Block task_eb;
 static Error_Block ev_eb;
 
 #define TRIGGER_BUF_SIZE ADC_TRANSFER_SIZE * 2 * 14
 
-static uint16_t channel_A_samples[TRIGGER_BUF_SIZE] __attribute__(( aligned(8) ));
-static uint16_t channel_B_samples[TRIGGER_BUF_SIZE] __attribute__(( aligned(8) ));
+static uint16_t _channel_A_samples[TRIGGER_BUF_SIZE] __attribute__(( aligned(8) ));
+static uint16_t _channel_B_samples[TRIGGER_BUF_SIZE] __attribute__(( aligned(8) ));
 
-static uint32_t offset_A = 0, offset_B = 0;
+static uint16_t* channel_A_samples_12 = (uint16_t*) &_channel_A_samples;
+static uint16_t* channel_B_samples_12 = (uint16_t*) &_channel_B_samples;
+static uint8_t* channel_A_samples_8 = (uint8_t*) &_channel_A_samples;
+static uint8_t* channel_B_samples_8 = (uint8_t*) &_channel_B_samples;
+
+static uint32_t offset = 0;
 
 static const char* TriggerModeNames[] = {"Auto", "Normal", "Single"};
 static const char* TriggerTypeNames[] = {"Rising", "Falling", "Level"};
@@ -61,9 +68,9 @@ triggerSearchISR(UArg arg0, UArg arg1)
 		{
 			for (i = 0; i < ADC_TRANSFER_SIZE; i++)
 			{
-				channel_A_samples[offset_A + i] = adc_buffer_A_PRI[i];
+				channel_A_samples_12[offset + i] = adc_buffer_A_PRI[i];
 
-				if (trigger_index < 0 && channel_A_samples[offset_A + i] > realThreshold)
+				if (trigger_index < 0 && channel_A_samples_12[offset + i] > realThreshold)
 				{
 					trigger_index = i;
 				}
@@ -73,19 +80,12 @@ triggerSearchISR(UArg arg0, UArg arg1)
 		{
 			for (i = 0; i < ADC_TRANSFER_SIZE; i++)
 			{
-				channel_A_samples[offset_A + ADC_TRANSFER_SIZE + i] = adc_buffer_A_ALT[i];
+				channel_A_samples_12[offset + ADC_TRANSFER_SIZE + i] = adc_buffer_A_ALT[i];
 
-				if (trigger_index < 0 && channel_A_samples[offset_A + ADC_TRANSFER_SIZE + i] > realThreshold)
+				if (trigger_index < 0 && channel_A_samples_12[offset + ADC_TRANSFER_SIZE + i] > realThreshold)
 				{
 					trigger_index = i + ADC_TRANSFER_SIZE;
 				}
-			}
-
-			offset_A += 2 * ADC_TRANSFER_SIZE;
-
-			if (offset_A >= TRIGGER_BUF_SIZE)
-			{
-				offset_A = 0;
 			}
 		}
 
@@ -93,21 +93,21 @@ triggerSearchISR(UArg arg0, UArg arg1)
 		{
 			for (i = 0; i < ADC_TRANSFER_SIZE; i++)
 			{
-				channel_B_samples[offset_B + i] = adc_buffer_B_PRI[i];
+				channel_B_samples_12[offset + i] = adc_buffer_B_PRI[i];
 			}
 		}
 		else if (events & EVENT_ID_B_ALT)
 		{
 			for (i = 0; i < ADC_TRANSFER_SIZE; i++)
 			{
-				channel_B_samples[offset_B + ADC_TRANSFER_SIZE + i] = adc_buffer_B_ALT[i];
+				channel_B_samples_12[offset + ADC_TRANSFER_SIZE + i] = adc_buffer_B_ALT[i];
 			}
 
-			offset_B += 2 * ADC_TRANSFER_SIZE;
+			offset += 2 * ADC_TRANSFER_SIZE;
 
-			if (offset_B >= TRIGGER_BUF_SIZE)
+			if (offset >= TRIGGER_BUF_SIZE)
 			{
-				offset_B = 0;
+				offset = 0;
 			}
 		}
 
@@ -186,8 +186,9 @@ ForceTrigger(void)
 {
 	static uint32_t last = 0;
 
+	// Ignore trigger if too soon
 	uint32_t current = Clock_getTicks();
-	if (current - last < 1000)
+	if (current - last < MIN_TRIGGER_PERIOD)
 	{
 		return;
 	}
@@ -210,12 +211,12 @@ ForceTrigger(void)
 	while ((seqnum + 1) * maxSamples < TRIGGER_BUF_SIZE)
 	{
 		scmd.seq_num = seqnum;
-		scmd.buffer = &channel_A_samples[seqnum * maxSamples];
+		scmd.buffer = &channel_A_samples_12[seqnum * maxSamples];
 		NetSend((Command *) &scmd, 100);
 		seqnum++;
 	}
 	scmd.seq_num = seqnum;
-	scmd.buffer = &channel_A_samples[seqnum * maxSamples];
+	scmd.buffer = &channel_A_samples_12[seqnum * maxSamples];
 	scmd.num_samples = TRIGGER_BUF_SIZE - seqnum * maxSamples;
 	NetSend((Command *) &scmd, 100);
 
@@ -226,24 +227,29 @@ ForceTrigger(void)
 	while ((seqnum + 1) * maxSamples < TRIGGER_BUF_SIZE)
 	{
 		scmd.seq_num = seqnum;
-		scmd.buffer = &channel_B_samples[seqnum * maxSamples];
+		scmd.buffer = &channel_B_samples_12[seqnum * maxSamples];
 		NetSend((Command *) &scmd, 100);
 		seqnum++;
 	}
 	scmd.seq_num = seqnum;
-	scmd.buffer = &channel_B_samples[seqnum * maxSamples];
+	scmd.buffer = &channel_B_samples_12[seqnum * maxSamples];
 	scmd.num_samples = TRIGGER_BUF_SIZE - seqnum * maxSamples;
 	NetSend((Command *) &scmd, 100);
 
-	offset_A = 0;
-	offset_B = 0;
+	offset = 0;
+}
+
+static void
+ClearBuffers(void)
+{
+    memset(&_channel_A_samples, 0, sizeof(_channel_A_samples));
+    memset(&_channel_B_samples, 0, sizeof(_channel_B_samples));
 }
 
 void
 Trigger_Init(void)
 {
-    memset(&channel_A_samples, 0, sizeof(channel_A_samples));
-    memset(&channel_B_samples, 0, sizeof(channel_B_samples));
+	ClearBuffers();
 
 	AcqEvent = Event_create(NULL, &ev_eb);
 
