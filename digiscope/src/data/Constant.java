@@ -81,14 +81,20 @@ public class Constant {
 		ONE_MICROSECOND, TEN_MICROSECONDS, ONE_HUNDRED_MICROSECONDS,
 		ONE_MILISECOND, TEN_MILISECONDS, ONE_HUNDRED_MILISECONDS, ONE_SECOND};
 
-	public static final String SINE = "Sine";
-	public static final String SQUARE = "Square";
-	public static final String TRIANGLE = "Triangle";
-	public static final String RAMP = "Ramp";
-	public static final String RANDOM_NOISE = "Random noise";
+	public static final String SINE_NAME = "Sine";
+	public static final String SQUARE_NAME = "Square";
+	public static final String TRIANGLE_NAME = "Triangle";
+	public static final String RAMP_NAME = "Ramp";
+	public static final String RANDOM_NOISE_NAME = "Random noise";
 	
 	public static final String[] WAVE_TYPES = new String[] {
-		SINE, SQUARE, TRIANGLE, RAMP, RANDOM_NOISE };
+		SINE_NAME, SQUARE_NAME, TRIANGLE_NAME, RAMP_NAME, RANDOM_NOISE_NAME };
+	
+	public static final int SINE = 0;
+	public static final int SQUARE = 1;
+	public static final int TRIANGLE = 2;
+	public static final int RAMP = 3;
+	public static final int RANDOM_NOISE = 4;
 	
 	public static final String CHANNEL_A = "Channel A";
 	public static final String CHANNEL_B = "Channel B";
@@ -120,6 +126,9 @@ public class Constant {
 
 	public static final int DC = 0;
 	public static final int AC = 1;
+	
+	public static final int GENERATOR_OFF = 0;
+	public static final int GENERATOR_ON = 1;
 	
 	public static final int MODE_8BIT = 0;
 	public static final int MODE_12_BIT = 1;

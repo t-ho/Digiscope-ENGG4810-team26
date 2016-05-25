@@ -25,11 +25,11 @@ public class PacketType {
 	public static final byte CHANNEL_COUPLING_B = (byte) 0xBC;
 	public static final byte CHANNEL_MODE_A = (byte) 0xA7;
 	public static final byte CHANNEL_MODE_B = (byte) 0xB7;
-	public static final byte FUNCTION_GENERATOR_OUTPUT = (byte) 0xF0;
+	public static final byte GENERATOR_OUTPUT = (byte) 0xF0;
 	public static final byte WAVE_TYPE = (byte) 0xF1;
-	public static final byte FUNCTION_GENERATOR_VOLTAGE = (byte) 0xF2;
-	public static final byte FUNCTION_GENERATOR_OFFSET = (byte) 0xF3;
-	public static final byte FUNCTION_GENERATOR_FREQUENCY = (byte) 0xF4;
+	public static final byte GENERATOR_VOLTAGE = (byte) 0xF2;
+	public static final byte GENERATOR_OFFSET = (byte) 0xF3;
+	public static final byte GENERATOR_FREQUENCY = (byte) 0xF4;
 	public static final byte KEEP_ALIVE = (byte) 0xEE;
 	public static final byte DISPLAY_POWER = (byte) 0xD0;
 	public static final byte BACKLIGHT_BRIGHTNESS = (byte) 0xD1;

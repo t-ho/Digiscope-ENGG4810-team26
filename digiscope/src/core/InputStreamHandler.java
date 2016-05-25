@@ -33,7 +33,6 @@ public class InputStreamHandler extends Thread {
 
 	@Override
 	public void run() {
-		// TODO
 		try {
 			int aCurrentTime = 0;
 			int aPeriod = 0;
@@ -44,8 +43,8 @@ public class InputStreamHandler extends Thread {
 			double bMaxDiplayVoltage = 0;
 			double bMinDiplayVoltage = 0;
 			double maxDisplayTime = 0;
-			boolean isUpdateA = false;
-			boolean isUpdateB = false;
+			boolean isUpdatedA = false;
+			boolean isUpdatedB = false;
 			int aTotalOfSamples = 0;
 			int bTotalOfSamples = 0;
 			XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
@@ -119,6 +118,14 @@ public class InputStreamHandler extends Thread {
 							case PacketType.DC_OFFSET_B:
 								mainWindow_.setVerticalOffset(Constant.CHANNEL_B, commandPacket.getArgument());
 								break;
+							
+							case PacketType.GENERATOR_OUTPUT:
+								mainWindow_.setGeneratorOutput(commandPacket.getArgument());
+								break;
+								
+							case PacketType.WAVE_TYPE:
+								mainWindow_.setWaveType(commandPacket.getArgument());
+								break;
 							}
 						}
 					} else if (packet instanceof DataPacket) {
@@ -129,10 +136,10 @@ public class InputStreamHandler extends Thread {
 						switch (type) {
 						case PacketType.CHANNEL_A_8_BITS:
 							if (sequenceNumber == 0) {
-								if (isUpdateA == true) {
+								if (isUpdatedA == true) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, false);
 								}
-								isUpdateA = false;
+								isUpdatedA = false;
 								aSeries = new XYSeries(Constant.CHANNEL_A);
 								aCurrentTime = 0;
 								aPeriod = dataPacket.getPeriod();
@@ -148,23 +155,23 @@ public class InputStreamHandler extends Thread {
 								aCurrentTime += aPeriod;
 								aTotalOfSamples += 1;
 							}
-							if (isUpdateA == false) {
+							if (isUpdatedA == false) {
 								if (aCurrentTime >= maxDisplayTime) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, true);
-									isUpdateA = true;
+									isUpdatedA = true;
 								} else if (aTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_A)) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, true);
-									isUpdateA = false;
+									isUpdatedA = false;
 								}
 							}
 							break;
 
 						case PacketType.CHANNEL_B_8_BITS:
 							if (sequenceNumber == 0) {
-								if (isUpdateB == true) {
+								if (isUpdatedB == true) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, false);
 								}
-								isUpdateB = false;
+								isUpdatedB = false;
 								bSeries = new XYSeries(Constant.CHANNEL_B);
 								bCurrentTime = 0;
 								bPeriod = dataPacket.getPeriod();
@@ -180,23 +187,23 @@ public class InputStreamHandler extends Thread {
 								bCurrentTime += bPeriod;
 								bTotalOfSamples += 1;
 							}
-							if (isUpdateB == false) {
+							if (isUpdatedB == false) {
 								if (bCurrentTime >= maxDisplayTime) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, true);
-									isUpdateB = true;
+									isUpdatedB = true;
 								} else if (bTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_B)) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, true);
-									isUpdateB = false;
+									isUpdatedB = false;
 								}
 							}
 							break;
 
 						case PacketType.CHANNEL_A_12_BITS:
 							if (sequenceNumber == 0) {
-								if (isUpdateA == true) {
+								if (isUpdatedA == true) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, false);
 								}
-								isUpdateA = false;
+								isUpdatedA = false;
 								aSeries = new XYSeries(Constant.CHANNEL_A);
 								aCurrentTime = 0;
 								aPeriod = dataPacket.getPeriod();
@@ -212,23 +219,23 @@ public class InputStreamHandler extends Thread {
 								aCurrentTime += aPeriod;
 								aTotalOfSamples += 1;
 							}
-							if (isUpdateA == false) {
+							if (isUpdatedA == false) {
 								if (aCurrentTime >= maxDisplayTime) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, true);
-									isUpdateA = true;
+									isUpdatedA = true;
 								} else if (aTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_A)) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, true);
-									isUpdateA = false;
+									isUpdatedA = false;
 								}
 							}
 							break;
 
 						case PacketType.CHANNEL_B_12_BITS:
 							if (sequenceNumber == 0) {
-								if (isUpdateB == true) {
+								if (isUpdatedB == true) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, false);
 								}
-								isUpdateB = false;
+								isUpdatedB = false;
 								bSeries = new XYSeries(Constant.CHANNEL_B);
 								bCurrentTime = 0;
 								bPeriod = dataPacket.getPeriod();
@@ -244,13 +251,13 @@ public class InputStreamHandler extends Thread {
 								bCurrentTime += bPeriod;
 								bTotalOfSamples += 1;
 							}
-							if (isUpdateB == false) {
+							if (isUpdatedB == false) {
 								if (bCurrentTime >= maxDisplayTime) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, true);
-									isUpdateB = true;
+									isUpdatedB = true;
 								} else if (bTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_B)) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, true);
-									isUpdateB = false;
+									isUpdatedB = false;
 								}
 							}
 							break;

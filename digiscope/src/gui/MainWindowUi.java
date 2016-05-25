@@ -1618,7 +1618,7 @@ public class MainWindowUi extends JFrame {
         outputLabel_.setText("Output");
         generatorControlTopPanel_.add(outputLabel_);
 
-        outputToggleButton.setText("On");
+        outputToggleButton.setText("Off");
         outputToggleButton.setFocusable(false);
         outputToggleButton.setPreferredSize(new Dimension(80, 23));
         generatorControlTopPanel_.add(outputToggleButton);

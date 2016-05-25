@@ -72,6 +72,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	private int previousVerticalOffsetBValue_;
 	private boolean sentVerticalOffsetACommand_;
 	private boolean sentVerticalOffsetBCommand_;
+	private int previousWaveTypeIndex_;
 	
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
@@ -110,6 +111,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		previousVerticalOffsetBValue_ = (int) verticalOffsetBSpinner.getValue();
 		sentVerticalOffsetACommand_ = false;
 		sentVerticalOffsetBCommand_ = false;
+		previousWaveTypeIndex_ = waveTypeComboBox.getSelectedIndex();
 		// test
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
@@ -226,6 +228,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		verticalOffsetMathSpinner.addChangeListener(this);
 
 		verticalOffsetFilterSpinner.addChangeListener(this);
+		
+		outputToggleButton.addActionListener(this);
+		
+		waveTypeComboBox.addActionListener(this);
 
 		verticalOffsetGeneratorSpinner.addChangeListener(new ChangeListener() {
 			@Override
@@ -1722,6 +1728,27 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	}
 	
 	/**
+	 * Turn on or turn off function generator output
+	 * @param state
+	 */
+	public void setGeneratorOutput(int state) {
+		if (state == Constant.GENERATOR_ON) {
+			outputToggleButton.setSelected(true);
+			outputToggleButton.setText("ON");
+		} else {
+			outputToggleButton.setSelected(false);
+			outputToggleButton.setText("OFF");
+		}
+	}
+
+	public void setWaveType(int waveType) {
+		waveTypeComboBox.removeActionListener(this);
+		waveTypeComboBox.setSelectedIndex(waveType);
+		waveTypeComboBox.addActionListener(this);
+		previousWaveTypeIndex_ = waveTypeComboBox.getSelectedIndex();
+	}
+	
+	/**
 	 * Set channel mode
 	 * @param channelName
 	 * @param mode
@@ -2079,6 +2106,24 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == verticalOffsetUnitBComboBox) {
 			sendCommand(PacketType.DC_OFFSET_B, 0);
 			sentVerticalOffsetBCommand_ = true;
+
+		} else if(source == outputToggleButton) {
+			int state;
+			if(outputToggleButton.isSelected()) {
+				state = Constant.GENERATOR_ON;
+				outputToggleButton.setSelected(false);
+			} else {
+				state = Constant.GENERATOR_OFF;
+				outputToggleButton.setSelected(true);
+			}
+			sendCommand(PacketType.GENERATOR_OUTPUT, state);
+
+		} else if (source == waveTypeComboBox) {
+			int waveType = waveTypeComboBox.getSelectedIndex();
+			waveTypeComboBox.removeActionListener(this);
+			waveTypeComboBox.setSelectedIndex(previousWaveTypeIndex_);
+			waveTypeComboBox.addActionListener(this);
+			sendCommand(PacketType.WAVE_TYPE, waveType);
 		}
 	}
 

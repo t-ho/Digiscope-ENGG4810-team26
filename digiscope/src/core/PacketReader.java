@@ -100,19 +100,19 @@ public class PacketReader {
 			case PacketType.CHANNEL_MODE_B :
 				// Fallthrough
 
-			case PacketType.FUNCTION_GENERATOR_OUTPUT :
+			case PacketType.GENERATOR_OUTPUT :
 				// Fallthrough
 				
 			case PacketType.WAVE_TYPE :
 				// Fallthrough
 
-			case PacketType.FUNCTION_GENERATOR_VOLTAGE :
+			case PacketType.GENERATOR_VOLTAGE :
 				// Fallthrough
 				
-			case PacketType.FUNCTION_GENERATOR_OFFSET :
+			case PacketType.GENERATOR_OFFSET :
 				// Fallthrough
 
-			case PacketType.FUNCTION_GENERATOR_FREQUENCY :
+			case PacketType.GENERATOR_FREQUENCY :
 				// Fallthrough
 				
 			case PacketType.KEEP_ALIVE :
