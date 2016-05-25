@@ -75,6 +75,9 @@ public class PacketReader {
 			
 			case PacketType.DC_OFFSET_B :
 				// Fallthrough
+			
+			case PacketType.NUMBER_OF_SAMPLES :
+				// Fallthrough
 
 			case PacketType.TRIGGER_ARM_A :
 				// Fallthrough

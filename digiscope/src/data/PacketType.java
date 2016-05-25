@@ -17,6 +17,7 @@ public class PacketType {
 	public static final byte TRIGGER_THRESHOLD_B = (byte) 0xB5;
 	public static final byte DC_OFFSET_A = (byte) 0xA6;
 	public static final byte DC_OFFSET_B = (byte) 0xB6;
+	public static final byte NUMBER_OF_SAMPLES = (byte) 0x71;
 	public static final byte TRIGGER_ARM_A = (byte) 0xAA;
 	public static final byte TRIGGER_ARM_B = (byte) 0xBA;
 	public static final byte TRIGGER_FORCE_A = (byte) 0xAF;

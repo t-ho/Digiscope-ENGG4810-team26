@@ -126,6 +126,10 @@ public class InputStreamHandler extends Thread {
 							case PacketType.WAVE_TYPE:
 								mainWindow_.setWaveType(commandPacket.getArgument());
 								break;
+							
+							case PacketType.NUMBER_OF_SAMPLES:
+								mainWindow_.setNoOfSamples(commandPacket.getArgument());
+								break;
 							}
 						}
 					} else if (packet instanceof DataPacket) {
