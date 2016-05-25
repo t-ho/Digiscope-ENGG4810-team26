@@ -75,6 +75,9 @@ public class PacketReader {
 			
 			case PacketType.DC_OFFSET_B :
 				// Fallthrough
+			
+			case PacketType.NUMBER_OF_SAMPLES :
+				// Fallthrough
 
 			case PacketType.TRIGGER_ARM_A :
 				// Fallthrough
@@ -100,19 +103,19 @@ public class PacketReader {
 			case PacketType.CHANNEL_MODE_B :
 				// Fallthrough
 
-			case PacketType.FUNCTION_GENERATOR_OUTPUT :
+			case PacketType.GENERATOR_OUTPUT :
 				// Fallthrough
 				
 			case PacketType.WAVE_TYPE :
 				// Fallthrough
 
-			case PacketType.FUNCTION_GENERATOR_VOLTAGE :
+			case PacketType.GENERATOR_VOLTAGE :
 				// Fallthrough
 				
-			case PacketType.FUNCTION_GENERATOR_OFFSET :
+			case PacketType.GENERATOR_OFFSET :
 				// Fallthrough
 
-			case PacketType.FUNCTION_GENERATOR_FREQUENCY :
+			case PacketType.GENERATOR_FREQUENCY :
 				// Fallthrough
 				
 			case PacketType.KEEP_ALIVE :

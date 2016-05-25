@@ -72,6 +72,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	private int previousVerticalOffsetBValue_;
 	private boolean sentVerticalOffsetACommand_;
 	private boolean sentVerticalOffsetBCommand_;
+	private int previousWaveTypeIndex_;
+	private int previousNoOfSamples_;
 	
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
@@ -110,6 +112,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		previousVerticalOffsetBValue_ = (int) verticalOffsetBSpinner.getValue();
 		sentVerticalOffsetACommand_ = false;
 		sentVerticalOffsetBCommand_ = false;
+		previousWaveTypeIndex_ = waveTypeComboBox.getSelectedIndex();
+		previousNoOfSamples_ = (int) noOfSamplesASpinner.getValue();
 		// test
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
@@ -226,6 +230,14 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		verticalOffsetMathSpinner.addChangeListener(this);
 
 		verticalOffsetFilterSpinner.addChangeListener(this);
+		
+		outputToggleButton.addActionListener(this);
+		
+		waveTypeComboBox.addActionListener(this);
+		
+		noOfSamplesASpinner.addChangeListener(this);
+		
+		noOfSamplesBSpinner.addChangeListener(this);
 
 		verticalOffsetGeneratorSpinner.addChangeListener(new ChangeListener() {
 			@Override
@@ -1621,6 +1633,20 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	}
 	
 	/**
+	 * Set number of samples
+	 * @param noOfSamples
+	 */
+	public void setNoOfSamples(int noOfSamples) {
+		noOfSamplesASpinner.removeChangeListener(this);
+		noOfSamplesBSpinner.removeChangeListener(this);
+		noOfSamplesASpinner.setValue(noOfSamples);
+		noOfSamplesBSpinner.setValue(noOfSamples);
+		noOfSamplesASpinner.addChangeListener(this);
+		noOfSamplesBSpinner.addChangeListener(this);
+		previousNoOfSamples_ = (int) noOfSamplesASpinner.getValue();
+	}
+	
+	/**
 	 * Calculate the value for vertical offset spinner
 	 * @param microvolts
 	 * @param unit
@@ -1719,6 +1745,27 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				channelCouplingBToggleButton.setText("AC");
 			}
 		}
+	}
+	
+	/**
+	 * Turn on or turn off function generator output
+	 * @param state
+	 */
+	public void setGeneratorOutput(int state) {
+		if (state == Constant.GENERATOR_ON) {
+			outputToggleButton.setSelected(true);
+			outputToggleButton.setText("ON");
+		} else {
+			outputToggleButton.setSelected(false);
+			outputToggleButton.setText("OFF");
+		}
+	}
+
+	public void setWaveType(int waveType) {
+		waveTypeComboBox.removeActionListener(this);
+		waveTypeComboBox.setSelectedIndex(waveType);
+		waveTypeComboBox.addActionListener(this);
+		previousWaveTypeIndex_ = waveTypeComboBox.getSelectedIndex();
 	}
 	
 	/**
@@ -2079,6 +2126,24 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == verticalOffsetUnitBComboBox) {
 			sendCommand(PacketType.DC_OFFSET_B, 0);
 			sentVerticalOffsetBCommand_ = true;
+
+		} else if(source == outputToggleButton) {
+			int state;
+			if(outputToggleButton.isSelected()) {
+				state = Constant.GENERATOR_ON;
+				outputToggleButton.setSelected(false);
+			} else {
+				state = Constant.GENERATOR_OFF;
+				outputToggleButton.setSelected(true);
+			}
+			sendCommand(PacketType.GENERATOR_OUTPUT, state);
+
+		} else if (source == waveTypeComboBox) {
+			int waveType = waveTypeComboBox.getSelectedIndex();
+			waveTypeComboBox.removeActionListener(this);
+			waveTypeComboBox.setSelectedIndex(previousWaveTypeIndex_);
+			waveTypeComboBox.addActionListener(this);
+			sendCommand(PacketType.WAVE_TYPE, waveType);
 		}
 	}
 
@@ -2109,6 +2174,27 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 
 		} else if(source == verticalOffsetFilterSpinner) {
 			refreshChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
+
+		} else if(source == noOfSamplesASpinner) {
+			int nSamples = (int) noOfSamplesASpinner.getValue();
+			noOfSamplesASpinner.removeChangeListener(this);
+			noOfSamplesASpinner.setValue(previousNoOfSamples_);
+			noOfSamplesASpinner.addChangeListener(this);
+			if(nSamples > 0) {
+				sendCommand(PacketType.NUMBER_OF_SAMPLES, nSamples);
+			} else {
+				// Ignore
+			}
+		} else if(source == noOfSamplesBSpinner) {
+			int nSamples = (int) noOfSamplesBSpinner.getValue();
+			noOfSamplesBSpinner.removeChangeListener(this);
+			noOfSamplesBSpinner.setValue(previousNoOfSamples_);
+			noOfSamplesBSpinner.addChangeListener(this);
+			if(nSamples > 0) {
+				sendCommand(PacketType.NUMBER_OF_SAMPLES, nSamples);
+			} else {
+				// Ignore
+			}
 		}
 	}
 }
