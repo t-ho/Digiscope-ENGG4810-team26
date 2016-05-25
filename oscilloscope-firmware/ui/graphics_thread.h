@@ -24,7 +24,8 @@ enum menus
 {
 	MAIN_MENU,
 	RANGE_MENU,
-	TRIGGER_MENU,
+	TRIGGER_ARM_MENU,
+	TRIGGER_THRESHOLD_MENU,
 	WAVEGEN_MENU,
 	BRIGHTNESS_MENU,
 	OVERVOLTAGE_MENU
@@ -34,6 +35,8 @@ extern uint8_t current_menu;
 extern tCanvasWidget menus[];
 extern void OnMAIN(tWidget *psWidget);
 extern void OnOVERVOLTAGE(tWidget *psWidget);
+extern void OnTRIGGER_ARM(tWidget *psWidget);
+extern void OnTRIGGER_THRESHOLD(tWidget *psWidget);
 
 extern void UISend(Command *cmd, uint32_t timeout);
 

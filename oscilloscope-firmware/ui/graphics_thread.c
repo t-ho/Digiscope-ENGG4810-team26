@@ -21,14 +21,16 @@
 #include "graphics_thread.h"
 #include "overvoltage_menu.h"
 #include "range_menu.h"
+#include "trigger_menu.h"
 
-static const char * const menu_titles[] = { "Team 26 Oscilloscope", "Channel X", "Trigger", "Wave Generator", "Brightness", "Overvoltage Warning!" };
+static const char * const menu_titles[] = { "Team 26 Oscilloscope", "Channel X", "Trigger - Force/Arm", "Trigger - Threshold", "Wave Generator", "Brightness", "Overvoltage Warning!" };
 
 tCanvasWidget g_sTitle;
 
 tPushButtonWidget main_menu_buttons[];
 extern tPushButtonWidget RangeBack;
-extern tPushButtonWidget TriggerBack;
+extern tPushButtonWidget TriggerArmBack;
+extern tPushButtonWidget TriggerThresholdBack;
 extern tPushButtonWidget WaveGenBack;
 extern tPushButtonWidget BrightnessBack;
 
@@ -52,8 +54,11 @@ tCanvasWidget menus[] =
 	// Range menu
     CanvasStruct(0, 0, &RangeBack, &SSD1289_Display, 0, 24,
                  320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
-	// Trigger menu
-	CanvasStruct(0, 0, &TriggerBack, &SSD1289_Display, 0, 24,
+	// Trigger Arm menu
+	CanvasStruct(0, 0, &TriggerArmBack, &SSD1289_Display, 0, 24,
+				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
+	// Trigger Threshold menu
+	CanvasStruct(0, 0, &TriggerThresholdBack, &SSD1289_Display, 0, 24,
 				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
 	// Wavegen menu
 	CanvasStruct(0, 0, &WaveGenBack, &SSD1289_Display, 0, 24,
@@ -67,7 +72,8 @@ tCanvasWidget menus[] =
 };
 
 MENU_NAV(MAIN)
-static MENU_NAV(TRIGGER)
+MENU_NAV(TRIGGER_ARM)
+MENU_NAV(TRIGGER_THRESHOLD)
 static MENU_NAV(WAVEGEN)
 static MENU_NAV(BRIGHTNESS)
 MENU_NAV(OVERVOLTAGE)
@@ -113,7 +119,7 @@ tPushButtonWidget main_menu_buttons[] =
 		ClrWhite, &g_sFontCm18b, "Channel B", 0, 0, 0, 0, OnRange_B),
 	RectangularButtonStruct(&menus[MAIN_MENU], main_menu_buttons + 3, 0, &SSD1289_Display, 220, 30,
 		100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrBlue, ClrYellow, ClrWhite,
-		ClrWhite, &g_sFontCm18b, "Trigger", 0, 0, 0, 0, OnTRIGGER),
+		ClrWhite, &g_sFontCm18b, "Trigger", 0, 0, 0, 0, OnTRIGGER_ARM),
 	RectangularButtonStruct(&menus[MAIN_MENU], main_menu_buttons + 4, 0, &SSD1289_Display, 0, 120,
 		100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrBlue, ClrYellow, ClrWhite,
 		ClrWhite, &g_sFontCm18b, "Brightness", 0, 0, 0, 0, OnBRIGHTNESS),

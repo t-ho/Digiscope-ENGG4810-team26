@@ -16,9 +16,32 @@
 #define EVENT_ID_B_PRI Event_Id_02
 #define EVENT_ID_B_ALT Event_Id_03
 
+typedef enum TriggerMode
+{
+	TRIGGER_MODE_AUTO,
+	TRIGGER_MODE_NORMAL,
+	TRIGGER_MODE_SINGLE
+} TriggerMode;
+
+typedef enum TriggerType
+{
+	TRIGGER_TYPE_RISING,
+	TRIGGER_TYPE_FALLING,
+	TRIGGER_TYPE_LEVEL
+} TriggerType;
+
 extern void Trigger_Init(void);
 extern Event_Handle AcqEvent;
 extern void ForceTrigger(void);
+
+extern int32_t TriggerGetThreshold(void);
+extern void TriggerSetThreshold(int32_t threshold);
+extern TriggerMode TriggerGetMode(void);
+extern void TriggerSetMode(TriggerMode mode);
+extern TriggerType TriggerGetType(void);
+extern void TriggerSetType(TriggerType type);
+extern uint32_t TriggerGetChannel(void);
+extern void TriggerSetChannel(uint32_t channel);
 
 extern volatile uint8_t channel_a_pri_full;
 extern volatile uint8_t channel_a_alt_full;
