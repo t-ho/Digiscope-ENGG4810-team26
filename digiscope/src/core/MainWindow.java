@@ -46,7 +46,7 @@ import gui.MainWindowUi;
  *
  * @author ToanHo
  */
-public class MainWindow extends MainWindowUi implements ChartMouseListener, ItemListener, ActionListener {
+public class MainWindow extends MainWindowUi implements ChartMouseListener, ItemListener, ActionListener, ChangeListener{
 
 	private static final long serialVersionUID = 1L;
 	private LaunchWindow launchWindow_;
@@ -61,11 +61,17 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	private PacketReader packetReader_;
 	private InputStreamHandler inputStreamHandler_;
 
-	private int previousVerticalRangeAIndex;
-	private int previousVerticalRangeBIndex;
-	private int previousHorizontalRangeIndex;
-	private int previousTriggerModeAIndex;
-	private int previousTriggerTypeAIndex;
+	private int previousVerticalRangeAIndex_;
+	private int previousVerticalRangeBIndex_;
+	private int previousHorizontalRangeIndex_;
+	private int previousTriggerModeAIndex_;
+	private int previousTriggerModeBIndex_;
+	private int previousTriggerTypeAIndex_;
+	private int previousTriggerTypeBIndex_;
+	private int previousVerticalOffsetAValue_;
+	private int previousVerticalOffsetBValue_;
+	private boolean sentVerticalOffsetACommand_;
+	private boolean sentVerticalOffsetBCommand_;
 	
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
@@ -93,11 +99,17 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		visualizer_ = new Visualizer();
 		chartPanel_ = createDefaultChartPanel(visualizer_.getChart());
 		filterFile_ = new FilterFile();
-		previousVerticalRangeAIndex = verticalRangeAComboBox.getSelectedIndex();
-		previousVerticalRangeBIndex = verticalRangeBComboBox.getSelectedIndex();
-		previousHorizontalRangeIndex = horizontalRangeAComboBox.getSelectedIndex();
-		previousTriggerModeAIndex = triggerModeAComboBox.getSelectedIndex();
-		previousTriggerTypeAIndex = triggerTypeAComboBox.getSelectedIndex();
+		previousVerticalRangeAIndex_ = verticalRangeAComboBox.getSelectedIndex();
+		previousVerticalRangeBIndex_ = verticalRangeBComboBox.getSelectedIndex();
+		previousHorizontalRangeIndex_ = horizontalRangeAComboBox.getSelectedIndex();
+		previousTriggerModeAIndex_ = triggerModeAComboBox.getSelectedIndex();
+		previousTriggerModeBIndex_ = triggerModeBComboBox.getSelectedIndex();
+		previousTriggerTypeAIndex_ = triggerTypeAComboBox.getSelectedIndex();
+		previousTriggerTypeBIndex_ = triggerTypeBComboBox.getSelectedIndex();
+		previousVerticalOffsetAValue_ = (int) verticalOffsetASpinner.getValue();
+		previousVerticalOffsetBValue_ = (int) verticalOffsetBSpinner.getValue();
+		sentVerticalOffsetACommand_ = false;
+		sentVerticalOffsetBCommand_ = false;
 		// test
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
@@ -117,7 +129,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		// Channel B
 		XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
 		for(double i = 0; i <= 50000; i = i + 0.1) {
-			bSeries.add(i * 500, 1.5 * Math.sin(i));
+			bSeries.add(i * 500, 1.5 + 1.5 * Math.sin(i));
 		}
 		rawXYSeries.put(Constant.CHANNEL_B, bSeries);
 
@@ -192,39 +204,28 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		verticalRangeGeneratorComboBox.addActionListener(this);
 		
 		forceTriggerAButton.addActionListener(this);
+
+		forceTriggerBButton.addActionListener(this);
 		
 		triggerModeAComboBox.addActionListener(this);
+
+		triggerModeBComboBox.addActionListener(this);
 		
 		triggerTypeAComboBox.addActionListener(this);
 		
+		triggerTypeBComboBox.addActionListener(this);
 		
-		verticalOffsetASpinner.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent event) {
-				verticalOffsetASpinnerStateChanged();
-			}
-		});
+		verticalOffsetUnitAComboBox.addActionListener(this);
+		
+		verticalOffsetUnitBComboBox.addActionListener(this);
+		
+		verticalOffsetASpinner.addChangeListener(this);
+		
+		verticalOffsetBSpinner.addChangeListener(this);
 
-		verticalOffsetBSpinner.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent event) {
-				verticalOffsetBSpinnerStateChanged();
-			}
-		});
+		verticalOffsetMathSpinner.addChangeListener(this);
 
-		verticalOffsetMathSpinner.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent event) {
-				verticalOffsetMathSpinnerStateChanged();
-			}
-		});
-
-		verticalOffsetFilterSpinner.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent event) {
-				verticalOffsetFilterSpinnerStateChanged();
-			}
-		});
+		verticalOffsetFilterSpinner.addChangeListener(this);
 
 		verticalOffsetGeneratorSpinner.addChangeListener(new ChangeListener() {
 			@Override
@@ -265,20 +266,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			@Override
 			public void stateChanged(ChangeEvent event) {
 				horizontalOffsetGeneratorSpinnerStateChanged();
-			}
-		});
-
-		verticalOffsetUnitAComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				verticalOffsetUnitAComboBoxItemStateChanged();
-			}
-		});
-
-		verticalOffsetUnitBComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				verticalOffsetUnitBComboBoxItemStateChanged();
 			}
 		});
 
@@ -474,20 +461,12 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		String expression = expressionTextArea.getText();
 		ExpressionDialog expressionDialog = new ExpressionDialog(this, expression);
 		expressionDialog.setVisible(true);
-		calculateMathChannel();
+		calculateMathChannel(expressionTextArea.getText().trim());
 	}
 
 	private void newExpressionButtonActionPerformed() {
 		ExpressionDialog expressionDialog = new ExpressionDialog(this);
 		expressionDialog.setVisible(true);
-	}
-
-	private void verticalOffsetUnitAComboBoxItemStateChanged() {
-		verticalOffsetASpinner.setValue(0);
-	}
-
-	private void verticalOffsetUnitBComboBoxItemStateChanged() {
-		verticalOffsetBSpinner.setValue(0);
 	}
 
 	private void verticalOffsetUnitMathComboBoxItemStateChanged() {
@@ -522,27 +501,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		horizontalOffsetGeneratorSpinner.setValue(0);
 	}
 
-	private void verticalOffsetASpinnerStateChanged() {
-		refreshChannelPlotOnChartPanel(Constant.CHANNEL_A);
-	}
-	
-	private void verticalOffsetBSpinnerStateChanged() {
-		refreshChannelPlotOnChartPanel(Constant.CHANNEL_B);
-	}
-
-	private void verticalOffsetMathSpinnerStateChanged() {
-		refreshChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
-	}
-
-	private void verticalOffsetFilterSpinnerStateChanged() {
-		refreshChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
-	}
-
 	private void verticalOffsetGeneratorSpinnerStateChanged() {
 		// TODO
 		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetGeneratorSpinner.getValue(),
 				(String) horizontalOffsetUnitGeneratorComboBox.getSelectedItem());
-		double verticalOffset = getVerticalOffsetValue((int) verticalOffsetGeneratorSpinner.getValue(),
+		double verticalOffset = getVerticalOffsetValueInVolt((int) verticalOffsetGeneratorSpinner.getValue(),
 				(String) verticalOffsetUnitGeneratorComboBox.getSelectedItem());
 		XYSeries generatorSeries = createXYSeriesWithOffsets(Constant.GENERATOR_CHANNEL,
 				rawXYSeries.get(Constant.GENERATOR_CHANNEL), horizontalOffset, verticalOffset);
@@ -569,7 +532,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		// TODO
 		int horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetGeneratorSpinner.getValue(),
 				(String) horizontalOffsetUnitGeneratorComboBox.getSelectedItem());
-		double verticalOffset = getVerticalOffsetValue((int) verticalOffsetGeneratorSpinner.getValue(),
+		double verticalOffset = getVerticalOffsetValueInVolt((int) verticalOffsetGeneratorSpinner.getValue(),
 				(String) verticalOffsetUnitGeneratorComboBox.getSelectedItem());
 		XYSeries generatorSeries = createXYSeriesWithOffsets(Constant.GENERATOR_CHANNEL,
 				rawXYSeries.get(Constant.GENERATOR_CHANNEL), horizontalOffset, verticalOffset);
@@ -1108,13 +1071,13 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			} else if (channelName == Constant.MATH_CHANNEL) {
 				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetMathSpinner.getValue(),
 						(String) horizontalOffsetUnitMathComboBox.getSelectedItem());
-				verticalOffset = getVerticalOffsetValue((int) verticalOffsetMathSpinner.getValue(),
+				verticalOffset = getVerticalOffsetValueInVolt((int) verticalOffsetMathSpinner.getValue(),
 						(String) verticalOffsetUnitMathComboBox.getSelectedItem());
 				channelIndex = Constant.MATH_INDEX;
 			} else if (channelName == Constant.FILTER_CHANNEL) {
 				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetFilterSpinner.getValue(),
 						(String) horizontalOffsetUnitFilterComboBox.getSelectedItem());
-				verticalOffset = getVerticalOffsetValue((int) verticalOffsetFilterSpinner.getValue(),
+				verticalOffset = getVerticalOffsetValueInVolt((int) verticalOffsetFilterSpinner.getValue(),
 						(String) verticalOffsetUnitFilterComboBox.getSelectedItem());
 				channelIndex = Constant.FILTER_INDEX;
 			} else if (channelName == Constant.GENERATOR_CHANNEL) {
@@ -1149,12 +1112,12 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	}
 
 	/**
-	 * Get vertical offset value
+	 * Get vertical offset value in volt
 	 * @param offset the value from verticalOffset spinner
 	 * @param unit the selected unit from verticalOffsetUnit combobox
 	 * @return vertical offset value in milivolts
 	 */
-	private double getVerticalOffsetValue(int offset, String unit) {
+	private double getVerticalOffsetValueInVolt(int offset, String unit) {
 		if(unit.equals(Constant.TEN_MILIVOLTS)) {
 			return offset * 0.01;
 		} else if(unit.equals(Constant.ONE_HUNDRED_MILIVOLTS)) {
@@ -1166,8 +1129,27 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		}
 	}
 	
+
 	/**
-	 * Get horizontal offset value
+	 * Get vertical offset value in microvolt
+	 * @param offset the value from verticalOffset spinner
+	 * @param unit the selected unit from verticalOffsetUnit combobox
+	 * @return vertical offset value in milivolts
+	 */
+	private int getVerticalOffsetValueInMicrovolt(int offset, String unit) {
+		if(unit.equals(Constant.TEN_MILIVOLTS)) {
+			return offset * 10000;
+		} else if(unit.equals(Constant.ONE_HUNDRED_MILIVOLTS)) {
+			return offset * 100000;
+		} else if(unit.equals(Constant.ONE_VOLT)) {
+			return offset * 1000000;
+		}else { // unit == Constant.ONE_MILIVOLT
+			return offset * 1000;
+		}
+	}
+	
+	/**
+	 * Get horizontal offset value in microsecond 
 	 * @param offset the value from horizontalOffset spinner
 	 * @param unit the selected unit from horizontalOffsetUnit combobox
 	 * @return horizontal offset value in micro-seconds
@@ -1191,53 +1173,59 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	}
 	
 	/**
-	 * Calculate the MATH channel
+	 * Calculate the MATH channel and store MATH channel data into rawXYSeries
+	 * @param expression the expression string
+	 * @return false if the expression produce infinity number. Otherwise, true
+	 * @throws IllegalArgumentException
 	 */
-	public void calculateMathChannel() {
-		String expression = expressionTextArea.getText().trim();
-		if (!expression.equals("")) {
-			Map<String, String> channelNames = new HashMap<String, String>();
-			if (expression.contains("A")) {
-				channelNames.put("A", Constant.CHANNEL_A);
-			}
-			if (expression.contains("B")) {
-				channelNames.put("B", Constant.CHANNEL_B);
-			}
-			if (expression.contains("F")) {
-				channelNames.put("F", Constant.FILTER_CHANNEL);
-			}
-			int noOfItems = getMinNoOfItems(channelNames);
-			double maxHorizontalRange = visualizer_.getHorizontalRange().getUpperBound();
-			if (noOfItems != Integer.MAX_VALUE) {
-				Evaluator evaluator = new Evaluator();
-				XYSeries mathSeries = new XYSeries(Constant.MATH_CHANNEL);
-				Double x = Double.MAX_VALUE;
-				Double lastX = Double.MAX_VALUE;
-				for (int i = 0; i < noOfItems; i++) {
-					for (Map.Entry<String, String> entry : channelNames.entrySet()) {
-						XYDataItem dataItem = rawXYSeries.get(entry.getValue()).getDataItem(i);
-						evaluator.setVariableValue(entry.getKey(), dataItem.getYValue());
-						x = dataItem.getXValue();
-					}
-					if(x <= maxHorizontalRange) {
-						mathSeries.add(x, evaluator.evaluate(expression, evaluator.getVariables()));
+	public boolean calculateMathChannel(String expression) throws IllegalArgumentException{
+		Map<String, String> channelNames = new HashMap<String, String>();
+		if (expression.contains("A")) {
+			channelNames.put("A", Constant.CHANNEL_A);
+		}
+		if (expression.contains("B")) {
+			channelNames.put("B", Constant.CHANNEL_B);
+		}
+		if (expression.contains("F")) {
+			channelNames.put("F", Constant.FILTER_CHANNEL);
+		}
+		int noOfItems = getMinNoOfItems(channelNames);
+		double maxHorizontalRange = visualizer_.getHorizontalRange().getUpperBound();
+		if (noOfItems != Integer.MAX_VALUE) {
+			Evaluator evaluator = new Evaluator();
+			XYSeries mathSeries = new XYSeries(Constant.MATH_CHANNEL);
+			Double x = Double.MAX_VALUE;
+			Double lastX = Double.MAX_VALUE;
+			for (int i = 0; i < noOfItems; i++) {
+				for (Map.Entry<String, String> entry : channelNames.entrySet()) {
+					XYDataItem dataItem = rawXYSeries.get(entry.getValue()).getDataItem(i);
+					evaluator.setVariableValue(entry.getKey(), dataItem.getYValue());
+					x = dataItem.getXValue();
+				}
+				Double y = evaluator.evaluate(expression, evaluator.getVariables());
+				if (y != Double.POSITIVE_INFINITY && y != Double.NEGATIVE_INFINITY) {
+					if (x <= maxHorizontalRange) {
+						mathSeries.add(x, y);
 						lastX = x;
 					} else {
-						if(lastX < maxHorizontalRange) {
-							mathSeries.add(x, evaluator.evaluate(expression, evaluator.getVariables()));
+						if (lastX < maxHorizontalRange) {
+							mathSeries.add(x, y);
 						}
 						break;
 					}
+				} else {
+					return false;
 				}
-				rawXYSeries.put(Constant.MATH_CHANNEL, mathSeries);
-				if(mathChannelCheckBox.isSelected()) {
-					showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
-				}
-			} else {
-				System.out.print("There is no input channels (A, B or Filter) in the expression");
 			}
+			rawXYSeries.put(Constant.MATH_CHANNEL, mathSeries);
+			if (mathChannelCheckBox.isSelected()) {
+				showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
+			}
+			return true;
+		} else {
+			System.out.print("There is no input channels (A, B or Filter) in the expression");
+			return false;
 		}
-
 	}
 	
 	/**
@@ -1530,9 +1518,9 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 
 		int horizontalRange = microSeconds;
 		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
-		if(horizontalRangeAComboBox.getSelectedIndex() > previousHorizontalRangeIndex) {
+		if(horizontalRangeAComboBox.getSelectedIndex() > previousHorizontalRangeIndex_) {
 			if (rawXYSeries.containsKey(Constant.MATH_CHANNEL)) {
-				calculateMathChannel();
+				calculateMathChannel(expressionTextArea.getText().trim());
 			}
 			if (rawXYSeries.containsKey(Constant.FILTER_CHANNEL)) {
 				calculateFilterChannel();
@@ -1544,7 +1532,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		showMeasurementResults(Constant.FILTER_INDEX);
 		showMeasurementResults(Constant.GENERATOR_INDEX);
 		horizontalDivisionInfoLabel.setText("Horizontal: " + timeString + "/div");
-		previousHorizontalRangeIndex = horizontalRangeAComboBox.getSelectedIndex();
+		previousHorizontalRangeIndex_ = horizontalRangeAComboBox.getSelectedIndex();
 	}
 	
 	/**
@@ -1558,7 +1546,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			verticalRangeAComboBox.removeActionListener(this);
 			verticalRangeAComboBox.setSelectedItem(voltageString);
 			verticalRangeAComboBox.addActionListener(this);
-			previousVerticalRangeAIndex = verticalRangeAComboBox.getSelectedIndex();
+			previousVerticalRangeAIndex_ = verticalRangeAComboBox.getSelectedIndex();
 			double verticalRange = convertVoltageStringToVolts(voltageString);
 			visualizer_.setValueForVerticalGridSpacing(Constant.A_INDEX, verticalRange);
 			showMeasurementResults(Constant.A_INDEX);
@@ -1571,7 +1559,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			verticalRangeBComboBox.removeActionListener(this);
 			verticalRangeBComboBox.setSelectedItem(voltageString);
 			verticalRangeBComboBox.addActionListener(this);
-			previousVerticalRangeBIndex = verticalRangeBComboBox.getSelectedIndex();
+			previousVerticalRangeBIndex_ = verticalRangeBComboBox.getSelectedIndex();
 			double verticalRange = convertVoltageStringToVolts(voltageString);
 			visualizer_.setValueForVerticalGridSpacing(Constant.B_INDEX, verticalRange);
 			showMeasurementResults(Constant.B_INDEX);
@@ -1586,6 +1574,73 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	}
 	
 	/**
+	 * Set vertical offset
+	 * @param channelName
+	 * @param microvolts
+	 */
+	public void setVerticalOffset(String channelName, int microvolts) {
+		if(channelName.equals(Constant.CHANNEL_A)) {
+			if(microvolts == 0) {
+				verticalOffsetASpinner.removeChangeListener(this);
+				verticalOffsetASpinner.setValue(0);
+				verticalOffsetASpinner.addChangeListener(this);
+			} else {
+				if(sentVerticalOffsetACommand_ == false) {
+					verticalOffsetUnitAComboBox.removeActionListener(this);
+					verticalOffsetUnitAComboBox.setSelectedItem(Constant.ONE_MILIVOLT);
+					verticalOffsetUnitAComboBox.removeActionListener(this);
+				}
+				sentVerticalOffsetACommand_ = false;
+				verticalOffsetASpinner.removeChangeListener(this);
+				int spinnerValue = calculateVerticalOffsetForSpinner(microvolts, 
+						(String) verticalOffsetUnitAComboBox.getSelectedItem());
+				verticalOffsetASpinner.setValue(spinnerValue);
+				verticalOffsetASpinner.addChangeListener(this);
+				previousVerticalOffsetAValue_ = (int) verticalOffsetASpinner.getValue();
+			}
+		} else if(channelName.equals(Constant.CHANNEL_B)) {
+			if(microvolts == 0) {
+				verticalOffsetBSpinner.removeChangeListener(this);
+				verticalOffsetBSpinner.setValue(0);
+				verticalOffsetBSpinner.addChangeListener(this);
+			} else {
+				if (sentVerticalOffsetBCommand_ == false) {
+					verticalOffsetUnitBComboBox.removeActionListener(this);
+					verticalOffsetUnitBComboBox.setSelectedItem(Constant.ONE_MILIVOLT);
+					verticalOffsetUnitBComboBox.removeActionListener(this);
+				}
+				sentVerticalOffsetBCommand_ = false;
+				verticalOffsetBSpinner.removeChangeListener(this);
+				int spinnerValue = calculateVerticalOffsetForSpinner(microvolts,
+						(String) verticalOffsetUnitBComboBox.getSelectedItem());
+				verticalOffsetBSpinner.setValue(spinnerValue);
+				verticalOffsetBSpinner.addChangeListener(this);
+				previousVerticalOffsetBValue_ = (int) verticalOffsetBSpinner.getValue();
+			}
+		}
+	}
+	
+	/**
+	 * Calculate the value for vertical offset spinner
+	 * @param microvolts
+	 * @param unit
+	 * @return
+	 */
+	private int calculateVerticalOffsetForSpinner(int microvolts, String unit) {
+		int result = 0;
+		if(unit.equals(Constant.ONE_MILIVOLT)) {
+			result = microvolts / 1000;
+		} else if(unit.equals(Constant.TEN_MILIVOLTS)) {
+			result = microvolts / 10000;
+		} else if(unit.equals(Constant.ONE_HUNDRED_MILIVOLTS)) {
+			result = microvolts / 100000;
+		} else if(unit.equals(Constant.ONE_VOLT)) {
+			result = microvolts / 1000000;
+		}
+		return result;
+	}
+	
+	/**
 	 * Set trigger mode
 	 * @param triggerMode
 	 */
@@ -1595,9 +1650,22 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				triggerModeAComboBox.removeActionListener(this);
 				triggerModeAComboBox.setSelectedIndex(triggerMode);
 				triggerModeAComboBox.addActionListener(this);
-				previousTriggerModeAIndex = triggerMode;
+				previousTriggerModeAIndex_ = triggerMode;
+				if(triggerMode == Constant.SINGLE_MODE) {
+					rearmTriggerAButton.setEnabled(true);
+				} else {
+					rearmTriggerAButton.setEnabled(false);
+				}
 			} else if(channelName.equals(Constant.CHANNEL_B)) {
-				//TODO
+				triggerModeBComboBox.removeActionListener(this);
+				triggerModeBComboBox.setSelectedIndex(triggerMode);
+				triggerModeBComboBox.addActionListener(this);
+				previousTriggerModeBIndex_ = triggerMode;
+				if(triggerMode == Constant.SINGLE_MODE) {
+					rearmTriggerBButton.setEnabled(true);
+				} else {
+					rearmTriggerBButton.setEnabled(false);
+				}
 			}
 		} else {
 			System.err.println("Trigger mode is out of range.");
@@ -1615,9 +1683,12 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				triggerTypeAComboBox.removeActionListener(this);
 				triggerTypeAComboBox.setSelectedIndex(triggerType);
 				triggerTypeAComboBox.addActionListener(this);
-				previousTriggerTypeAIndex = triggerType;
+				previousTriggerTypeAIndex_ = triggerType;
 			} else if(channelName.equals(Constant.CHANNEL_B)) {
-				//TODO:
+				triggerTypeBComboBox.removeActionListener(this);
+				triggerTypeBComboBox.setSelectedIndex(triggerType);
+				triggerTypeBComboBox.addActionListener(this);
+				previousTriggerTypeBIndex_ = triggerType;
 			}
 		} else {
 			System.err.println("Trigger type is out of range.");
@@ -1687,7 +1758,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			if (channelName.equals(Constant.CHANNEL_A)) {
 				String expression = expressionTextArea.getText().trim();
 				if (expression.contains("A")) {
-					calculateMathChannel();
+					calculateMathChannel(expressionTextArea.getText().trim());
 				}
 				String inputChannelForFilter = (String) inputChannelComboBox.getSelectedItem();
 				if (inputChannelForFilter.equals(Constant.CHANNEL_A)) {
@@ -1699,7 +1770,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			} else if (channelName.equals(Constant.CHANNEL_B)) {
 				String expression = expressionTextArea.getText().trim();
 				if (expression.contains("B")) {
-					calculateMathChannel();
+					calculateMathChannel(expressionTextArea.getText().trim());
 				}
 				String inputChannelForFilter = (String) inputChannelComboBox.getSelectedItem();
 				if (inputChannelForFilter.equals(Constant.CHANNEL_B)) {
@@ -1885,7 +1956,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == horizontalRangeAComboBox) {
 			String timeString = (String) horizontalRangeAComboBox.getSelectedItem();
 			horizontalRangeAComboBox.removeActionListener(this);
-			horizontalRangeAComboBox.setSelectedIndex(previousHorizontalRangeIndex);
+			horizontalRangeAComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
 			horizontalRangeAComboBox.addActionListener(this);
 			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
@@ -1893,7 +1964,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == horizontalRangeBComboBox) {
 			String timeString = (String) horizontalRangeBComboBox.getSelectedItem();
 			horizontalRangeBComboBox.removeActionListener(this);
-			horizontalRangeBComboBox.setSelectedIndex(previousHorizontalRangeIndex);
+			horizontalRangeBComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
 			horizontalRangeBComboBox.addActionListener(this);
 			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
@@ -1901,7 +1972,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == horizontalRangeMathComboBox) {
 			String timeString = (String) horizontalRangeMathComboBox.getSelectedItem();
 			horizontalRangeMathComboBox.removeActionListener(this);
-			horizontalRangeMathComboBox.setSelectedIndex(previousHorizontalRangeIndex);
+			horizontalRangeMathComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
 			horizontalRangeMathComboBox.addActionListener(this);
 			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
@@ -1909,7 +1980,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == horizontalRangeFilterComboBox) {
 			String timeString = (String) horizontalRangeFilterComboBox.getSelectedItem();
 			horizontalRangeFilterComboBox.removeActionListener(this);
-			horizontalRangeFilterComboBox.setSelectedIndex(previousHorizontalRangeIndex);
+			horizontalRangeFilterComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
 			horizontalRangeFilterComboBox.addActionListener(this);
 			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
@@ -1917,7 +1988,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == horizontalRangeGeneratorComboBox) {
 			String timeString = (String) horizontalRangeGeneratorComboBox.getSelectedItem();
 			horizontalRangeGeneratorComboBox.removeActionListener(this);
-			horizontalRangeGeneratorComboBox.setSelectedIndex(previousHorizontalRangeIndex);
+			horizontalRangeGeneratorComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
 			horizontalRangeGeneratorComboBox.addActionListener(this);
 			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
@@ -1925,7 +1996,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == verticalRangeAComboBox) {
 			String voltageString = (String) verticalRangeAComboBox.getSelectedItem();
 			verticalRangeAComboBox.removeActionListener(this);
-			verticalRangeAComboBox.setSelectedIndex(previousVerticalRangeAIndex);
+			verticalRangeAComboBox.setSelectedIndex(previousVerticalRangeAIndex_);
 			verticalRangeAComboBox.addActionListener(this);
 			int verticalRange = convertVoltageStringToMicrovolts(voltageString);
 			sendCommand(PacketType.VERTICAL_RANGE_A, verticalRange);
@@ -1933,7 +2004,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if (source == verticalRangeBComboBox) {
 			String voltageString = (String) verticalRangeBComboBox.getSelectedItem();
 			verticalRangeBComboBox.removeItemListener(this);
-			verticalRangeBComboBox.setSelectedIndex(previousVerticalRangeBIndex);
+			verticalRangeBComboBox.setSelectedIndex(previousVerticalRangeBIndex_);
 			verticalRangeBComboBox.addItemListener(this);
 			int verticalRange = convertVoltageStringToMicrovolts(voltageString);
 			sendCommand(PacketType.VERTICAL_RANGE_B, verticalRange);
@@ -1970,20 +2041,74 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if(source == forceTriggerAButton) {
 			sendCommand(PacketType.TRIGGER_FORCE_A, Constant.IGNORE);
 
+		} else if(source == forceTriggerBButton) {
+			sendCommand(PacketType.TRIGGER_FORCE_B, Constant.IGNORE);
+
 		} else if (source == triggerModeAComboBox) {
 			int mode = triggerModeAComboBox.getSelectedIndex();
 			triggerModeAComboBox.removeActionListener(this);
-			triggerModeAComboBox.setSelectedIndex(previousTriggerModeAIndex);
+			triggerModeAComboBox.setSelectedIndex(previousTriggerModeAIndex_);
 			triggerModeAComboBox.addActionListener(this);
 			sendCommand(PacketType.TRIGGER_MODE_A, mode);
+			
+		}else if(source == triggerModeBComboBox) {
+			int mode = triggerModeBComboBox.getSelectedIndex();
+			triggerModeBComboBox.removeActionListener(this);
+			triggerModeBComboBox.setSelectedIndex(previousTriggerModeBIndex_);
+			triggerModeBComboBox.addActionListener(this);
+			sendCommand(PacketType.TRIGGER_MODE_B, mode);
 			
 		} else if (source == triggerTypeAComboBox) {
 			int mode = triggerTypeAComboBox.getSelectedIndex();
 			triggerTypeAComboBox.removeActionListener(this);
-			triggerTypeAComboBox.setSelectedIndex(previousTriggerTypeAIndex);
+			triggerTypeAComboBox.setSelectedIndex(previousTriggerTypeAIndex_);
 			triggerTypeAComboBox.addActionListener(this);
 			sendCommand(PacketType.TRIGGER_TYPE_A, mode);
 			
+		} else if (source == triggerTypeBComboBox) {
+			int mode = triggerTypeBComboBox.getSelectedIndex();
+			triggerTypeBComboBox.removeActionListener(this);
+			triggerTypeBComboBox.setSelectedIndex(previousTriggerTypeBIndex_);
+			triggerTypeBComboBox.addActionListener(this);
+			sendCommand(PacketType.TRIGGER_TYPE_B, mode);
+			
+		} else if (source == verticalOffsetUnitAComboBox) {
+			sendCommand(PacketType.DC_OFFSET_A, 0);
+			sentVerticalOffsetACommand_ = true;
+
+		} else if (source == verticalOffsetUnitBComboBox) {
+			sendCommand(PacketType.DC_OFFSET_B, 0);
+			sentVerticalOffsetBCommand_ = true;
+		}
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		// TODO
+		Object source = e.getSource();
+		if(source == verticalOffsetASpinner) {
+			int offset = getVerticalOffsetValueInMicrovolt((int) verticalOffsetASpinner.getValue(),
+					(String) verticalOffsetUnitAComboBox.getSelectedItem());
+			verticalOffsetASpinner.removeChangeListener(this);
+			verticalOffsetASpinner.setValue(previousVerticalOffsetAValue_);
+			verticalOffsetASpinner.addChangeListener(this);
+			sendCommand(PacketType.DC_OFFSET_A, offset);
+			sentVerticalOffsetACommand_ = true;
+
+		} else if (source == verticalOffsetBSpinner) {
+			int offset = getVerticalOffsetValueInMicrovolt((int) verticalOffsetBSpinner.getValue(),
+					(String) verticalOffsetUnitBComboBox.getSelectedItem());
+			verticalOffsetBSpinner.removeChangeListener(this);
+			verticalOffsetBSpinner.setValue(previousVerticalOffsetBValue_);
+			verticalOffsetBSpinner.addChangeListener(this);
+			sendCommand(PacketType.DC_OFFSET_B, offset);
+			sentVerticalOffsetBCommand_ = true;
+
+		} else if (source == verticalOffsetMathSpinner) {
+			refreshChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
+
+		} else if(source == verticalOffsetFilterSpinner) {
+			refreshChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
 		}
 	}
 }

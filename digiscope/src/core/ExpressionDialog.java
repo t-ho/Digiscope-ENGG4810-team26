@@ -69,26 +69,24 @@ public class ExpressionDialog extends ExpressionDialogUi implements ActionListen
 		// TODO
 		String expression = expressionTextArea.getText().trim();
 		if(!expression.equals("")) {
-			if(expression.contains("A") || expression.contains("B") || expression.contains("F")) {
-			try {
-				Double result = evaluator.evaluate(expression, evaluator.getVariables());
-				if(result != Double.POSITIVE_INFINITY && 
-						result != Double.NEGATIVE_INFINITY) {
-					mainWindow.setExpressionForMathChannel(expression);
-					mainWindow.setEnabledExpressionControls(true);
-					mainWindow.calculateMathChannel();
-					mainWindow.setEnabledMathChannelControls(true);
-					mainWindow.updateInputChannelComboBox();
-					this.dispose();
-				} else {
-					setStatus("Infinity number", Constant.ERROR);
-				}
-			} catch(IllegalArgumentException iae) {
-				if(iae.getMessage() == null) {
-					setStatus("Invalid expression", Constant.ERROR);
-				} else {
-					setStatus(iae.getMessage(), Constant.ERROR);
-				}
+			if (expression.contains("A") || expression.contains("B") || expression.contains("F")) {
+				try {
+					boolean isValid = mainWindow.calculateMathChannel(expression);
+					if (isValid == true) {
+						mainWindow.setExpressionForMathChannel(expression);
+						mainWindow.setEnabledExpressionControls(true);
+						mainWindow.setEnabledMathChannelControls(true);
+						mainWindow.updateInputChannelComboBox();
+						this.dispose();
+					} else {
+						setStatus("Infinity number", Constant.ERROR);
+					}
+				} catch (IllegalArgumentException iae) {
+					if (iae.getMessage() == null) {
+						setStatus("Invalid expression", Constant.ERROR);
+					} else {
+						setStatus(iae.getMessage(), Constant.ERROR);
+					}
 			}
 			} else {
 				setStatus("The expression does not have any derived channels", Constant.ERROR);

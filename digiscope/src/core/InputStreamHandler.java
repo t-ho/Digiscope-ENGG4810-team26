@@ -112,6 +112,13 @@ public class InputStreamHandler extends Thread {
 								mainWindow_.setChannelMode(Constant.CHANNEL_B, commandPacket.getArgument());
 								break;
 
+							case PacketType.DC_OFFSET_A:
+								mainWindow_.setVerticalOffset(Constant.CHANNEL_A, commandPacket.getArgument());
+								break;
+							
+							case PacketType.DC_OFFSET_B:
+								mainWindow_.setVerticalOffset(Constant.CHANNEL_B, commandPacket.getArgument());
+								break;
 							}
 						}
 					} else if (packet instanceof DataPacket) {
