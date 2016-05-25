@@ -29,6 +29,15 @@ static Error_Block ev_eb;
 
 #define TRIGGER_BUF_SIZE ADC_TRANSFER_SIZE * 2 * 14
 
+#define SAMPLECOPY16(dest, src, offset) for (i = 0; i < ADC_TRANSFER_SIZE; i++) \
+{\
+	dest[offset + i] = src[i]; \
+	if (trigger_index < 0 && dest[offset + i] > realThreshold) \
+	{ \
+		trigger_index = offset + i; \
+	} \
+} \
+
 static uint16_t _channel_A_samples[TRIGGER_BUF_SIZE] __attribute__(( aligned(8) ));
 static uint16_t _channel_B_samples[TRIGGER_BUF_SIZE] __attribute__(( aligned(8) ));
 
@@ -54,61 +63,29 @@ triggerSearchISR(UArg arg0, UArg arg1)
 {
 	int i;
 
-	uint32_t events;
-
 	int trigger_index;
 
 	while (1)
 	{
-		events = Event_pend(AcqEvent, Event_Id_NONE, EVENT_ID_A_PRI | EVENT_ID_A_ALT | EVENT_ID_B_PRI | EVENT_ID_B_ALT, BIOS_WAIT_FOREVER);
-
 		trigger_index = -1;
 
-		if (events & EVENT_ID_A_PRI)
+		Event_pend(AcqEvent, EVENT_ID_A_PRI | EVENT_ID_B_PRI, Event_Id_NONE, BIOS_WAIT_FOREVER);
+
+		SAMPLECOPY16(channel_A_samples_12, adc_buffer_A_PRI, offset)
+		SAMPLECOPY16(channel_B_samples_12, adc_buffer_B_PRI, offset)
+
+		Event_pend(AcqEvent, EVENT_ID_A_ALT | EVENT_ID_B_ALT, Event_Id_NONE, BIOS_WAIT_FOREVER);
+
+		offset += ADC_TRANSFER_SIZE;
+
+		SAMPLECOPY16(channel_A_samples_12, adc_buffer_A_ALT, offset)
+		SAMPLECOPY16(channel_B_samples_12, adc_buffer_B_ALT, offset)
+
+		offset += ADC_TRANSFER_SIZE;
+
+		if (offset >= TRIGGER_BUF_SIZE)
 		{
-			for (i = 0; i < ADC_TRANSFER_SIZE; i++)
-			{
-				channel_A_samples_12[offset + i] = adc_buffer_A_PRI[i];
-
-				if (trigger_index < 0 && channel_A_samples_12[offset + i] > realThreshold)
-				{
-					trigger_index = i;
-				}
-			}
-		}
-		else if (events & EVENT_ID_A_ALT)
-		{
-			for (i = 0; i < ADC_TRANSFER_SIZE; i++)
-			{
-				channel_A_samples_12[offset + ADC_TRANSFER_SIZE + i] = adc_buffer_A_ALT[i];
-
-				if (trigger_index < 0 && channel_A_samples_12[offset + ADC_TRANSFER_SIZE + i] > realThreshold)
-				{
-					trigger_index = i + ADC_TRANSFER_SIZE;
-				}
-			}
-		}
-
-		if (events & EVENT_ID_B_PRI)
-		{
-			for (i = 0; i < ADC_TRANSFER_SIZE; i++)
-			{
-				channel_B_samples_12[offset + i] = adc_buffer_B_PRI[i];
-			}
-		}
-		else if (events & EVENT_ID_B_ALT)
-		{
-			for (i = 0; i < ADC_TRANSFER_SIZE; i++)
-			{
-				channel_B_samples_12[offset + ADC_TRANSFER_SIZE + i] = adc_buffer_B_ALT[i];
-			}
-
-			offset += 2 * ADC_TRANSFER_SIZE;
-
-			if (offset >= TRIGGER_BUF_SIZE)
-			{
-				offset = 0;
-			}
+			offset = 0;
 		}
 
 		if (trigger_index >= 0)
