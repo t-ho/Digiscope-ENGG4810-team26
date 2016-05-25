@@ -18,6 +18,7 @@
 #include "adc.h"
 #include "net.h"
 
+#include "ui/graphics_thread.h"
 #include "ui/trigger_menu.h"
 
 Event_Handle AcqEvent;
@@ -25,7 +26,6 @@ static Error_Block task_eb;
 static Error_Block ev_eb;
 
 #define TRIGGER_BUF_SIZE ADC_TRANSFER_SIZE * 2 * 14
-#define TRIGGER_LEVEL 0x700
 
 static uint16_t channel_A_samples[TRIGGER_BUF_SIZE] __attribute__(( aligned(8) ));
 static uint16_t channel_B_samples[TRIGGER_BUF_SIZE] __attribute__(( aligned(8) ));
@@ -38,6 +38,9 @@ static const char* TriggerTypeNames[] = {"Rising", "Falling", "Level"};
 static TriggerType currentType = TRIGGER_TYPE_FALLING;
 static TriggerMode currentMode = TRIGGER_MODE_NORMAL;
 static uint32_t currentChannel = 0;
+
+static int32_t currentThreshold = 0;
+static uint16_t realThreshold = 0x700;
 
 static void
 triggerSearchISR(UArg arg0, UArg arg1)
@@ -60,7 +63,7 @@ triggerSearchISR(UArg arg0, UArg arg1)
 			{
 				channel_A_samples[offset_A + i] = adc_buffer_A_PRI[i];
 
-				if (trigger_index < 0 && channel_A_samples[offset_A + i] > TRIGGER_LEVEL)
+				if (trigger_index < 0 && channel_A_samples[offset_A + i] > realThreshold)
 				{
 					trigger_index = i;
 				}
@@ -72,7 +75,7 @@ triggerSearchISR(UArg arg0, UArg arg1)
 			{
 				channel_A_samples[offset_A + ADC_TRANSFER_SIZE + i] = adc_buffer_A_ALT[i];
 
-				if (trigger_index < 0 && channel_A_samples[offset_A + ADC_TRANSFER_SIZE + i] > TRIGGER_LEVEL)
+				if (trigger_index < 0 && channel_A_samples[offset_A + ADC_TRANSFER_SIZE + i] > realThreshold)
 				{
 					trigger_index = i + ADC_TRANSFER_SIZE;
 				}
@@ -118,13 +121,19 @@ triggerSearchISR(UArg arg0, UArg arg1)
 int32_t
 TriggerGetThreshold(void)
 {
-
+	return currentThreshold;
 }
 
 void
 TriggerSetThreshold(int32_t threshold)
 {
+	static char line1[16], line2[16];
 
+	currentThreshold = threshold;
+
+	SI_Micro_Print(line1, line2, currentThreshold, "V");
+
+	TriggerSetThresholdLevelText(line1, line2);
 }
 
 TriggerMode
@@ -254,5 +263,6 @@ Trigger_Init(void)
     TriggerSetChannel(0);
     TriggerSetMode(TriggerGetMode());
     TriggerSetType(TriggerGetType());
+    TriggerSetThreshold(10000);
 
 }

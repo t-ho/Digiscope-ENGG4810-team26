@@ -8,7 +8,7 @@
 #ifndef UI_TRIGGER_MENU_H_
 #define UI_TRIGGER_MENU_H_
 
-extern void TriggerSetThresholdLevelText(const char* text);
+extern void TriggerSetThresholdLevelText(const char* line1, const char* line2);
 extern void TriggerSetModeText(const char* text);
 extern void TriggerSetTypeText(const char* text);
 extern void TriggerSetChannelText(const char* text);

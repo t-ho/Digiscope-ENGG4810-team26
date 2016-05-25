@@ -102,5 +102,5 @@ OnWaveGenAmplitude(tWidget *psWidget)
 static void
 OnWaveGenShape(tWidget *psWidget)
 {
-	WaveGenSetShape((WaveGenGetShape() + 1) % 5);
+	WaveGenSetShape((WaveType)((WaveGenGetShape() + 1) % 5));
 }

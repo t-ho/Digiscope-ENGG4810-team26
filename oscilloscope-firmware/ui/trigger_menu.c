@@ -36,10 +36,13 @@ RectangularButton(TriggerArmBack, &menus[TRIGGER_ARM_MENU], &TriggerArm, 0, &SSD
 	100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrGray, ClrYellow, ClrWhite,
 	ClrWhite, &g_sFontCm18b, "Back", 0, 0, 0, 0, OnMAIN);
 
-static Canvas(TriggerThresholdLabel, &menus[TRIGGER_THRESHOLD_MENU], 0, 0, &SSD1289_Display, 170, 140, 90, 20,
+static Canvas(TriggerThresholdLabel1, &menus[TRIGGER_THRESHOLD_MENU], 0, 0, &SSD1289_Display, 170, 50, 90, 20,
 	CANVAS_STYLE_TEXT | CANVAS_STYLE_TEXT_OPAQUE | CANVAS_STYLE_FILL, 0, 0, ClrWhite,
 	&g_sFontCm20, NULL, 0, 0);
-static RectangularButton(TriggerTypeButton, &menus[TRIGGER_THRESHOLD_MENU], &TriggerThresholdLabel, 0, &SSD1289_Display, 110, 120,
+static Canvas(TriggerThresholdLabel2, &menus[TRIGGER_THRESHOLD_MENU], &TriggerThresholdLabel1, 0, &SSD1289_Display, 170, 70, 90, 20,
+	CANVAS_STYLE_TEXT | CANVAS_STYLE_TEXT_OPAQUE | CANVAS_STYLE_FILL, 0, 0, ClrWhite,
+	&g_sFontCm20, NULL, 0, 0);
+static RectangularButton(TriggerTypeButton, &menus[TRIGGER_THRESHOLD_MENU], &TriggerThresholdLabel2, 0, &SSD1289_Display, 110, 120,
 	100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE , ClrBlue, ClrYellow, ClrWhite,
 	ClrWhite, &g_sFontCm18b, NULL, 0, 0, 0, 0, OnTriggerType);
 static RectangularButton(TriggerToArm, &menus[TRIGGER_THRESHOLD_MENU], &TriggerTypeButton, 0, &SSD1289_Display, 0, 120,
@@ -58,13 +61,13 @@ RectangularButton(TriggerThresholdBack, &menus[TRIGGER_THRESHOLD_MENU], &Trigger
 static void
 OnTriggerType(tWidget *psWidget)
 {
-	TriggerSetType((TriggerGetType() + 1) % 3);
+	TriggerSetType((TriggerType)((TriggerGetType() + 1) % 3));
 }
 
 static void
 OnTriggerMode(tWidget *psWidget)
 {
-	TriggerSetMode((TriggerGetMode() + 1) % 3);
+	TriggerSetMode((TriggerMode)((TriggerGetMode() + 1) % 3));
 }
 
 static void
@@ -95,13 +98,15 @@ OnTriggerChannel(tWidget *psWidget)
 }
 
 void
-TriggerSetThresholdLevelText(const char* text)
+TriggerSetThresholdLevelText(const char* line1, const char* line2)
 {
-	CanvasTextSet(&TriggerThresholdLabel, text);
+	CanvasTextSet(&TriggerThresholdLabel1, line1);
+	CanvasTextSet(&TriggerThresholdLabel2, line2);
 
 	if (current_menu == TRIGGER_THRESHOLD_MENU)
 	{
-		Repaint((tWidget *)&TriggerThresholdLabel);
+		Repaint((tWidget *)&TriggerThresholdLabel1);
+		Repaint((tWidget *)&TriggerThresholdLabel2);
 	}
 }
 
