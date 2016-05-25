@@ -152,6 +152,7 @@ public class PacketReader {
 			case PacketType.CHANNEL_B_12_BITS :
 				sequenceNumber = (short) dis_.readByte();
 				nSamples = dis_.readShort();
+				System.out.printf("%x, %d\n", type, sequenceNumber);
 				// Skip period for now
 				period = dis_.readShort();
 				totalPacketSize = 6 + nSamples * 2;

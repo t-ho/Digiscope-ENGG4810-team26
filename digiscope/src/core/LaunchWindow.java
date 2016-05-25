@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.regex.Matcher;
@@ -117,13 +118,16 @@ public class LaunchWindow extends LaunchWindowUi {
 					@Override
 					protected String doInBackground() throws Exception {
 						try {
-							clientSocket = new Socket(ipAddress, Constant.PORT_NUMBER);
+							clientSocket = new Socket();
+							clientSocket.connect(new InetSocketAddress(ipAddress, Constant.PORT_NUMBER), 3000);
 							setMainWindow(new MainWindow(that, clientSocket));
 							getMainWindow().setVisible(true);
 						} catch (UnknownHostException e) {
+							clientSocket = null;
 							setStatus(e.getMessage(), Constant.ERROR);
 							setEnabled(true);
 						} catch (IOException e) {
+							clientSocket = null;
 							setStatus(e.getMessage(), Constant.ERROR);
 							setEnabled(true);
 						}
