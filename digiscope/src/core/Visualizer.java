@@ -68,8 +68,6 @@ public class Visualizer {
 				renderers[channelIndex].setSeriesPaint(0, Constant.MATH_COLOR);
 			} else if(channelIndex == Constant.FILTER_INDEX) {
 				renderers[channelIndex].setSeriesPaint(0, Constant.FILTER_COLOR);
-			} else if(channelIndex == Constant.GENERATOR_INDEX) {
-				renderers[channelIndex].setSeriesPaint(0, Constant.GENERATOR_COLOR);
 			}
 		}
 	}
@@ -123,7 +121,7 @@ public class Visualizer {
 			verticalAxes[i] = createDefaultVerticalAxis();
 			renderers[i] = new XYLineAndShapeRenderer(true, false);
 		}
-		/* Hide 5 vertical axes of 5 channels */
+		/* Hide 4 vertical axes of 4 channels */
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			verticalAxes[i].setTickLabelsVisible(false);
 			verticalAxes[i].setAxisLineVisible(false);
@@ -135,9 +133,6 @@ public class Visualizer {
 		xYPlot.setRangeAxis(0, commonVerticalAxis); // commonVerticalAxis's index = 0
 		xYPlot.setDomainZeroBaselineVisible(true);
 		xYPlot.setRangeZeroBaselineVisible(true);
-		//xYPlot.setDomainCrosshairVisible(true);
-		//xYPlot.setRangeCrosshairLockedOnData(false);
-		//xYPlot.setRangeCrosshairVisible(true);
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			xYPlot.setRangeAxis(i + 1, verticalAxes[i]);
 			xYPlot.setDataset(i, datasets[i]);

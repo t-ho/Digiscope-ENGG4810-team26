@@ -151,12 +151,11 @@ public class Constant {
 	public static double DEFAULT_VERTICAL_RANGE = 0.02;
 	public static int DEFAULT_HORIZONTAL_RANGE = 1;
 	
-	public static final int NUMBER_OF_CHANNELS = 5;
+	public static final int NUMBER_OF_CHANNELS = 4;
 	public static final int A_INDEX = 0;
 	public static final int B_INDEX = 1;
 	public static final int MATH_INDEX = 2;
 	public static final int FILTER_INDEX = 3;
-	public static final int GENERATOR_INDEX = 4;
 	
 	public static final Color A_COLOR = new Color(255, 0, 0); // red
 	public static final Color B_COLOR = new Color(0, 0, 255); // blue
@@ -228,7 +227,7 @@ public class Constant {
 	 * @param value
 	 * @return
 	 */
-	public static String roundString(double value) {
+	public static String roundString(Double value) {
 	    DecimalFormat decimalFormat = new DecimalFormat("#.####");
 	    return decimalFormat.format(value);
 	}
