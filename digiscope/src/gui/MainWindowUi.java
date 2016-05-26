@@ -749,7 +749,7 @@ public class MainWindowUi extends JFrame {
         measurementATopPanel_.setPreferredSize(new Dimension(380, 30));
         measurementATopPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
 
-        measureAToggleButton.setText("Off");
+        measureAToggleButton.setText("OFF");
         measureAToggleButton.setFocusable(false);
         measureAToggleButton.setPreferredSize(new Dimension(80, 23));
         measurementATopPanel_.add(measureAToggleButton);
@@ -921,7 +921,6 @@ public class MainWindowUi extends JFrame {
         triggerABottomRightPanel3_.add(thresholdALabel2_);
 
         triggerThresholdUnitAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
-        triggerThresholdUnitAComboBox.setEnabled(false);
         triggerThresholdUnitAComboBox.setPreferredSize(new Dimension(75, 20));
         triggerABottomRightPanel3_.add(triggerThresholdUnitAComboBox);
 
@@ -1037,7 +1036,7 @@ public class MainWindowUi extends JFrame {
         measurementBTopPanel_.setPreferredSize(new Dimension(380, 30));
         measurementBTopPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
 
-        measureBToggleButton.setText("Off");
+        measureBToggleButton.setText("OFF");
         measureBToggleButton.setFocusable(false);
         measureBToggleButton.setPreferredSize(new Dimension(80, 23));
         measurementBTopPanel_.add(measureBToggleButton);
@@ -1209,7 +1208,6 @@ public class MainWindowUi extends JFrame {
         triggerBBottomRightPanel3_.add(thresholdBLabel2_);
 
         triggerThresholdUnitBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
-        triggerThresholdUnitBComboBox.setEnabled(false);
         triggerThresholdUnitBComboBox.setPreferredSize(new Dimension(75, 20));
         triggerBBottomRightPanel3_.add(triggerThresholdUnitBComboBox);
 
@@ -1354,7 +1352,7 @@ public class MainWindowUi extends JFrame {
         measurementMathTopPanel_.setPreferredSize(new Dimension(380, 30));
         measurementMathTopPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
 
-        measureMathToggleButton.setText("Off");
+        measureMathToggleButton.setText("OFF");
         measureMathToggleButton.setFocusable(false);
         measureMathToggleButton.setPreferredSize(new Dimension(80, 23));
         measurementMathTopPanel_.add(measureMathToggleButton);
@@ -1571,7 +1569,7 @@ public class MainWindowUi extends JFrame {
         measurementFilterTopPanel_.setPreferredSize(new Dimension(380, 30));
         measurementFilterTopPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
 
-        measureFilterToggleButton.setText("Off");
+        measureFilterToggleButton.setText("OFF");
         measureFilterToggleButton.setFocusable(false);
         measureFilterToggleButton.setPreferredSize(new Dimension(80, 23));
         measurementFilterTopPanel_.add(measureFilterToggleButton);
@@ -1661,7 +1659,7 @@ public class MainWindowUi extends JFrame {
         generatorControlFirstPanel_.setPreferredSize(new Dimension(380, 30));
         generatorControlFirstPanel_.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 3));
 
-        outputToggleButton.setText("Off");
+        outputToggleButton.setText("OFF");
         outputToggleButton.setFocusable(false);
         outputToggleButton.setPreferredSize(new Dimension(80, 23));
         generatorControlFirstPanel_.add(outputToggleButton);

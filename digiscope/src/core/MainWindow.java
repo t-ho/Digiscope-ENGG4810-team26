@@ -74,6 +74,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	private boolean sentVerticalOffsetBCommand_;
 	private int previousWaveTypeIndex_;
 	private int previousNoOfSamples_;
+	private boolean sentTriggerThresholdACommand_;
+	private boolean sentTriggerThresholdBCommand_;
+	private int previousTriggerThresholdAValue_;
+	private int previousTriggerThresholdBValue_;
 	
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
@@ -114,6 +118,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		sentVerticalOffsetBCommand_ = false;
 		previousWaveTypeIndex_ = waveTypeComboBox.getSelectedIndex();
 		previousNoOfSamples_ = (int) noOfSamplesASpinner.getValue();
+		sentTriggerThresholdACommand_ = false;
+		sentTriggerThresholdBCommand_ = false;
+		previousTriggerThresholdAValue_ = (int) triggerThresholdASpinner.getValue();
+		previousTriggerThresholdBValue_ = (int) triggerThresholdBSpinner.getValue();
 		// test
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
@@ -232,6 +240,22 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		noOfSamplesASpinner.addChangeListener(this);
 		
 		noOfSamplesBSpinner.addChangeListener(this);
+		
+		measureAToggleButton.addActionListener(this);
+		
+		measureBToggleButton.addActionListener(this);
+		
+		measureMathToggleButton.addActionListener(this);
+		
+		measureFilterToggleButton.addActionListener(this);
+		
+		triggerThresholdUnitAComboBox.addActionListener(this);
+		
+		triggerThresholdUnitBComboBox.addActionListener(this);
+		
+		triggerThresholdASpinner.addChangeListener(this);
+		
+		triggerThresholdBSpinner.addChangeListener(this);
 
 		horizontalOffsetASpinner.addChangeListener(new ChangeListener() {
 			@Override
@@ -1080,20 +1104,20 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	
 
 	/**
-	 * Get vertical offset value in microvolt
-	 * @param offset the value from verticalOffset spinner
-	 * @param unit the selected unit from verticalOffsetUnit combobox
-	 * @return vertical offset value in milivolts
+	 * Convert to microvolt
+	 * @param value from spinner
+	 * @param unit the selected unit from the combobox
+	 * @return value in milivolts
 	 */
-	private int getVerticalOffsetValueInMicrovolt(int offset, String unit) {
+	private int convertToMicrovolt(int value, String unit) {
 		if(unit.equals(Constant.TEN_MILIVOLTS)) {
-			return offset * 10000;
+			return value * 10000;
 		} else if(unit.equals(Constant.ONE_HUNDRED_MILIVOLTS)) {
-			return offset * 100000;
+			return value * 100000;
 		} else if(unit.equals(Constant.ONE_VOLT)) {
-			return offset * 1000000;
+			return value * 1000000;
 		}else { // unit == Constant.ONE_MILIVOLT
-			return offset * 1000;
+			return value * 1000;
 		}
 	}
 	
@@ -1275,7 +1299,31 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 * @return Map<String, Double> containing results or null
 	 */
 	private Map<String, Double> measureChannel(int channelIndex) {
-		// TODO:
+		switch (channelIndex) {
+		case Constant.A_INDEX:
+			if(measureAToggleButton.isSelected() == false) {
+				return null;
+			}
+			break;
+			
+		case Constant.B_INDEX:
+			if(measureBToggleButton.isSelected() == false) {
+				return null;
+			}
+			break;
+			
+		case Constant.MATH_INDEX:
+			if(measureMathToggleButton.isSelected() == false) {
+				return null;
+			}
+			break;
+			
+		case Constant.FILTER_INDEX:
+			if(measureFilterToggleButton.isSelected() == false) {
+				return null;
+			}
+			break;
+		}
 		Map<String, Double> result = new HashMap<String, Double>();
 		XYSeries xYSeries = visualizer_.getSeries(channelIndex);
 		if (xYSeries != null) {
@@ -1533,11 +1581,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				if(sentVerticalOffsetACommand_ == false) {
 					verticalOffsetUnitAComboBox.removeActionListener(this);
 					verticalOffsetUnitAComboBox.setSelectedItem(Constant.ONE_MILIVOLT);
-					verticalOffsetUnitAComboBox.removeActionListener(this);
+					verticalOffsetUnitAComboBox.addActionListener(this);
 				}
 				sentVerticalOffsetACommand_ = false;
 				verticalOffsetASpinner.removeChangeListener(this);
-				int spinnerValue = calculateVerticalOffsetForSpinner(microvolts, 
+				int spinnerValue = calculateValueForSpinner(microvolts, 
 						(String) verticalOffsetUnitAComboBox.getSelectedItem());
 				verticalOffsetASpinner.setValue(spinnerValue);
 				verticalOffsetASpinner.addChangeListener(this);
@@ -1552,16 +1600,64 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				if (sentVerticalOffsetBCommand_ == false) {
 					verticalOffsetUnitBComboBox.removeActionListener(this);
 					verticalOffsetUnitBComboBox.setSelectedItem(Constant.ONE_MILIVOLT);
-					verticalOffsetUnitBComboBox.removeActionListener(this);
+					verticalOffsetUnitBComboBox.addActionListener(this);
 				}
 				sentVerticalOffsetBCommand_ = false;
 				verticalOffsetBSpinner.removeChangeListener(this);
-				int spinnerValue = calculateVerticalOffsetForSpinner(microvolts,
+				int spinnerValue = calculateValueForSpinner(microvolts,
 						(String) verticalOffsetUnitBComboBox.getSelectedItem());
 				verticalOffsetBSpinner.setValue(spinnerValue);
 				verticalOffsetBSpinner.addChangeListener(this);
 				previousVerticalOffsetBValue_ = (int) verticalOffsetBSpinner.getValue();
 			}
+		}
+	}
+	
+	/**
+	 * Set trigger threshold
+	 * @param channelName
+	 * @param microvolts
+	 */
+	public void setTriggerThreshold(String channelName, int microvolts) {
+		if (channelName.equals(Constant.CHANNEL_A)) {
+			if (microvolts == 0) {
+				triggerThresholdASpinner.removeChangeListener(this);
+				triggerThresholdASpinner.setValue(0);
+				triggerThresholdASpinner.addChangeListener(this);
+			} else {
+				if (sentTriggerThresholdACommand_ == false) {
+					triggerThresholdUnitAComboBox.removeActionListener(this);
+					triggerThresholdUnitAComboBox.setSelectedItem(Constant.ONE_MILIVOLT);
+					triggerThresholdUnitAComboBox.addActionListener(this);
+				}
+				sentTriggerThresholdACommand_ = false;
+				triggerThresholdASpinner.removeChangeListener(this);
+				int spinnerValue = calculateValueForSpinner(microvolts,
+						(String) triggerThresholdUnitAComboBox.getSelectedItem());
+				triggerThresholdASpinner.setValue(spinnerValue);
+				triggerThresholdASpinner.addChangeListener(this);
+				previousTriggerThresholdAValue_ = (int) triggerThresholdASpinner.getValue();
+			}
+		} else if (channelName.equals(Constant.CHANNEL_B)) {
+			if (microvolts == 0) {
+				triggerThresholdBSpinner.removeChangeListener(this);
+				triggerThresholdBSpinner.setValue(0);
+				triggerThresholdBSpinner.addChangeListener(this);
+			} else {
+				if (sentTriggerThresholdBCommand_ == false) {
+					triggerThresholdUnitBComboBox.removeActionListener(this);
+					triggerThresholdUnitBComboBox.setSelectedItem(Constant.ONE_MILIVOLT);
+					triggerThresholdUnitBComboBox.addActionListener(this);
+				}
+				sentTriggerThresholdBCommand_ = false;
+				triggerThresholdBSpinner.removeChangeListener(this);
+				int spinnerValue = calculateValueForSpinner(microvolts,
+						(String) triggerThresholdUnitBComboBox.getSelectedItem());
+				triggerThresholdBSpinner.setValue(spinnerValue);
+				triggerThresholdBSpinner.addChangeListener(this);
+				previousTriggerThresholdBValue_ = (int) triggerThresholdBSpinner.getValue();
+			}
+
 		}
 	}
 	
@@ -1580,12 +1676,12 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	}
 	
 	/**
-	 * Calculate the value for vertical offset spinner
+	 * Calculate the value for spinner
 	 * @param microvolts
 	 * @param unit
 	 * @return
 	 */
-	private int calculateVerticalOffsetForSpinner(int microvolts, String unit) {
+	private int calculateValueForSpinner(int microvolts, String unit) {
 		int result = 0;
 		if(unit.equals(Constant.ONE_MILIVOLT)) {
 			result = microvolts / 1000;
@@ -2047,6 +2143,46 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			waveTypeComboBox.setSelectedIndex(previousWaveTypeIndex_);
 			waveTypeComboBox.addActionListener(this);
 			sendCommand(PacketType.WAVE_TYPE, waveType);
+
+		} else if (source == measureAToggleButton) {
+			if(measureAToggleButton.isSelected()) {
+				measureAToggleButton.setText("ON");
+			} else {
+				measureAToggleButton.setText("OFF");
+			}
+			showMeasurementResults(Constant.A_INDEX);
+
+		} else if (source == measureBToggleButton) {
+			if(measureBToggleButton.isSelected()) {
+				measureBToggleButton.setText("ON");
+			} else {
+				measureBToggleButton.setText("OFF");
+			}
+			showMeasurementResults(Constant.B_INDEX);
+
+		} else if (source == measureMathToggleButton) {
+			if(measureMathToggleButton.isSelected()) {
+				measureMathToggleButton.setText("ON");
+			} else {
+				measureMathToggleButton.setText("OFF");
+			}
+			showMeasurementResults(Constant.MATH_INDEX);
+
+		} else if (source == measureFilterToggleButton) {
+			if(measureFilterToggleButton.isSelected()) {
+				measureFilterToggleButton.setText("ON");
+			} else {
+				measureFilterToggleButton.setText("OFF");
+			}
+			showMeasurementResults(Constant.FILTER_INDEX);
+
+		} else if(source == triggerThresholdUnitAComboBox) {
+			sendCommand(PacketType.TRIGGER_THRESHOLD_A, 0);
+			sentTriggerThresholdACommand_ = true;
+
+		} else if(source == triggerThresholdUnitBComboBox) {
+			sendCommand(PacketType.TRIGGER_THRESHOLD_B, 0);
+			sentTriggerThresholdBCommand_ = true;
 		}
 	}
 
@@ -2055,7 +2191,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		// TODO
 		Object source = e.getSource();
 		if(source == verticalOffsetASpinner) {
-			int offset = getVerticalOffsetValueInMicrovolt((int) verticalOffsetASpinner.getValue(),
+			int offset = convertToMicrovolt((int) verticalOffsetASpinner.getValue(),
 					(String) verticalOffsetUnitAComboBox.getSelectedItem());
 			verticalOffsetASpinner.removeChangeListener(this);
 			verticalOffsetASpinner.setValue(previousVerticalOffsetAValue_);
@@ -2064,7 +2200,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			sentVerticalOffsetACommand_ = true;
 
 		} else if (source == verticalOffsetBSpinner) {
-			int offset = getVerticalOffsetValueInMicrovolt((int) verticalOffsetBSpinner.getValue(),
+			int offset = convertToMicrovolt((int) verticalOffsetBSpinner.getValue(),
 					(String) verticalOffsetUnitBComboBox.getSelectedItem());
 			verticalOffsetBSpinner.removeChangeListener(this);
 			verticalOffsetBSpinner.setValue(previousVerticalOffsetBValue_);
@@ -2088,6 +2224,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			} else {
 				// Ignore
 			}
+
 		} else if(source == noOfSamplesBSpinner) {
 			int nSamples = (int) noOfSamplesBSpinner.getValue();
 			noOfSamplesBSpinner.removeChangeListener(this);
@@ -2098,6 +2235,24 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			} else {
 				// Ignore
 			}
+
+		} else if(source == triggerThresholdASpinner) {
+			int threshold = convertToMicrovolt((int) triggerThresholdASpinner.getValue(),
+					(String) triggerThresholdUnitAComboBox.getSelectedItem());
+			triggerThresholdASpinner.removeChangeListener(this);;
+			triggerThresholdASpinner.setValue(previousTriggerThresholdAValue_);
+			triggerThresholdASpinner.addChangeListener(this);
+			sendCommand(PacketType.TRIGGER_THRESHOLD_A, threshold);
+			sentTriggerThresholdACommand_ = true;
+
+		} else if(source == triggerThresholdBSpinner) {
+			int threshold = convertToMicrovolt((int) triggerThresholdBSpinner.getValue(),
+					(String) triggerThresholdUnitBComboBox.getSelectedItem());
+			triggerThresholdBSpinner.removeChangeListener(this);;
+			triggerThresholdBSpinner.setValue(previousTriggerThresholdBValue_);
+			triggerThresholdBSpinner.addChangeListener(this);
+			sendCommand(PacketType.TRIGGER_THRESHOLD_B, threshold);
+			sentTriggerThresholdBCommand_ = true;
 		}
 	}
 }

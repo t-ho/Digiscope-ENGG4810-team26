@@ -92,7 +92,11 @@ public class InputStreamHandler extends Thread {
 								break;
 
 							case PacketType.TRIGGER_THRESHOLD_A:
-								// TODO
+								mainWindow_.setTriggerThreshold(Constant.CHANNEL_A, commandPacket.getArgument());
+								break;
+								
+							case PacketType.TRIGGER_THRESHOLD_B:
+								mainWindow_.setTriggerThreshold(Constant.CHANNEL_B, commandPacket.getArgument());
 								break;
 
 							case PacketType.CHANNEL_COUPLING_A:
