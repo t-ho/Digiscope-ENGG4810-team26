@@ -275,7 +275,7 @@ TriggerSetSampleSize(SampleSize mode)
 	samplesize = mode;
 
 	Command cmd;
-	cmd.type = COMMAND_SAMPLE_LENGTH_A;
+	cmd.type = COMMAND_SAMPLE_LENGTH;
 	cmd.args[0] = TriggerGetSampleSize();
 	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
 

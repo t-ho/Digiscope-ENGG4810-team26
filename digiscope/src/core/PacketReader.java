@@ -52,22 +52,13 @@ public class PacketReader {
 			case PacketType.VERTICAL_RANGE_B :
 				// Fallthrough
 
-			case PacketType.TRIGGER_MODE_A :
+			case PacketType.TRIGGER_MODE :
 				// Fallthrough
 
-			case PacketType.TRIGGER_MODE_B :
+			case PacketType.TRIGGER_TYPE :
 				// Fallthrough
 
-			case PacketType.TRIGGER_TYPE_A :
-				// Fallthrough
-
-			case PacketType.TRIGGER_TYPE_B :
-				// Fallthrough
-
-			case PacketType.TRIGGER_THRESHOLD_A :
-				// Fallthrough
-
-			case PacketType.TRIGGER_THRESHOLD_B :
+			case PacketType.TRIGGER_THRESHOLD :
 				// Fallthrough
 
 			case PacketType.DC_OFFSET_A :
@@ -79,28 +70,19 @@ public class PacketReader {
 			case PacketType.NUMBER_OF_SAMPLES :
 				// Fallthrough
 
-			case PacketType.TRIGGER_ARM_A :
+			case PacketType.TRIGGER_ARM :
 				// Fallthrough
 			
-			case PacketType.TRIGGER_ARM_B :
-				// Fallthrough
-
-			case PacketType.TRIGGER_FORCE_A :
+			case PacketType.TRIGGER_FORCE :
 				// Fallthrough
 			
-			case PacketType.TRIGGER_FORCE_B :
-				// Fallthrough
-
 			case PacketType.CHANNEL_COUPLING_A :
 				// Fallthrough
 
 			case PacketType.CHANNEL_COUPLING_B :
 				// Fallthrough
 			
-			case PacketType.CHANNEL_MODE_A :
-				// Fallthrough
-				
-			case PacketType.CHANNEL_MODE_B :
+			case PacketType.CHANNEL_MODE :
 				// Fallthrough
 
 			case PacketType.GENERATOR_OUTPUT :

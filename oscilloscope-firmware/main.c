@@ -109,7 +109,7 @@ void heartBeatFxn(UArg arg0, UArg arg1)
 //	int freq = 500;
 
 	Command cmd;
-	cmd.type = _COMMAND_UNKNOWN;
+	cmd.type = COMMAND_UNKNOWN;
 
     while (1) {
         Task_sleep((unsigned int)arg0);

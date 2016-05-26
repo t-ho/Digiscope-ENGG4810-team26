@@ -255,7 +255,7 @@ UI_Task(UArg arg0, UArg arg1)
     WidgetPaint(WIDGET_ROOT);
 
 	Command cmd;
-	cmd.type = _COMMAND_UNKNOWN;
+	cmd.type = COMMAND_UNKNOWN;
 
 	Mailbox_post(GraphicsMailbox, &cmd, 0);
 
@@ -306,8 +306,7 @@ UI_Task(UArg arg0, UArg arg1)
     		case COMMAND_VERTICAL_RANGE_B:
     			FrontEndSetVerDiv(1, cmd.args[0]);
 				break;
-    		case COMMAND_TRIGGER_FORCE_A:
-    		case COMMAND_TRIGGER_FORCE_B:
+    		case COMMAND_TRIGGER_FORCE:
     			ForceTrigger();
     			break;
     		case COMMAND_NUM_SAMPLES:
@@ -318,7 +317,7 @@ UI_Task(UArg arg0, UArg arg1)
     		case COMMAND_COUPLING_B:
     			FrontEndSetCoupling(1, cmd.args[0]);
     			break;
-    		case COMMAND_SAMPLE_LENGTH_A:
+    		case COMMAND_SAMPLE_LENGTH:
     			TriggerSetSampleSize((SampleSize)cmd.args[0]);
     			break;
     		case COMMAND_FUNCTION_GEN_OUT:
@@ -330,7 +329,7 @@ UI_Task(UArg arg0, UArg arg1)
     		case _COMMAND_REPAINT:
     			WidgetPaint((tWidget *)cmd.args[0]);
     			break;
-    		case _COMMAND_UNKNOWN:
+    		case COMMAND_UNKNOWN:
     			/* Fallthrough */
     		default:
     			break;

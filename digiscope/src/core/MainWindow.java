@@ -1907,7 +1907,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				mode = Constant.MODE_12_BIT;
 				channelModeAToggleButton.setSelected(true);
 			}
-			sendCommand(PacketType.CHANNEL_MODE_A, mode);
+			sendCommand(PacketType.CHANNEL_MODE, mode);
 			
 		}else if(source == channelModeBToggleButton) {
 			int mode;
@@ -1918,7 +1918,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				mode = Constant.MODE_12_BIT;
 				channelModeBToggleButton.setSelected(true);
 			}
-			sendCommand(PacketType.CHANNEL_MODE_B, mode);
+			sendCommand(PacketType.CHANNEL_MODE, mode);
 			
 		} else if (source == horizontalRangeAComboBox) {
 			String timeString = (String) horizontalRangeAComboBox.getSelectedItem();
@@ -1988,39 +1988,36 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			}
 			filterDivisionInfoLabel.setText("Filter: " + selectedItem + "/div");
 
-		} else if(source == forceTriggerAButton) {
-			sendCommand(PacketType.TRIGGER_FORCE_A, Constant.IGNORE);
-
-		} else if(source == forceTriggerBButton) {
-			sendCommand(PacketType.TRIGGER_FORCE_B, Constant.IGNORE);
+		} else if(source == forceTriggerAButton || source == forceTriggerBButton) {
+			sendCommand(PacketType.TRIGGER_FORCE, Constant.IGNORE);
 
 		} else if (source == triggerModeAComboBox) {
 			int mode = triggerModeAComboBox.getSelectedIndex();
 			triggerModeAComboBox.removeActionListener(this);
 			triggerModeAComboBox.setSelectedIndex(previousTriggerModeAIndex_);
 			triggerModeAComboBox.addActionListener(this);
-			sendCommand(PacketType.TRIGGER_MODE_A, mode);
+			sendCommand(PacketType.TRIGGER_MODE, mode);
 			
 		}else if(source == triggerModeBComboBox) {
 			int mode = triggerModeBComboBox.getSelectedIndex();
 			triggerModeBComboBox.removeActionListener(this);
 			triggerModeBComboBox.setSelectedIndex(previousTriggerModeBIndex_);
 			triggerModeBComboBox.addActionListener(this);
-			sendCommand(PacketType.TRIGGER_MODE_B, mode);
+			sendCommand(PacketType.TRIGGER_MODE, mode);
 			
 		} else if (source == triggerTypeAComboBox) {
 			int mode = triggerTypeAComboBox.getSelectedIndex();
 			triggerTypeAComboBox.removeActionListener(this);
 			triggerTypeAComboBox.setSelectedIndex(previousTriggerTypeAIndex_);
 			triggerTypeAComboBox.addActionListener(this);
-			sendCommand(PacketType.TRIGGER_TYPE_A, mode);
+			sendCommand(PacketType.TRIGGER_TYPE, mode);
 			
 		} else if (source == triggerTypeBComboBox) {
 			int mode = triggerTypeBComboBox.getSelectedIndex();
 			triggerTypeBComboBox.removeActionListener(this);
 			triggerTypeBComboBox.setSelectedIndex(previousTriggerTypeBIndex_);
 			triggerTypeBComboBox.addActionListener(this);
-			sendCommand(PacketType.TRIGGER_TYPE_B, mode);
+			sendCommand(PacketType.TRIGGER_TYPE, mode);
 			
 		} else if (source == verticalOffsetUnitAComboBox) {
 			sendCommand(PacketType.DC_OFFSET_A, 0);

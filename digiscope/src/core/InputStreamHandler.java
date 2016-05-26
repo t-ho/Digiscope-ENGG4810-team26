@@ -75,23 +75,17 @@ public class InputStreamHandler extends Thread {
 								mainWindow_.setHorizontalRange(commandPacket.getArgument());
 								break;
 
-							case PacketType.TRIGGER_MODE_A:
+							case PacketType.TRIGGER_MODE:
 								mainWindow_.setTriggerMode(Constant.CHANNEL_A, commandPacket.getArgument());
-								break;
-
-							case PacketType.TRIGGER_MODE_B:
 								mainWindow_.setTriggerMode(Constant.CHANNEL_B, commandPacket.getArgument());
 								break;
 
-							case PacketType.TRIGGER_TYPE_A:
+							case PacketType.TRIGGER_TYPE:
 								mainWindow_.setTriggerType(Constant.CHANNEL_A, commandPacket.getArgument());
-								break;
-
-							case PacketType.TRIGGER_TYPE_B:
 								mainWindow_.setTriggerType(Constant.CHANNEL_B, commandPacket.getArgument());
 								break;
 
-							case PacketType.TRIGGER_THRESHOLD_A:
+							case PacketType.TRIGGER_THRESHOLD:
 								// TODO
 								break;
 
@@ -103,11 +97,8 @@ public class InputStreamHandler extends Thread {
 								mainWindow_.setChannelCoupling(Constant.CHANNEL_B, commandPacket.getArgument());
 								break;
 
-							case PacketType.CHANNEL_MODE_A:
+							case PacketType.CHANNEL_MODE:
 								mainWindow_.setChannelMode(Constant.CHANNEL_A, commandPacket.getArgument());
-								break;
-
-							case PacketType.CHANNEL_MODE_B:
 								mainWindow_.setChannelMode(Constant.CHANNEL_B, commandPacket.getArgument());
 								break;
 
