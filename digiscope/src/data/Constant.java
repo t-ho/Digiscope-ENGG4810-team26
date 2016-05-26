@@ -130,6 +130,9 @@ public class Constant {
 	public static final int GENERATOR_OFF = 0;
 	public static final int GENERATOR_ON = 1;
 	
+	public static final int REARM_TRIGGER_OFF = 0;
+	public static final int REARM_TRIGGER_ON = 1;
+
 	public static final int MODE_8BIT = 0;
 	public static final int MODE_12_BIT = 1;
 

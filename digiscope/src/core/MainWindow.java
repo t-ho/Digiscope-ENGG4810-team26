@@ -256,6 +256,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		triggerThresholdASpinner.addChangeListener(this);
 		
 		triggerThresholdBSpinner.addChangeListener(this);
+		
+		rearmTriggerAToggleButton.addActionListener(this);
+		
+		rearmTriggerBToggleButton.addActionListener(this);
 
 		horizontalOffsetASpinner.addChangeListener(new ChangeListener() {
 			@Override
@@ -1612,6 +1616,32 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			}
 		}
 	}
+
+	/**
+	 * Set re-arm trigger state
+	 * @param channelName
+	 * @param state ON or OFF
+	 */
+	public void setReArmTrigger(String channelName, int state) {
+		if (channelName.equals(Constant.CHANNEL_A)) {
+			if (state == Constant.REARM_TRIGGER_ON) {
+				rearmTriggerAToggleButton.setSelected(true);
+				rearmTriggerAToggleButton.setText("Re-arm - ON");
+			} else {
+				rearmTriggerAToggleButton.setSelected(false);
+				rearmTriggerAToggleButton.setText("Re-arm - OFF");
+			}
+		} else if (channelName.equals(Constant.CHANNEL_B)) {
+			if (state == Constant.REARM_TRIGGER_ON) {
+				rearmTriggerBToggleButton.setSelected(true);
+				rearmTriggerBToggleButton.setText("Re-arm - ON");
+			} else {
+				rearmTriggerBToggleButton.setSelected(false);
+				rearmTriggerBToggleButton.setText("Re-arm - OFF");
+			}
+
+		}
+	}
 	
 	/**
 	 * Set trigger threshold
@@ -1707,9 +1737,9 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				triggerModeAComboBox.addActionListener(this);
 				previousTriggerModeAIndex_ = triggerMode;
 				if(triggerMode == Constant.SINGLE_MODE) {
-					rearmTriggerAButton.setEnabled(true);
+					rearmTriggerAToggleButton.setEnabled(true);
 				} else {
-					rearmTriggerAButton.setEnabled(false);
+					rearmTriggerAToggleButton.setEnabled(false);
 				}
 			} else if(channelName.equals(Constant.CHANNEL_B)) {
 				triggerModeBComboBox.removeActionListener(this);
@@ -1717,9 +1747,9 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				triggerModeBComboBox.addActionListener(this);
 				previousTriggerModeBIndex_ = triggerMode;
 				if(triggerMode == Constant.SINGLE_MODE) {
-					rearmTriggerBButton.setEnabled(true);
+					rearmTriggerBToggleButton.setEnabled(true);
 				} else {
-					rearmTriggerBButton.setEnabled(false);
+					rearmTriggerBToggleButton.setEnabled(false);
 				}
 			}
 		} else {
@@ -1784,9 +1814,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		if (state == Constant.GENERATOR_ON) {
 			outputToggleButton.setSelected(true);
 			outputToggleButton.setText("ON");
+			setEnabledGeneratorChannelControls(true);
 		} else {
 			outputToggleButton.setSelected(false);
 			outputToggleButton.setText("OFF");
+			setEnabledGeneratorChannelControls(false);
 		}
 	}
 
@@ -2183,6 +2215,29 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if(source == triggerThresholdUnitBComboBox) {
 			sendCommand(PacketType.TRIGGER_THRESHOLD_B, 0);
 			sentTriggerThresholdBCommand_ = true;
+
+		} else if(source == rearmTriggerAToggleButton) {
+			int state;
+			if(rearmTriggerAToggleButton.isSelected()) {
+				state = Constant.REARM_TRIGGER_ON;
+				rearmTriggerAToggleButton.setSelected(false);
+			} else {
+				state = Constant.REARM_TRIGGER_OFF;
+				rearmTriggerAToggleButton.setSelected(true);
+			}
+			sendCommand(PacketType.TRIGGER_ARM_A, state);
+
+		} else if(source == rearmTriggerBToggleButton) {
+			int state;
+			if(rearmTriggerBToggleButton.isSelected()) {
+				state = Constant.REARM_TRIGGER_ON;
+				rearmTriggerBToggleButton.setSelected(false);
+			} else {
+				state = Constant.REARM_TRIGGER_OFF;
+				rearmTriggerBToggleButton.setSelected(true);
+			}
+			sendCommand(PacketType.TRIGGER_ARM_B, state);
+
 		}
 	}
 
@@ -2253,6 +2308,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			triggerThresholdBSpinner.addChangeListener(this);
 			sendCommand(PacketType.TRIGGER_THRESHOLD_B, threshold);
 			sentTriggerThresholdBCommand_ = true;
+
 		}
 	}
 }

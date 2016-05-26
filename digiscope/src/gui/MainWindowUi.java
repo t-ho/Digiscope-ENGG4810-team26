@@ -213,8 +213,8 @@ public class MainWindowUi extends JFrame {
     private JLabel p2pVoltageLabel_;
     protected JSpinner p2pVoltageSpinner;
     protected JComboBox<String> p2pVoltageUnitComboBox;
-    protected JButton rearmTriggerAButton;
-    protected JButton rearmTriggerBButton;
+    protected JToggleButton rearmTriggerAToggleButton;
+    protected JToggleButton rearmTriggerBToggleButton;
     protected JButton removeExpressionButton;
     protected JButton removeFilterButton;
     private JPanel rightPanel_;
@@ -313,6 +313,7 @@ public class MainWindowUi extends JFrame {
     private JLabel verticalRangeMathLabel2_;
     protected JComboBox<String> waveTypeComboBox;
     private JLabel waveTypeLabel_;
+
     protected Map<String, XYSeries> rawXYSeries;
 
     /**
@@ -395,7 +396,7 @@ public class MainWindowUi extends JFrame {
         triggerTypeALabel_ = new JLabel();
         triggerTypeAComboBox = new JComboBox<String>();
         triggerAMiddleRightPanel2_ = new JPanel();
-        rearmTriggerAButton = new JButton();
+        rearmTriggerAToggleButton = new JToggleButton();
         triggerABottomLeftPanel3_ = new JPanel();
         noOfSamplesALabel_ = new JLabel();
         noOfSamplesASpinner = new JSpinner();
@@ -462,7 +463,7 @@ public class MainWindowUi extends JFrame {
         triggerTypeBLabel_ = new JLabel();
         triggerTypeBComboBox = new JComboBox<String>();
         triggerBMiddleRightPanel2_ = new JPanel();
-        rearmTriggerBButton = new JButton();
+        rearmTriggerBToggleButton = new JToggleButton();
         triggerBBottomLeftPanel3_ = new JPanel();
         noOfSamplesBLabel_ = new JLabel();
         noOfSamplesBSpinner = new JSpinner();
@@ -844,7 +845,7 @@ public class MainWindowUi extends JFrame {
         triggerStateALabel.setHorizontalAlignment(SwingConstants.CENTER);
         triggerStateALabel.setText("Stop");
         triggerStateALabel.setBorder(BorderFactory.createTitledBorder(""));
-        triggerStateALabel.setPreferredSize(new Dimension(80, 19));
+        triggerStateALabel.setPreferredSize(new Dimension(100, 19));
         triggerATopPanel_.add(triggerStateALabel);
 
         triggerAPanel_.add(triggerATopPanel_);
@@ -888,11 +889,11 @@ public class MainWindowUi extends JFrame {
         triggerAMiddleRightPanel2_.setPreferredSize(new Dimension(155, 30));
         triggerAMiddleRightPanel2_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 3));
 
-        rearmTriggerAButton.setText("Re-arm - OFF");
-        rearmTriggerAButton.setEnabled(false);
-        rearmTriggerAButton.setFocusable(false);
-        rearmTriggerAButton.setPreferredSize(new Dimension(130, 23));
-        triggerAMiddleRightPanel2_.add(rearmTriggerAButton);
+        rearmTriggerAToggleButton.setText("Re-arm - OFF");
+        rearmTriggerAToggleButton.setEnabled(false);
+        rearmTriggerAToggleButton.setFocusable(false);
+        rearmTriggerAToggleButton.setPreferredSize(new Dimension(130, 23));
+        triggerAMiddleRightPanel2_.add(rearmTriggerAToggleButton);
 
         triggerAPanel_.add(triggerAMiddleRightPanel2_);
 
@@ -1175,11 +1176,11 @@ public class MainWindowUi extends JFrame {
         triggerBMiddleRightPanel2_.setPreferredSize(new Dimension(155, 30));
         triggerBMiddleRightPanel2_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 3));
 
-        rearmTriggerBButton.setText("Re-arm - OFF");
-        rearmTriggerBButton.setEnabled(false);
-        rearmTriggerBButton.setFocusable(false);
-        rearmTriggerBButton.setPreferredSize(new Dimension(130, 23));
-        triggerBMiddleRightPanel2_.add(rearmTriggerBButton);
+        rearmTriggerBToggleButton.setText("Re-arm - OFF");
+        rearmTriggerBToggleButton.setEnabled(false);
+        rearmTriggerBToggleButton.setFocusable(false);
+        rearmTriggerBToggleButton.setPreferredSize(new Dimension(130, 23));
+        triggerBMiddleRightPanel2_.add(rearmTriggerBToggleButton);
 
         triggerBPanel_.add(triggerBMiddleRightPanel2_);
 
@@ -1850,13 +1851,12 @@ public class MainWindowUi extends JFrame {
      * @param enabled boolean
      */
     public void setEnabledGeneratorChannelControls(boolean enabled) {
-        if (rawXYSeries.containsKey(Constant.GENERATOR_CHANNEL)) {
-            verticalOffsetGeneratorSpinner.setEnabled(enabled);
-            verticalOffsetUnitGeneratorComboBox.setEnabled(enabled);
-            waveTypeComboBox.setEnabled(enabled);
-            p2pVoltageSpinner.setEnabled(enabled);
-            generatorFrequencySpinner.setEnabled(enabled);
-        }
+        verticalOffsetGeneratorSpinner.setEnabled(enabled);
+        verticalOffsetUnitGeneratorComboBox.setEnabled(enabled);
+        waveTypeComboBox.setEnabled(enabled);
+        p2pVoltageSpinner.setEnabled(enabled);
+        p2pVoltageUnitComboBox.setEnabled(enabled);
+        generatorFrequencySpinner.setEnabled(enabled);
     }
 
     /**
@@ -1958,5 +1958,4 @@ public class MainWindowUi extends JFrame {
         validate();
         repaint();
     }
-
 }
