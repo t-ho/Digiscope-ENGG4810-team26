@@ -37,6 +37,8 @@ Values are signed 32 bit integers unless otherwise stated.
 		0x02 & Horizontal Range & Range in \textmu s \\ \hline
 		0xA1 & Channel A Vertical Range & Range in \textmu V \\ \hline
 		0xB1 & Channel B Vertical Range & Range in \textmu V \\ \hline
+		0xA8 & Channel A Trigger State & 0:Auto, 1:Single, 2:Normal \\ \hline
+		0xB8 & Channel B Trigger State & 0:Armed, 1:Triggered, 2:Stopped \\ \hline
 		0xA3 & Channel A Trigger Mode & 0:Auto, 1:Single, 2:Normal \\ \hline
 		0xB3 & Channel B Trigger Mode & 0:Auto, 1:Single, 2:Normal \\ \hline
 		0xA4 & Channel A Trigger Type & 0:Level, 1:Rising, 2:Falling \\ \hline
@@ -45,7 +47,7 @@ Values are signed 32 bit integers unless otherwise stated.
 		0xB5 & Channel B Trigger Threshold & Threshold in \textmu V \\ \hline
 		0xA6 & Channel A DC Offset & Offset in \textmu V \\ \hline
 		0xB6 & Channel B DC Offset & Offset in \textmu V \\ \hline
-		0x71 & Number of samples & number of samples \\ \hline
+		0x71 & Number of samples & Number of samples \\ \hline
 		0xAA & Channel A Trigger Arm & 0:Off, Other:On \\ \hline 
 		0xBA & Channel B Trigger Arm & 0:Off, Other:On \\ \hline 
 		0xAF & Channel A Trigger Force & Ignored \\ \hline 

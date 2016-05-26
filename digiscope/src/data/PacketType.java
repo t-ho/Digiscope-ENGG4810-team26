@@ -9,6 +9,8 @@ public class PacketType {
 	public static final byte HORIZONTAL_RANGE = (byte) 0x02;
 	public static final byte VERTICAL_RANGE_A = (byte) 0xA1;
 	public static final byte VERTICAL_RANGE_B = (byte) 0xB1;
+	public static final byte TRIGGER_STATE_A = (byte) 0xA8;
+	public static final byte TRIGGER_STATE_B = (byte) 0xB8;
 	public static final byte TRIGGER_MODE_A = (byte) 0xA3;
 	public static final byte TRIGGER_MODE_B = (byte) 0xB3;
 	public static final byte TRIGGER_TYPE_A = (byte) 0xA4;

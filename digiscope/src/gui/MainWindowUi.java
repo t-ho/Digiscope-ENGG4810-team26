@@ -843,9 +843,9 @@ public class MainWindowUi extends JFrame {
 
         triggerStateALabel.setForeground(Color.blue);
         triggerStateALabel.setHorizontalAlignment(SwingConstants.CENTER);
-        triggerStateALabel.setText("Stop");
+        triggerStateALabel.setText("ARMED");
         triggerStateALabel.setBorder(BorderFactory.createTitledBorder(""));
-        triggerStateALabel.setPreferredSize(new Dimension(100, 19));
+        triggerStateALabel.setPreferredSize(new Dimension(120, 19));
         triggerATopPanel_.add(triggerStateALabel);
 
         triggerAPanel_.add(triggerATopPanel_);
@@ -1130,9 +1130,9 @@ public class MainWindowUi extends JFrame {
 
         triggerStateBLabel.setForeground(Color.blue);
         triggerStateBLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        triggerStateBLabel.setText("Stop");
+        triggerStateBLabel.setText("ARMED");
         triggerStateBLabel.setBorder(BorderFactory.createTitledBorder(""));
-        triggerStateBLabel.setPreferredSize(new Dimension(100, 19));
+        triggerStateBLabel.setPreferredSize(new Dimension(120, 19));
         triggerBTopPanel_.add(triggerStateBLabel);
 
         triggerBPanel_.add(triggerBTopPanel_);

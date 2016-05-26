@@ -110,6 +110,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		previousHorizontalRangeIndex_ = horizontalRangeAComboBox.getSelectedIndex();
 		previousTriggerModeAIndex_ = triggerModeAComboBox.getSelectedIndex();
 		previousTriggerModeBIndex_ = triggerModeBComboBox.getSelectedIndex();
+		triggerTypeAComboBox.setSelectedIndex(Constant.RISING);
+		triggerTypeBComboBox.setSelectedIndex(Constant.RISING);
 		previousTriggerTypeAIndex_ = triggerTypeAComboBox.getSelectedIndex();
 		previousTriggerTypeBIndex_ = triggerTypeBComboBox.getSelectedIndex();
 		previousVerticalOffsetAValue_ = (int) verticalOffsetASpinner.getValue();
@@ -1624,22 +1626,64 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 */
 	public void setReArmTrigger(String channelName, int state) {
 		if (channelName.equals(Constant.CHANNEL_A)) {
-			if (state == Constant.REARM_TRIGGER_ON) {
-				rearmTriggerAToggleButton.setSelected(true);
-				rearmTriggerAToggleButton.setText("Re-arm - ON");
-			} else {
+			if (state == Constant.REARM_TRIGGER_OFF) {
 				rearmTriggerAToggleButton.setSelected(false);
 				rearmTriggerAToggleButton.setText("Re-arm - OFF");
+			} else {
+				rearmTriggerAToggleButton.setSelected(true);
+				rearmTriggerAToggleButton.setText("Re-arm - ON");
 			}
 		} else if (channelName.equals(Constant.CHANNEL_B)) {
-			if (state == Constant.REARM_TRIGGER_ON) {
-				rearmTriggerBToggleButton.setSelected(true);
-				rearmTriggerBToggleButton.setText("Re-arm - ON");
-			} else {
+			if (state == Constant.REARM_TRIGGER_OFF) {
 				rearmTriggerBToggleButton.setSelected(false);
 				rearmTriggerBToggleButton.setText("Re-arm - OFF");
+			} else {
+				rearmTriggerBToggleButton.setSelected(true);
+				rearmTriggerBToggleButton.setText("Re-arm - ON");
 			}
 
+		}
+	}
+	
+	/**
+	 * Set trigger state
+	 * @param channelName
+	 * @param state
+	 */
+	public void setTriggerState(String channelName, int state) {
+		if (state >= 0 && state <= 2) {
+			if (channelName.equals(Constant.CHANNEL_A)) {
+				switch (state) {
+				case Constant.ARMED_STATE:
+					triggerStateALabel.setText("ARMED");
+					break;
+
+				case Constant.TRIGGERED_STATE:
+					triggerStateALabel.setText("TRIGGERED");
+					break;
+
+				case Constant.STOPPED_STATE:
+					triggerStateALabel.setText("STOPPED");
+					break;
+				}
+
+			} else if (channelName.equals(Constant.CHANNEL_B)) {
+				switch (state) {
+				case Constant.ARMED_STATE:
+					triggerStateBLabel.setText("ARMED");
+					break;
+
+				case Constant.TRIGGERED_STATE:
+					triggerStateBLabel.setText("TRIGGERED");
+					break;
+
+				case Constant.STOPPED_STATE:
+					triggerStateBLabel.setText("STOPPED");
+					break;
+				}
+			}
+		} else {
+			System.out.println("Invalid trigger state: " + state);
 		}
 	}
 	
@@ -1811,14 +1855,14 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 * @param state
 	 */
 	public void setGeneratorOutput(int state) {
-		if (state == Constant.GENERATOR_ON) {
-			outputToggleButton.setSelected(true);
-			outputToggleButton.setText("ON");
-			setEnabledGeneratorChannelControls(true);
-		} else {
+		if (state == Constant.GENERATOR_OFF) {
 			outputToggleButton.setSelected(false);
 			outputToggleButton.setText("OFF");
 			setEnabledGeneratorChannelControls(false);
+		} else {
+			outputToggleButton.setSelected(true);
+			outputToggleButton.setText("ON");
+			setEnabledGeneratorChannelControls(true);
 		}
 	}
 
