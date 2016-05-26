@@ -17,6 +17,7 @@
 #include "overvolt.h"
 #include "frontend.h"
 #include "wavegen.h"
+#include "trigger.h"
 
 #include "graphics_thread.h"
 #include "overvoltage_menu.h"
@@ -309,11 +310,16 @@ UI_Task(UArg arg0, UArg arg1)
     		case COMMAND_TRIGGER_FORCE_B:
     			ForceTrigger();
     			break;
+    		case COMMAND_NUM_SAMPLES:
+    			TriggerSetNumSamples(cmd.args[0]);
     		case COMMAND_COUPLING_A:
-    			FrontEndSetCoupling(0, !FrontEndGetCoupling(0));
+    			FrontEndSetCoupling(0, cmd.args[0]);
     			break;
     		case COMMAND_COUPLING_B:
-    			FrontEndSetCoupling(1, !FrontEndGetCoupling(1));
+    			FrontEndSetCoupling(1, cmd.args[0]);
+    			break;
+    		case COMMAND_SAMPLE_LENGTH_A:
+    			TriggerSetSampleSize((SampleSize)cmd.args[0]);
     			break;
     		case COMMAND_FUNCTION_GEN_OUT:
     			WaveGenEnableSet(cmd.args[0]);

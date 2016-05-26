@@ -30,6 +30,12 @@ typedef enum TriggerType
 	TRIGGER_TYPE_LEVEL
 } TriggerType;
 
+typedef enum SampleSize
+{
+	SAMPLE_SIZE_8_BIT = 0,
+	SAMPLE_SIZE_12_BIT = 1,
+} SampleSize;
+
 extern void Trigger_Init(void);
 extern Event_Handle AcqEvent;
 extern void ForceTrigger(void);
@@ -42,6 +48,11 @@ extern TriggerType TriggerGetType(void);
 extern void TriggerSetType(TriggerType type);
 extern uint32_t TriggerGetChannel(void);
 extern void TriggerSetChannel(uint32_t channel);
+extern SampleSize TriggerGetSampleSize(void);
+extern void TriggerSetSampleSize(SampleSize mode);
+extern uint32_t TriggerGetNumSamples(void);
+extern void TriggerSetNumSamples(uint32_t newNum);
+
 
 extern volatile uint8_t channel_a_pri_full;
 extern volatile uint8_t channel_a_alt_full;

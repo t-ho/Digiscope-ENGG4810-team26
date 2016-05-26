@@ -23,13 +23,14 @@
 
 #define MIN_TRIGGER_PERIOD 500
 
-Event_Handle AcqEvent;
-static Error_Block task_eb;
-static Error_Block ev_eb;
+#define TRIGGER_BUF_12_SIZE ADC_TRANSFER_SIZE * 28
+#define TRIGGER_BUF_8_SIZE (TRIGGER_BUF_12_SIZE * 2)
 
-#define TRIGGER_BUF_SIZE ADC_TRANSFER_SIZE * 2 * 14
+#define MAX_8_BIT_SAMPLES (1024 - COMMANDLENGTH)
+#define MAX_12_BIT_SAMPLES (MAX_8_BIT_SAMPLES / 2)
 
-#define SAMPLECOPY8(src, offset) chan_A_dest_8 = &channel_A_samples_8[offset]; \
+#define SAMPLECOPY8(src, offset) { \
+	chan_A_dest_8 = &channel_A_samples_8[offset]; \
 	chan_A_src = adc_buffer_A_##src; \
 	chan_B_dest_8 = &channel_B_samples_8[offset]; \
 	chan_B_src = adc_buffer_B_##src; \
@@ -37,29 +38,45 @@ static Error_Block ev_eb;
 	{ \
 		*chan_A_dest_8 = *chan_A_src >> 4; \
 		*chan_B_dest_8 = *chan_B_src >> 4; \
-		if (trigger_index < 0 && *chan_A_dest_8 > realThreshold) \
+/*		if (trigger_index < 0 && *chan_A_dest_8 > realThreshold) \
 		{ \
 			trigger_index = offset + i; \
-		} \
+		} */\
 		chan_A_dest_8++; \
 		chan_A_src++; \
 		chan_B_dest_8++; \
 		chan_B_src++; \
 	} \
-//
-//	channel_A_samples_8[offset + i] = adc_buffer_A_##src[i] >> 4; \
-//	channel_B_samples_8[offset + i] = adc_buffer_B_##src[i] >> 4; \
-//
-//\
-//}
-//	if (trigger_index < 0 && channel_A_samples_8[offset + i] > realThreshold) \
-//	{ \
-//		trigger_index = offset + i; \
-//	} \
-// }
+}
 
-static uint16_t _channel_A_samples[TRIGGER_BUF_SIZE] __attribute__(( aligned(8) ));
-static uint16_t _channel_B_samples[TRIGGER_BUF_SIZE] __attribute__(( aligned(8) ));
+#define SAMPLECOPY12(src, offset) { \
+	chan_A_dest_12 = &channel_A_samples_12[offset]; \
+	chan_A_src = adc_buffer_A_##src; \
+	chan_B_dest_12 = &channel_B_samples_12[offset]; \
+	chan_B_src = adc_buffer_B_##src; \
+	while(chan_A_src <= &adc_buffer_A_##src[ADC_TRANSFER_SIZE]) \
+	{ \
+		*chan_A_dest_12 = *chan_A_src; \
+		*chan_B_dest_12 = *chan_B_src; \
+/*		if (trigger_index < 0 && *chan_A_dest_12 > realThreshold) \
+		{ \
+			trigger_index = offset + i; \
+		} */\
+		chan_A_dest_12++; \
+		chan_A_src++; \
+		chan_B_dest_12++;*\
+		chan_B_src++; \
+	} \
+}
+
+static void ResetBuffers(void);
+
+Event_Handle AcqEvent;
+static Error_Block task_eb;
+static Error_Block ev_eb;
+
+static uint16_t _channel_A_samples[TRIGGER_BUF_12_SIZE] __attribute__(( aligned(8) ));
+static uint16_t _channel_B_samples[TRIGGER_BUF_12_SIZE] __attribute__(( aligned(8) ));
 
 static uint16_t* channel_A_samples_12 = (uint16_t*) &_channel_A_samples;
 static uint16_t* channel_B_samples_12 = (uint16_t*) &_channel_B_samples;
@@ -78,58 +95,49 @@ static uint32_t currentChannel = 0;
 static int32_t currentThreshold = 0;
 static uint16_t realThreshold = 0x700;
 
-static uint8_t samplesize = 8;
+static SampleSize samplesize = SAMPLE_SIZE_12_BIT;
+static uint32_t numSamples = 25000;
 
 static void
 triggerSearchISR(UArg arg0, UArg arg1)
 {
-	int i;
+//	int trigger_index;
 
-	int trigger_index;
-
-	uint8_t *chan_A_dest_8;
-	uint16_t *chan_A_dest_16;
-	uint16_t *chan_A_src;
-	uint8_t *chan_B_dest_8;
-	uint16_t *chan_B_dest_16;
-	uint16_t *chan_B_src;
+	uint8_t 	*chan_A_dest_8, 	*chan_B_dest_8;
+	uint16_t 	*chan_A_dest_12, 	*chan_B_dest_12;
+	uint16_t 	*chan_A_src, 		*chan_B_src;
 
 	while (1)
 	{
-		trigger_index = -1;
-
-//		if (samplesize == 8)
-//		{
-//
-//		}
+//		trigger_index = -1;
 
 		Event_pend(AcqEvent, EVENT_ID_A_PRI | EVENT_ID_B_PRI, Event_Id_NONE, BIOS_WAIT_FOREVER);
 
-//		SAMPLECOPY16(channel_A_samples_12, adc_buffer_A_PRI, offset)
-//		SAMPLECOPY16(channel_B_samples_12, adc_buffer_B_PRI, offset)
-
-		SAMPLECOPY8(PRI, offset)
+		if (samplesize == SAMPLE_SIZE_8_BIT)
+			SAMPLECOPY8(PRI, offset)
+		else
+			SAMPLECOPY12(PRI, offset)
 
 		Event_pend(AcqEvent, EVENT_ID_A_ALT | EVENT_ID_B_ALT, Event_Id_NONE, BIOS_WAIT_FOREVER);
 
 		offset += ADC_TRANSFER_SIZE;
 
-//		SAMPLECOPY16(channel_A_samples_12, adc_buffer_A_ALT, offset)
-//		SAMPLECOPY16(channel_B_samples_12, adc_buffer_B_ALT, offset)
-
-		SAMPLECOPY8(ALT, offset)
+		if (samplesize == SAMPLE_SIZE_8_BIT)
+			SAMPLECOPY8(ALT, offset)
+		else
+			SAMPLECOPY12(ALT, offset)
 
 		offset += ADC_TRANSFER_SIZE;
 
-		if (offset >= TRIGGER_BUF_SIZE)
+		if (offset >= numSamples)
 		{
 			offset = 0;
 		}
 
-		if (trigger_index >= 0)
-		{
-			ForceTrigger();
-		}
+//		if (trigger_index >= 0)
+//		{
+//			ForceTrigger();
+//		}
 	}
 }
 
@@ -196,63 +204,114 @@ TriggerSetChannel(uint32_t channel)
 	TriggerSetChannelText(channelName);
 }
 
-//void
-//ForceTrigger(void)
-//{
-//	static uint32_t last = 0;
-//
-//	// Ignore trigger if too soon
-//	uint32_t current = Clock_getTicks();
-//	if (current - last < MIN_TRIGGER_PERIOD)
-//	{
-//		return;
-//	}
-//	else
-//	{
-//		last = current;
-//	}
-//
-//	short maxSamples = (1024 - COMMANDLENGTH) / 2;
-//
-//	SampleCommand scmd;
-//	scmd.type = SAMPLE_PACKET_A_12;
-//	scmd.num_samples = maxSamples;
-//	scmd.period = 1;
-//
-//	int seqnum = 0;
-//
-//	ADCPause();
-//
-//	while ((seqnum + 1) * maxSamples < TRIGGER_BUF_SIZE)
-//	{
-//		scmd.seq_num = seqnum;
-//		scmd.buffer = &channel_A_samples_12[seqnum * maxSamples];
-//		NetSend((Command *) &scmd, 100);
-//		seqnum++;
-//	}
-//	scmd.seq_num = seqnum;
-//	scmd.buffer = &channel_A_samples_12[seqnum * maxSamples];
-//	scmd.num_samples = TRIGGER_BUF_SIZE - seqnum * maxSamples;
-//	NetSend((Command *) &scmd, 100);
-//
-//	scmd.type = SAMPLE_PACKET_B_12;
-//	scmd.num_samples = maxSamples;
-//	seqnum = 0;
-//
-//	while ((seqnum + 1) * maxSamples < TRIGGER_BUF_SIZE)
-//	{
-//		scmd.seq_num = seqnum;
-//		scmd.buffer = &channel_B_samples_12[seqnum * maxSamples];
-//		NetSend((Command *) &scmd, 100);
-//		seqnum++;
-//	}
-//	scmd.seq_num = seqnum;
-//	scmd.buffer = &channel_B_samples_12[seqnum * maxSamples];
-//	scmd.num_samples = TRIGGER_BUF_SIZE - seqnum * maxSamples;
-//	NetSend((Command *) &scmd, 100);
-//
-//	offset = 0;
-//}
+static void
+TransmitBuffer8(uint8_t* buffer, uint8_t type, uint16_t start_index)
+{
+	int seqnum = 0;
+
+	SampleCommand scmd;
+	scmd.num_samples = MAX_8_BIT_SAMPLES;
+	scmd.period = 1;
+	scmd.type = type;
+
+	while ((seqnum + 1) * MAX_8_BIT_SAMPLES < numSamples)
+	{
+		scmd.seq_num = seqnum;
+		scmd.buffer = &buffer[seqnum * MAX_8_BIT_SAMPLES];
+		NetSend((Command *) &scmd, 100);
+		seqnum++;
+	}
+	scmd.seq_num = seqnum;
+	scmd.buffer = &buffer[seqnum * MAX_8_BIT_SAMPLES];
+	scmd.num_samples = numSamples - seqnum * MAX_8_BIT_SAMPLES;
+	NetSend((Command *) &scmd, 100);
+}
+
+static void
+TransmitBuffer12(uint16_t* buffer, uint8_t type, uint16_t start_index)
+{
+	int seqnum = 0;
+
+	SampleCommand scmd;
+	scmd.num_samples = MAX_12_BIT_SAMPLES;
+	scmd.period = 1;
+	scmd.type = type;
+
+	while ((seqnum + 1) * MAX_12_BIT_SAMPLES < numSamples)
+	{
+		scmd.seq_num = seqnum;
+		scmd.buffer = &buffer[(start_index + seqnum * MAX_12_BIT_SAMPLES)];
+		NetSend((Command *) &scmd, 100);
+		seqnum++;
+	}
+	scmd.seq_num = seqnum;
+	scmd.buffer = &buffer[(start_index + seqnum * MAX_12_BIT_SAMPLES)];
+	scmd.num_samples = numSamples - seqnum * MAX_12_BIT_SAMPLES;
+	NetSend((Command *) &scmd, 100);
+}
+
+SampleSize
+TriggerGetSampleSize(void)
+{
+	return samplesize;
+}
+
+void
+TriggerSetSampleSize(SampleSize mode)
+{
+	ResetBuffers();
+
+	offset = 0;
+
+	if (samplesize == SAMPLE_SIZE_8_BIT && mode == SAMPLE_SIZE_12_BIT)
+	{
+		TriggerSetNumSamples(TriggerGetNumSamples() / 2);
+	}
+	else if (samplesize == SAMPLE_SIZE_12_BIT && mode == SAMPLE_SIZE_8_BIT)
+	{
+		TriggerSetNumSamples(TriggerGetNumSamples() * 2);
+	}
+
+	samplesize = mode;
+
+	Command cmd;
+	cmd.type = COMMAND_SAMPLE_LENGTH_A;
+	cmd.args[0] = TriggerGetSampleSize();
+	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+
+	NetSend(&cmd, 0);
+}
+
+void
+TriggerSetNumSamples(uint32_t newNum)
+{
+	uint32_t max = (TriggerGetSampleSize() == SAMPLE_SIZE_8_BIT) ? TRIGGER_BUF_8_SIZE : TRIGGER_BUF_12_SIZE;
+
+	if (newNum >= max)
+	{
+		newNum = max;
+	}
+
+	if (newNum < 1024)
+	{
+		newNum = 1024;
+	}
+
+	numSamples = newNum;
+
+	Command cmd;
+	cmd.type = COMMAND_NUM_SAMPLES;
+	cmd.args[0] = numSamples;
+	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+
+	NetSend(&cmd, 0);
+}
+
+uint32_t
+TriggerGetNumSamples(void)
+{
+	return numSamples;
+}
 
 void
 ForceTrigger(void)
@@ -270,59 +329,34 @@ ForceTrigger(void)
 		last = current;
 	}
 
-	short maxSamples = (1024 - COMMANDLENGTH);
-
-	SampleCommand scmd;
-	scmd.type = SAMPLE_PACKET_A_8;
-	scmd.num_samples = maxSamples;
-	scmd.period = 1;
-
-	int seqnum = 0;
-
 	ADCPause();
 
-	while ((seqnum + 1) * maxSamples < TRIGGER_BUF_SIZE)
+	if (samplesize == SAMPLE_SIZE_8_BIT)
 	{
-		scmd.seq_num = seqnum;
-		scmd.buffer = &channel_A_samples_8[seqnum * maxSamples];
-		NetSend((Command *) &scmd, 100);
-		seqnum++;
+		TransmitBuffer8(channel_A_samples_8, SAMPLE_PACKET_A_8, 0);
+		TransmitBuffer8(channel_B_samples_8, SAMPLE_PACKET_B_8, 0);
 	}
-	scmd.seq_num = seqnum;
-	scmd.buffer = &channel_A_samples_8[seqnum * maxSamples];
-	scmd.num_samples = TRIGGER_BUF_SIZE - seqnum * maxSamples;
-	NetSend((Command *) &scmd, 100);
-
-	scmd.type = SAMPLE_PACKET_B_8;
-	scmd.num_samples = maxSamples;
-	seqnum = 0;
-
-	while ((seqnum + 1) * maxSamples < TRIGGER_BUF_SIZE)
+	else
 	{
-		scmd.seq_num = seqnum;
-		scmd.buffer = &channel_B_samples_8[seqnum * maxSamples];
-		NetSend((Command *) &scmd, 100);
-		seqnum++;
+		TransmitBuffer12(channel_A_samples_12, SAMPLE_PACKET_A_12, 0);
+		TransmitBuffer12(channel_B_samples_12, SAMPLE_PACKET_B_12, 0);
 	}
-	scmd.seq_num = seqnum;
-	scmd.buffer = &channel_B_samples_8[seqnum * maxSamples];
-	scmd.num_samples = TRIGGER_BUF_SIZE - seqnum * maxSamples;
-	NetSend((Command *) &scmd, 100);
 
 	offset = 0;
 }
 
 static void
-ClearBuffers(void)
+ResetBuffers(void)
 {
     memset(&_channel_A_samples, 0, sizeof(_channel_A_samples));
     memset(&_channel_B_samples, 0, sizeof(_channel_B_samples));
+    offset = 0;
 }
 
 void
 Trigger_Init(void)
 {
-	ClearBuffers();
+	ResetBuffers();
 
 	AcqEvent = Event_create(NULL, &ev_eb);
 
@@ -339,9 +373,9 @@ Trigger_Init(void)
         System_printf("Error: Failed to create trigger Task\n");
     }
 
-    TriggerSetChannel(0);
+    TriggerSetChannel(TriggerGetChannel());
     TriggerSetMode(TriggerGetMode());
     TriggerSetType(TriggerGetType());
-    TriggerSetThreshold(10000);
-
+    TriggerSetThreshold(TriggerGetThreshold());
+    TriggerSetSampleSize(TriggerGetSampleSize());
 }
