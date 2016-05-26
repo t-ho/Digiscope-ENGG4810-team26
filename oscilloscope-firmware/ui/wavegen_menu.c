@@ -16,10 +16,10 @@ static void OnWaveGenShape(tWidget *psWidget);
 
 static RectangularButton(WaveGenOnOff, &menus[WAVEGEN_MENU], 0, 0, &SSD1289_Display, 110, 30,
 				  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
-				  ClrWhite, &g_sFontCm18b, "On/Off", 0, 0, 0, 0, OnWaveGenEnable);
+				  ClrWhite, &g_sFontCm18b, NULL, 0, 0, 0, 0, OnWaveGenEnable);
 static RectangularButton(WaveGenFreq, &menus[WAVEGEN_MENU], &WaveGenOnOff, 0, &SSD1289_Display, 220, 120,
 				  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
-				  ClrWhite, &g_sFontCm18b, "Freq", 0, 0, 0, 0, OnWaveGenFreq);
+				  ClrWhite, &g_sFontCm18b, NULL, 0, 0, 0, 0, OnWaveGenFreq);
 static RectangularButton(WaveGenOffset, &menus[WAVEGEN_MENU], &WaveGenFreq, 0, &SSD1289_Display, 110, 120,
 				  100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
 				  ClrWhite, &g_sFontCm18b, "Offset", 0, 0, 0, 0, OnWaveGenOffset);
@@ -28,7 +28,7 @@ static RectangularButton(WaveGenAmplitude, &menus[WAVEGEN_MENU], &WaveGenOffset,
 				  ClrWhite, &g_sFontCm18b, "Vpp", 0, 0, 0, 0, OnWaveGenAmplitude);
 static RectangularButton(WaveGenShape, &menus[WAVEGEN_MENU], &WaveGenAmplitude, 0, &SSD1289_Display, 220, 30,
                   100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrBlue, ClrYellow, ClrWhite,
-				  ClrWhite, &g_sFontCm18b, "Type", 0, 0, 0, 0, OnWaveGenShape);
+				  ClrWhite, &g_sFontCm18b, NULL, 0, 0, 0, 0, OnWaveGenShape);
 RectangularButton(WaveGenBack, &menus[WAVEGEN_MENU], &WaveGenShape, 0, &SSD1289_Display, 0, 30,
                   100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrGray, ClrYellow, ClrWhite,
 				  ClrWhite, &g_sFontCm18b, "Back", 0, 0, 0, 0, OnMAIN);

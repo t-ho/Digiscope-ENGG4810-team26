@@ -23,6 +23,12 @@ extern bool WaveGenEnableGet(void);
 extern void WaveGenSetShape(WaveType shape);
 extern WaveType WaveGenGetShape(void);
 
+extern void WaveGenSetAmplitude(uint32_t uV);
+extern uint32_t WaveGenGetAmplitude(void);
+
+extern void WaveGenSetOffset(int32_t uV);
+extern int32_t WaveGenGetOffset(void);
+
 extern void WaveGen_Init(void);
 
 extern void WaveGenSetFreq(uint32_t freq);

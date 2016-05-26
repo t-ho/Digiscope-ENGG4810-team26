@@ -326,6 +326,15 @@ UI_Task(UArg arg0, UArg arg1)
     		case COMMAND_FUNCTION_GEN_FREQUENCY:
     			WaveGenSetFreq(cmd.args[0]);
     			break;
+    		case COMMAND_FUNCTION_GEN_WAVE:
+    			WaveGenSetShape((WaveType)cmd.args[0]);
+    			break;
+    		case COMMAND_FUNCTION_GEN_VOLTAGE:
+    			WaveGenSetAmplitude(cmd.args[0]);
+    			break;
+    		case COMMAND_FUNCTION_GEN_OFFSET:
+    			WaveGenSetOffset(cmd.args[0]);
+    			break;
     		case _COMMAND_REPAINT:
     			WidgetPaint((tWidget *)cmd.args[0]);
     			break;

@@ -29,11 +29,19 @@
 #include <ti/sysbios/family/arm/m3/Hwi.h>
 #include <ti/sysbios/family/arm/lm4/Timer.h>
 
+#include "command.h"
 #include "wavegen.h"
+#include "net.h"
 #include "ui/wavegen_menu.h"
 
 #define NOISE_PERIOD 300
 #define APPARENT_CLOCK_FREQ 118400000
+
+#define MAX_AMPLITUDE 2000000
+#define MIN_AMPLITUDE 100000
+#define MAX_OFFSET 2500000
+
+static void WaveGenUpdateShape();
 
 static char* WaveNames[] =
 {
@@ -93,8 +101,40 @@ static uint8_t sine[] =
 static uint8_t signal_lookup[256];
 
 static uint32_t frequency = 1000000;
+static uint32_t amplitude = MAX_AMPLITUDE;
+static int32_t offset = 0;
 static bool enabled;
 static WaveType shape = SINE;
+
+void
+WaveGenSetAmplitude(uint32_t uV)
+{
+	if (uV > MAX_AMPLITUDE)
+	{
+		uV = MAX_AMPLITUDE;
+	}
+	else if (uV < MIN_AMPLITUDE)
+	{
+		uV = MIN_AMPLITUDE;
+	}
+
+	amplitude = uV;
+
+	WaveGenUpdateShape();
+
+	Command cmd;
+	cmd.type = COMMAND_FUNCTION_GEN_VOLTAGE;
+	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+	cmd.args[0] = WaveGenGetAmplitude();
+
+	NetSend(&cmd, 0);
+}
+
+uint32_t
+WaveGenGetAmplitude(void)
+{
+	return amplitude;
+}
 
 void
 WaveGenSetFreq(uint32_t freq)
@@ -147,6 +187,13 @@ WaveGenSetFreq(uint32_t freq)
 	Hwi_enable();
 
 	WaveGenFreqSetText(freq_display);
+
+	Command cmd;
+	cmd.type = COMMAND_FUNCTION_GEN_FREQUENCY;
+	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+	cmd.args[0] = WaveGenGetFreq();
+
+	NetSend(&cmd, 0);
 }
 
 uint32_t
@@ -173,6 +220,13 @@ WaveGenEnableSet(bool on)
 	Hwi_enable();
 
 	WaveGenOnOffSetText(enabled?"On":"Off");
+
+	Command cmd;
+	cmd.type = COMMAND_FUNCTION_GEN_OUT;
+	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+	cmd.args[0] = enabled;
+
+	NetSend(&cmd, 0);
 }
 
 bool
@@ -181,6 +235,11 @@ WaveGenEnableGet(void)
 	return enabled;
 }
 
+/**
+ * Update the output buffer. 
+ * 
+ * Should be called whenever the shape or amplitude are changed.
+ */
 static void
 WaveGenUpdateShape()
 {
@@ -223,18 +282,67 @@ WaveGenUpdateShape()
 		WaveGenSetFreq(0);
 		break;
 	}
+
+	for (i = 0; i < 256; i++)
+	{
+		int32_t centred = signal_lookup[i];
+		centred -= 127;
+		centred *= amplitude;
+		centred /= MAX_AMPLITUDE;
+		centred += 127;
+		signal_lookup[i] = centred;
+	}
 }
 
-void WaveGenSetShape(WaveType newshape)
+void
+WaveGenSetShape(WaveType newshape)
 {
 	shape = newshape;
+
+	WaveGenShapeSetText(WaveNames[shape]);
+
 	WaveGenUpdateShape();
+
+	Command cmd;
+	cmd.type = COMMAND_FUNCTION_GEN_WAVE;
+	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+	cmd.args[0] = WaveGenGetShape();
+
+	NetSend(&cmd, 0);
 }
 
 WaveType
 WaveGenGetShape(void)
 {
 	return shape;
+}
+
+void
+WaveGenSetOffset(int32_t uV)
+{
+	if (uV > MAX_OFFSET)
+	{
+		uV = MAX_OFFSET;
+	}
+	else if (uV < -MAX_OFFSET)
+	{
+		uV = -MAX_OFFSET;
+	}
+
+	offset = uV;
+
+	Command cmd;
+	cmd.type = COMMAND_FUNCTION_GEN_OFFSET;
+	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+	cmd.args[0] = WaveGenGetOffset();
+
+	NetSend(&cmd, 0);
+}
+
+int32_t
+WaveGenGetOffset(void)
+{
+	return offset;
 }
 
 static void
@@ -290,6 +398,9 @@ WaveGen_Init(void)
 
 	TimerIntEnable(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
 
-	WaveGenEnableSet(false);
-//
+	WaveGenSetAmplitude(WaveGenGetAmplitude());
+	WaveGenSetFreq(WaveGenGetFreq());
+	WaveGenEnableSet(WaveGenEnableGet());
+	WaveGenSetShape(WaveGenGetShape());
+	WaveGenSetOffset(WaveGenGetOffset());
 }
