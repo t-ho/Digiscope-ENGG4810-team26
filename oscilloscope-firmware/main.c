@@ -34,6 +34,7 @@
  *  ======== main.c ========
  */
 
+#include <command.h>
 #include <string.h>
 
 /* XDCtools Header files */
@@ -76,12 +77,27 @@
 #include "grlib/grlib.h"
 #include "grlib/widget.h"
 
-#include "common.h"
 #include "net.h"
 #include "adc.h"
 #include "overvolt.h"
+#include "wavegen.h"
+#include "trigger.h"
 #include "drivers/SSD1289_driver.h"
 #include "drivers/XPT2046_driver.h"
+#include "ui/graphics_thread.h"
+
+extern unsigned int _HwiLoadStart;
+extern unsigned int _HwiLoadSize;
+extern unsigned int _HwiLoadEnd;
+extern unsigned int _HwiRunStart;
+extern unsigned int _WaveGenLoadStart;
+extern unsigned int _WaveGenLoadSize;
+extern unsigned int _WaveGenLoadEnd;
+extern unsigned int _WaveGenRunStart;
+extern unsigned int _IncLoadStart;
+extern unsigned int _IncLoadSize;
+extern unsigned int _IncLoadEnd;
+extern unsigned int _IncRunStart;
 
 /*
  *  ======== heartBeatFxn ========
@@ -90,10 +106,22 @@
  */
 void heartBeatFxn(UArg arg0, UArg arg1)
 {
+//	int freq = 500;
+
+	Command cmd;
+	cmd.type = COMMAND_UNKNOWN;
+
     while (1) {
         Task_sleep((unsigned int)arg0);
         GPIO_toggle(Board_LED0);
+        if (NetGetClients() > 0)
+        {
+//        	ForceTrigger();
+        }
         System_flush();
+
+        UISend(&cmd, 0);
+        WaveGenEnableGet();
     }
 }
 
@@ -121,12 +149,13 @@ int main(void)
 	MAP_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_1);
 	MAP_GPIOPadConfigSet(GPIO_PORTN_BASE, GPIO_PIN_1, GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
 
-    Init_Semaphores();
-    Init_SendQueue();
+    Init_Net();
+    Init_UI();
 
     SSD1289_Init();
     XPT2046_Init();
 
+    Trigger_Init();
     ADC_Init();
     WaveGen_Init();
 
@@ -144,4 +173,11 @@ int main(void)
     BIOS_start();
 
     return (0);
+}
+
+void
+FlashToRam(void)
+{
+    memcpy(&_HwiRunStart, &_HwiLoadStart, (uint32_t)&_HwiLoadSize);
+    memcpy(&_WaveGenRunStart, &_WaveGenLoadStart, (uint32_t)&_WaveGenLoadSize);
 }

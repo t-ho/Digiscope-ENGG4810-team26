@@ -5,11 +5,12 @@
  *      Author: Ryan
  */
 
+#include <command.h>
 #include "overvolt.h"
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
 
-#include "common.h"
+#include "ui/graphics_thread.h"
 
 void
 OverVoltageInit(void)
@@ -41,7 +42,7 @@ ComparatorHandler(unsigned int index)
 	msg.type = _COMMAND_OVERVOLTAGE;
 	msg.args[0] = index;
 
-	Mailbox_post(GraphicsMailbox, &msg, 0);
+	UISend(&msg, 0);
 }
 
 void

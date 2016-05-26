@@ -4,6 +4,7 @@
 \usepackage{float}
 \usepackage{hyperref}
 \usepackage{textcomp}
+\usepackage{array}
 
 \usepackage[a4paper, margin=1.5cm]{geometry}
 
@@ -29,43 +30,41 @@
 Values are signed 32 bit integers unless otherwise stated.
 
 \begin{table}[H]
+	 
+	 
 	\renewcommand{\arraystretch}{1.2}
 	\centering
-	\begin{tabular}{|c|c|c|}
+	\begin{tabular}{|>{\ttfamily}c|c|c|}
 		\hline
-		\textbf{Identifier} & \textbf{Type} & \textbf{Value} \\ \hline
+		\normalfont{\textbf{Identifier}} & \textbf{Type} & \textbf{Value} \\ \hline
+		0x00 & Unknown & Ignored \\ \hline
 		0x02 & Horizontal Range & Range in \textmu s \\ \hline
+		0x03 & Trigger Mode & 0:Auto, 1:Single, 2:Normal \\ \hline
+		0x04 & Trigger Type & 0:Level, 1:Rising, 2:Falling \\ \hline
+		0x05 & Trigger Threshold & Threshold in \textmu V \\ \hline
+		0x07 & Sampling Mode & 0:8bit, Other:12bit \\ \hline
+		0x0A & Trigger Arm & 0:Off, Other:On \\ \hline 
+		0x0F & Trigger Force & Ignored \\ \hline 
+		0x71 & Transmission Length & Number of samples \\ \hline
+		0x80 - 0x99 & \multicolumn{2}{c|}{Reserved for internal firmware use} \\ \hline
 		0xA1 & Channel A Vertical Range & Range in \textmu V \\ \hline
-		0xB1 & Channel B Vertical Range & Range in \textmu V \\ \hline
-		0xA3 & Channel A Trigger Mode & 0:Auto, 1:Single, 2:Normal \\ \hline
-		0xB3 & Channel B Trigger Mode & 0:Auto, 1:Single, 2:Normal \\ \hline
-		0xA4 & Channel A Trigger Type & 0:Level, 1:Rising, 2:Falling \\ \hline
-		0xB4 & Channel B Trigger Type & 0:Level, 1:Rising, 2:Falling \\ \hline
-		0xA5 & Channel A Trigger Threshold & Threshold in \textmu V \\ \hline
-		0xB5 & Channel B Trigger Threshold & Threshold in \textmu V \\ \hline
 		0xA6 & Channel A DC Offset & Offset in \textmu V \\ \hline
-		0xB6 & Channel B DC Offset & Offset in \textmu V \\ \hline
-		0x71 & Number of samples & number of samples \\ \hline
-		0xAA & Channel A Trigger Arm & 0:Off, Other:On \\ \hline 
-		0xBA & Channel B Trigger Arm & 0:Off, Other:On \\ \hline 
-		0xAF & Channel A Trigger Force & Ignored \\ \hline 
-		0xBF & Channel B Trigger Force & Ignored \\ \hline 
 		0xAC & Channel A Coupling & 0:DC, Other:AC \\ \hline
+		0xAD & 8 bit sample packet, channel A & See \autoref{8bit} \\ \hline
+		0xAE & 12 bit sample packet, channel A & See \autoref{12bit} \\ \hline
+		0xB1 & Channel B Vertical Range & Range in \textmu V \\ \hline
+		0xB6 & Channel B DC Offset & Offset in \textmu V \\ \hline
 		0xBC & Channel B Coupling & 0:DC, Other:AC \\ \hline
-		0xA7 & Channel A Mode & 0:8bit, Other:12bit \\ \hline
-		0xB7 & Channel B Mode & 0:8bit, Other:12bit \\ \hline
+		0xBD & 8 bit sample packet, channel B & See \autoref{8bit} \\ \hline
+		0xBE & 12 bit sample packet, channel B & See \autoref{12bit} \\ \hline
+		0xD0 & Display Power & 0:Off, Other:On \\ \hline
+		0xD1 & Display Backlight Brightness & Brightness level (0 - 5) \\ \hline
+		0xEE & Keep alive & Ignored \\ \hline
 		0xF0 & Function Generator Output & 0:Off, Other:On \\ \hline
 		0xF1 & Function Generator Wave Type & 0:Sine, 1:Square, 2:Triangle, 3:Ramp, 4:Noise \\ \hline
 		0xF2 & Function Generator Voltage & Voltage in \textmu V \\ \hline
 		0xF3 & Function Generator Offset & Voltage in \textmu V \\ \hline
 		0xF4 & Function Generator Frequency & Frequency in Hz \\ \hline
-		0xEE & Keep alive & Ignored \\ \hline
-		0xD0 & Display Power & 0:Off, Other:On \\ \hline
-		0xD1 & Display Backlight Brightness & Brightness level (0 - 5) \\ \hline
-		0xAD & 8 bit sample packet, channel A & See \autoref{8bit} \\ \hline
-		0xBD & 8 bit sample packet, channel B & See \autoref{8bit} \\ \hline
-		0xAE & 12 bit sample packet, channel A & See \autoref{12bit} \\ \hline
-		0xBE & 12 bit sample packet, channel B & See \autoref{12bit} \\ \hline
 	\end{tabular}
 	\caption{Packet type identifiers}
 \end{table}

@@ -8,7 +8,10 @@
 #ifndef NET_H_
 #define NET_H_
 
-extern void Init_SendQueue(void);
+#include "command.h"
+
+extern void Init_Net(void);
 extern int NetSend(Command *cmd, uint32_t timeout);
+extern int NetGetClients(void);
 
 #endif /* NET_H_ */

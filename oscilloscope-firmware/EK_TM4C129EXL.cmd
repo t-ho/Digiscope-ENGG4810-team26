@@ -54,4 +54,18 @@ SECTIONS
     .bss    :   > SRAM
     .sysmem :   > SRAM
     .stack  :   > SRAM
+    .hwi: { *.*(.text:*ti_sysbios*) }
+    	LOAD = FLASH PAGE = 0,
+    	RUN = SRAM, PAGE = 0,
+    	LOAD_START(_HwiLoadStart),
+		LOAD_SIZE(_HwiLoadSize),
+    	LOAD_END(_HwiLoadEnd),
+    	RUN_START(_HwiRunStart)
+    .wavegen: { *.*(.text:*ISR*) }
+    	LOAD = FLASH PAGE = 0,
+    	RUN = SRAM, PAGE = 0,
+    	LOAD_START(_WaveGenLoadStart),
+		LOAD_SIZE(_WaveGenLoadSize),
+    	LOAD_END(_WaveGenLoadEnd),
+    	RUN_START(_WaveGenRunStart)
 }
