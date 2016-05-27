@@ -101,7 +101,7 @@ static uint8_t sine[] =
 
 static uint8_t signal_lookup[256];
 
-static uint32_t frequency = 1000000;
+static uint32_t frequency = 50;
 static uint32_t amplitude = MAX_AMPLITUDE;
 static int32_t offset = 0;
 static bool enabled;

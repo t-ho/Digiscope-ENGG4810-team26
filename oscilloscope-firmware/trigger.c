@@ -218,13 +218,13 @@ TransmitBuffer8(uint8_t* buffer, uint8_t type, uint16_t start_index)
 	{
 		scmd.seq_num = seqnum;
 		scmd.buffer = &buffer[seqnum * MAX_8_BIT_SAMPLES];
-		NetSend((Command *) &scmd, 100);
+		NetSend((Command *) &scmd, 0);
 		seqnum++;
 	}
 	scmd.seq_num = seqnum;
 	scmd.buffer = &buffer[seqnum * MAX_8_BIT_SAMPLES];
 	scmd.num_samples = numSamples - seqnum * MAX_8_BIT_SAMPLES;
-	NetSend((Command *) &scmd, 100);
+	NetSend((Command *) &scmd, 0);
 }
 
 static void
@@ -240,14 +240,14 @@ TransmitBuffer12(uint16_t* buffer, uint8_t type, uint16_t start_index)
 	while ((seqnum + 1) * MAX_12_BIT_SAMPLES < numSamples)
 	{
 		scmd.seq_num = seqnum;
-		scmd.buffer = &buffer[(start_index + seqnum * MAX_12_BIT_SAMPLES)];
-		NetSend((Command *) &scmd, 100);
+		scmd.buffer = &buffer[seqnum * MAX_12_BIT_SAMPLES];
+		NetSend((Command *) &scmd, 0);
 		seqnum++;
 	}
 	scmd.seq_num = seqnum;
-	scmd.buffer = &buffer[(start_index + seqnum * MAX_12_BIT_SAMPLES)];
+	scmd.buffer = &buffer[seqnum * MAX_12_BIT_SAMPLES];
 	scmd.num_samples = numSamples - seqnum * MAX_12_BIT_SAMPLES;
-	NetSend((Command *) &scmd, 100);
+	NetSend((Command *) &scmd, 0);
 }
 
 SampleSize

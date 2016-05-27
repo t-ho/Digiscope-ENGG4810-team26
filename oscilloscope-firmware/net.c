@@ -161,12 +161,19 @@ Void tcpWorker(UArg arg0, UArg arg1)
 			}
 
 			if (cmd.type == SAMPLE_PACKET_A_8 || cmd.type == SAMPLE_PACKET_B_8
-					|| cmd.type == SAMPLE_PACKET_A_12 || cmd.type == SAMPLE_PACKET_B_12)
+				|| cmd.type == SAMPLE_PACKET_A_12 || cmd.type == SAMPLE_PACKET_B_12)
 			{
 				SampleCommand *scmd = (SampleCommand*) &cmd;
-				bytesSent = send(clientfd, scmd->buffer, ntohs(scmd->num_samples) * 2, 0);
 
-				if (bytesSent < 0 || bytesSent != ntohs(scmd->num_samples) * 2) {
+				uint16_t packetSize = ntohs(scmd->num_samples);
+				if (cmd.type == SAMPLE_PACKET_A_12 || cmd.type == SAMPLE_PACKET_B_12)
+				{
+					packetSize *= 2;
+				}
+
+				bytesSent = send(clientfd, scmd->buffer, packetSize, 0);
+
+				if (bytesSent < 0 || bytesSent != packetSize) {
 					System_printf("Error: buffer send failed.\n");
 					goto clientlost;
 				}
