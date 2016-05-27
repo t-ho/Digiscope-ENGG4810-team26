@@ -38,12 +38,26 @@
 	{ \
 		*chan_A_dest_8 = *chan_A_src >> 4; \
 		*chan_B_dest_8 = *chan_B_src >> 4; \
-		if (currentState == TRIGGER_STATE_ARMED && *chan_A_dest_8 > realThreshold) \
+		if (currentState == TRIGGER_STATE_ARMED) \
 		{ \
-			trigger_index = (chan_A_dest_8 - channel_A_samples_8) - (currentNumSamples / 2); \
-			if (trigger_index < 0) trigger_index += TRIGGER_BUF_8_SIZE; \
-			TriggerSetState(TRIGGER_STATE_TRIGGERED); \
-			countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4); \
+			if (**trig_src_8 > realThreshold) \
+			{ \
+				if (currentType == TRIGGER_TYPE_LEVEL \
+				|| (currentType == TRIGGER_TYPE_RISING && **(trig_src_8 - 1) <= realThreshold)) \
+				{ \
+					trigger_index = (chan_A_dest_8 - channel_A_samples_8) - (currentNumSamples / 2); \
+					if (trigger_index < 0) trigger_index += TRIGGER_BUF_8_SIZE; \
+					TriggerSetState(TRIGGER_STATE_TRIGGERED); \
+					countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4); \
+				} \
+			} \
+			else if (currentType == TRIGGER_TYPE_FALLING && **(trig_src_8 - 1) > realThreshold) \
+			{ \
+				trigger_index = (chan_A_dest_8 - channel_A_samples_8) - (currentNumSamples / 2); \
+				if (trigger_index < 0) trigger_index += TRIGGER_BUF_8_SIZE; \
+				TriggerSetState(TRIGGER_STATE_TRIGGERED); \
+				countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4); \
+			} \
 		} \
 		chan_A_dest_8++; \
 		chan_A_src++; \
@@ -61,12 +75,26 @@
 	{ \
 		*chan_A_dest_12 = *chan_A_src; \
 		*chan_B_dest_12 = *chan_B_src; \
-		if (currentState == TRIGGER_STATE_ARMED && *chan_A_dest_12 > realThreshold) \
+		if (currentState == TRIGGER_STATE_ARMED) \
 		{ \
-			trigger_index = (chan_A_dest_12 - channel_A_samples_12) - (currentNumSamples / 2); \
-			if (trigger_index < 0) trigger_index += TRIGGER_BUF_12_SIZE; \
-			TriggerSetState(TRIGGER_STATE_TRIGGERED); \
-			countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4); \
+			if (**trig_src_12 > realThreshold) \
+			{ \
+				if (currentType == TRIGGER_TYPE_LEVEL \
+				|| (currentType == TRIGGER_TYPE_RISING && **(trig_src_12 - 1) <= realThreshold)) \
+				{ \
+					trigger_index = (chan_A_dest_12 - channel_A_samples_12) - (currentNumSamples / 2); \
+					if (trigger_index < 0) trigger_index += TRIGGER_BUF_12_SIZE; \
+					TriggerSetState(TRIGGER_STATE_TRIGGERED); \
+					countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4); \
+				} \
+			} \
+			else if (currentType == TRIGGER_TYPE_FALLING && **(trig_src_12 - 1) > realThreshold) \
+			{ \
+				trigger_index = (chan_A_dest_12 - channel_A_samples_12) - (currentNumSamples / 2); \
+				if (trigger_index < 0) trigger_index += TRIGGER_BUF_12_SIZE; \
+				TriggerSetState(TRIGGER_STATE_TRIGGERED); \
+				countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4); \
+			} \
 		} \
 		chan_A_dest_12++; \
 		chan_A_src++; \
@@ -107,6 +135,8 @@ static uint16_t realThreshold;
 
 static SampleSize currentSampleSize = SAMPLE_SIZE_12_BIT;
 static uint32_t currentNumSamples = 25000;
+static uint8_t **trig_src_8 = &channel_A_samples_8;
+static uint16_t **trig_src_12 = &channel_A_samples_12;
 
 static void
 triggerSearchISR(UArg arg0, UArg arg1)
@@ -207,6 +237,8 @@ TriggerSetThreshold(int32_t threshold)
 	cmd.args[0] = currentThreshold;
 
 	NetSend(&cmd, 0);
+
+	System_printf("Trigger threshold set to %d mV, (0x%2x)\n", currentThreshold / 1000, realThreshold);
 }
 
 TriggerMode
@@ -280,6 +312,17 @@ void
 TriggerSetChannel(uint32_t channel)
 {
 	static char channelName[] = "Channel A";
+
+	if (channel == 0)
+	{
+		trig_src_12 = &channel_A_samples_12;
+		trig_src_8 = &channel_A_samples_8;
+	}
+	else
+	{
+		trig_src_12 = &channel_B_samples_12;
+		trig_src_8 = &channel_B_samples_8;
+	}
 
 	currentChannel = channel;
 	channelName[8] = 'A' + channel;
