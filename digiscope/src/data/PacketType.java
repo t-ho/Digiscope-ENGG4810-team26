@@ -10,6 +10,7 @@ public class PacketType {
 	public static final byte TRIGGER_TYPE = (byte) 0x04;
 	public static final byte TRIGGER_THRESHOLD = (byte) 0x05;
 	public static final byte CHANNEL_MODE = (byte) 0x07;
+	public static final byte TRIGGER_STATE = (byte) 0x08;
 	public static final byte TRIGGER_ARM = (byte) 0x0A;
 	public static final byte TRIGGER_FORCE = (byte) 0x0F;
 	

@@ -110,6 +110,10 @@ public class Constant {
 	public static final int SINGLE_MODE = 1;
 	public static final int NORMAL_MODE = 2;
 
+	public static final int ARMED_STATE = 0;
+	public static final int TRIGGERED_STATE = 1;
+	public static final int STOPPED_STATE = 2;
+
 	public static final String[] TRIGGER_MODES = new String[] { 
 		AUTO_MODE_NAME, SINGLE_MODE_NAME, NORMAL_MODE_NAME };
 

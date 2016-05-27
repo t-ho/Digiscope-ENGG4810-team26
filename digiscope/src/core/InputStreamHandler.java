@@ -74,6 +74,11 @@ public class InputStreamHandler extends Thread {
 							case PacketType.HORIZONTAL_RANGE:
 								mainWindow_.setHorizontalRange(commandPacket.getArgument());
 								break;
+								
+							case PacketType.TRIGGER_STATE:
+								mainWindow_.setTriggerState(Constant.CHANNEL_A, commandPacket.getArgument());
+								mainWindow_.setTriggerState(Constant.CHANNEL_B, commandPacket.getArgument());
+								break;
 
 							case PacketType.TRIGGER_MODE:
 								mainWindow_.setTriggerMode(Constant.CHANNEL_A, commandPacket.getArgument());

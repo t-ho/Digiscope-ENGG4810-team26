@@ -43,12 +43,12 @@ Values are signed 32 bit integers unless otherwise stated.
 		0x04 & Trigger Type & 0:Level, 1:Rising, 2:Falling \\ \hline
 		0x05 & Trigger Threshold & Threshold in \textmu V \\ \hline
 		0x07 & Sampling Mode & 0:8bit, Other:12bit \\ \hline
+		0x08 & Trigger State & 0:Armed, 1:Triggered, 2:Stop \\ \hline
 		0x0A & Trigger Arm & 0:Off, Other:On \\ \hline 
 		0x0F & Trigger Force & Ignored \\ \hline 
 		0x71 & Transmission Length & Number of samples \\ \hline
 		0x80 - 0x99 & \multicolumn{2}{c|}{Reserved for internal firmware use} \\ \hline
 		0xA1 & Channel A Vertical Range & Range in \textmu V \\ \hline
-		0xA6 & Channel A DC Offset & Offset in \textmu V \\ \hline
 		0xAC & Channel A Coupling & 0:DC, Other:AC \\ \hline
 		0xAD & 8 bit sample packet, channel A & See \autoref{8bit} \\ \hline
 		0xAE & 12 bit sample packet, channel A & See \autoref{12bit} \\ \hline

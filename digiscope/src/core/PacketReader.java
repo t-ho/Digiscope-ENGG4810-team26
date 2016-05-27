@@ -55,6 +55,9 @@ public class PacketReader {
 			case PacketType.TRIGGER_MODE :
 				// Fallthrough
 
+			case PacketType.TRIGGER_STATE:
+				// Fallthrough
+
 			case PacketType.TRIGGER_TYPE :
 				// Fallthrough
 

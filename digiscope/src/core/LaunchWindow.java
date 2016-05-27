@@ -71,39 +71,10 @@ public class LaunchWindow extends LaunchWindowUi {
 		}
 	}
 
-	// For testing
-	private void connect() {
-		String ipAddress = ipAddressTextField.getText().trim();
-		setEnabled(false);
-		if(ipAddress.equals("")) {
-			setStatus("Please enter the IP address!", Constant.ERROR);
-			setEnabled(true);
-		} else {
-			if(validateIpAddress(ipAddress)) {
-				this.setStatus("Connecting to the device...", Constant.NORMAL);
-				LaunchWindow that = this;
-				SwingWorker<String, Void> swingWorker = new SwingWorker<String, Void>() {
-					@Override
-					protected String doInBackground() throws Exception {
-						setMainWindow(new MainWindow(that));
-						getMainWindow().setVisible(true);
-						return null;
-					}
-					
-					@Override
-					protected void done() {
-						setEnabled(true);
-						setVisible(false);
-					}
-				};
-				swingWorker.execute();
-			} else {
-				setStatus("The IP address is invalid!", Constant.ERROR);
-				setEnabled(true);
-			}
-		}
-	}
-	
+	/**
+	 * Connect to the hardware
+	 * @param ipAddress
+	 */
 	private void connect(String ipAddress) {
 		setEnabled(false);
 		if(ipAddress.trim().equals("")) {
