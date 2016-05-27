@@ -24,7 +24,7 @@
 #include "range_menu.h"
 #include "trigger_menu.h"
 
-static const char * const menu_titles[] = { "Team 26 Oscilloscope", "Channel X", "Trigger - Force/Arm", "Trigger - Threshold", "Wave Generator", "Brightness", "Overvoltage Warning!" };
+static const char * const menu_titles[] = { "Team 26 Oscilloscope", "Channel X", "Trigger - Force/Arm", "Trigger - Threshold", "Wave Generator", "Wave Generator", "Brightness", "Overvoltage Warning!" };
 
 tCanvasWidget g_sTitle;
 
@@ -32,7 +32,8 @@ tPushButtonWidget main_menu_buttons[];
 extern tPushButtonWidget RangeBack;
 extern tPushButtonWidget TriggerArmBack;
 extern tPushButtonWidget TriggerThresholdBack;
-extern tPushButtonWidget WaveGenBack;
+extern tPushButtonWidget WaveGen1Back;
+extern tPushButtonWidget WaveGen2Back;
 extern tPushButtonWidget BrightnessBack;
 
 static Mailbox_Handle GraphicsMailbox;
@@ -61,8 +62,11 @@ tCanvasWidget menus[] =
 	// Trigger Threshold menu
 	CanvasStruct(0, 0, &TriggerThresholdBack, &SSD1289_Display, 0, 24,
 				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
-	// Wavegen menu
-	CanvasStruct(0, 0, &WaveGenBack, &SSD1289_Display, 0, 24,
+	// Wavegen1 menu
+	CanvasStruct(0, 0, &WaveGen1Back, &SSD1289_Display, 0, 24,
+				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
+	// Wavegen2 menu
+	CanvasStruct(0, 0, &WaveGen2Back, &SSD1289_Display, 0, 24,
 				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
 	// Brightness menu
 	CanvasStruct(0, 0, &BrightnessBack, &SSD1289_Display, 0, 24,
@@ -75,7 +79,8 @@ tCanvasWidget menus[] =
 MENU_NAV(MAIN)
 MENU_NAV(TRIGGER_ARM)
 MENU_NAV(TRIGGER_THRESHOLD)
-static MENU_NAV(WAVEGEN)
+MENU_NAV(WAVEGEN1)
+MENU_NAV(WAVEGEN2)
 static MENU_NAV(BRIGHTNESS)
 MENU_NAV(OVERVOLTAGE)
 
@@ -129,7 +134,7 @@ tPushButtonWidget main_menu_buttons[] =
 		ClrWhite, &g_sFontCm18b, "Sleep", 0, 0, 0, 0, EnterSleep),
 	RectangularButtonStruct(&menus[MAIN_MENU], 0, 0, &SSD1289_Display, 220, 120,
 		100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrBlue, ClrYellow, ClrWhite,
-		ClrWhite, &g_sFontCm18b, "Wave Gen", 0, 0, 0, 0, OnWAVEGEN),
+		ClrWhite, &g_sFontCm18b, "Wave Gen", 0, 0, 0, 0, OnWAVEGEN1),
 };
 
 void
@@ -350,19 +355,26 @@ UI_Task(UArg arg0, UArg arg1)
 }
 
 void
-SI_Micro_Print(char* line1, char* line2, int32_t val, char* suffix)
+SI_Print(char* line1, char* line2, int32_t val, char* suffix, char* prefixes)
 {
-	char prefs[] = "um ";
 	int mag = 0;
+	uint16_t dec = 0;
 
-	while (val >= 1000)
+	while (abs(val) >= 1000)
 	{
+		dec = val % 1000;
 		val /= 1000;
 		mag++;
 	}
 
-	sprintf(line1, "%lu", val);
-	sprintf(line2, "%c%s", prefs[mag], suffix);
+	sprintf(line1, "%ld.%d", val, dec / 100);
+	sprintf(line2, "%c%s", prefixes[mag], suffix);
+}
+
+void
+SI_Micro_Print(char* line1, char* line2, int32_t val, char* suffix)
+{
+	SI_Print(line1, line2, val, suffix, "um k");
 }
 
 void

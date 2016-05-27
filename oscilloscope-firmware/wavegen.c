@@ -32,6 +32,7 @@
 #include "command.h"
 #include "wavegen.h"
 #include "net.h"
+#include "ui/graphics_thread.h"
 #include "ui/wavegen_menu.h"
 
 #define NOISE_PERIOD 300
@@ -109,6 +110,9 @@ static WaveType shape = SINE;
 void
 WaveGenSetAmplitude(uint32_t uV)
 {
+	static char line1[16];
+	static char line2[16];
+
 	if (uV > MAX_AMPLITUDE)
 	{
 		uV = MAX_AMPLITUDE;
@@ -121,6 +125,9 @@ WaveGenSetAmplitude(uint32_t uV)
 	amplitude = uV;
 
 	WaveGenUpdateShape();
+
+	SI_Micro_Print(line1, line2, WaveGenGetAmplitude(), "Vpp");
+	WaveGenAmplitudeSetText(line1, line2);
 
 	Command cmd;
 	cmd.type = COMMAND_FUNCTION_GEN_VOLTAGE;
@@ -139,14 +146,17 @@ WaveGenGetAmplitude(void)
 void
 WaveGenSetFreq(uint32_t freq)
 {
-	static char freq_display[8] = "500 Hz";
+	static char line1[16];
+	static char line2[16];
+
 	int period;
 
 	if (shape == NOISE)
 	{
 		inc = 0;
 		period = 300;
-		snprintf(freq_display, sizeof(freq_display), "N/A");
+		snprintf(line1, sizeof(line1), "N/A");
+		snprintf(line2, sizeof(line1), "");
 	}
 	else
 	{
@@ -168,14 +178,7 @@ WaveGenSetFreq(uint32_t freq)
 			period = (inc * APPARENT_CLOCK_FREQ / 255) / (frequency);
 		}
 
-		if (frequency < 1000)
-		{
-			snprintf(freq_display, sizeof(freq_display), "%d Hz", frequency);
-		}
-		else
-		{
-			snprintf(freq_display, sizeof(freq_display), "%d kHz", frequency/1000);
-		}
+		SI_Print(line1, line2, WaveGenGetFreq(), "Hz", " k");
 	}
 
 	Hwi_disable();
@@ -186,7 +189,7 @@ WaveGenSetFreq(uint32_t freq)
 	}
 	Hwi_enable();
 
-	WaveGenFreqSetText(freq_display);
+	WaveGenFreqSetText(line1, line2);
 
 	Command cmd;
 	cmd.type = COMMAND_FUNCTION_GEN_FREQUENCY;
@@ -320,6 +323,9 @@ WaveGenGetShape(void)
 void
 WaveGenSetOffset(int32_t uV)
 {
+	static char line1[16];
+	static char line2[16];
+
 	if (uV > MAX_OFFSET)
 	{
 		uV = MAX_OFFSET;
@@ -330,6 +336,9 @@ WaveGenSetOffset(int32_t uV)
 	}
 
 	offset = uV;
+
+	SI_Micro_Print(line1, line2, WaveGenGetOffset(), "V");
+	WaveGenOffsetSetText(line1, line2);
 
 	Command cmd;
 	cmd.type = COMMAND_FUNCTION_GEN_OFFSET;

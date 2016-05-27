@@ -26,7 +26,8 @@ enum menus
 	RANGE_MENU,
 	TRIGGER_ARM_MENU,
 	TRIGGER_THRESHOLD_MENU,
-	WAVEGEN_MENU,
+	WAVEGEN1_MENU,
+	WAVEGEN2_MENU,
 	BRIGHTNESS_MENU,
 	OVERVOLTAGE_MENU
 };
@@ -37,10 +38,13 @@ extern void OnMAIN(tWidget *psWidget);
 extern void OnOVERVOLTAGE(tWidget *psWidget);
 extern void OnTRIGGER_ARM(tWidget *psWidget);
 extern void OnTRIGGER_THRESHOLD(tWidget *psWidget);
+extern void OnWAVEGEN1(tWidget *psWidget);
+extern void OnWAVEGEN2(tWidget *psWidget);
 
 extern void UISend(Command *cmd, uint32_t timeout);
 
 extern uint32_t Standard_Step(uint32_t, int8_t);
+extern void SI_Print(char* line1, char* line2, int32_t val, char* suffix, char* prefixes);
 extern void SI_Micro_Print(char* line1, char* line2, int32_t val, char* suffix);
 extern void Repaint(tWidget *psWidget);
 
