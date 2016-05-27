@@ -516,7 +516,7 @@ Trigger_Init(void)
 	Task_Handle taskHandle;
 
     Task_Params_init(&taskParams);
-	taskParams.stackSize = 512;
+	taskParams.stackSize = 768;
     taskParams.priority = 10;
     taskHandle = Task_create((Task_FuncPtr)triggerSearchISR, &taskParams, &task_eb);
 
