@@ -38,10 +38,11 @@
 	{ \
 		*chan_A_dest_8 = *chan_A_src >> 4; \
 		*chan_B_dest_8 = *chan_B_src >> 4; \
-/*		if (trigger_index < 0 && *chan_A_dest_8 > realThreshold) \
+		if (currentState == TRIGGER_STATE_ARMED && *chan_A_dest_8 > realThreshold) \
 		{ \
-			trigger_index = offset + i; \
-		} */\
+			trigger_index = chan_A_dest_8 - channel_A_samples_8; \
+			TriggerSetState(TRIGGER_STATE_TRIGGERED); \
+		} \
 		chan_A_dest_8++; \
 		chan_A_src++; \
 		chan_B_dest_8++; \
@@ -58,10 +59,11 @@
 	{ \
 		*chan_A_dest_12 = *chan_A_src; \
 		*chan_B_dest_12 = *chan_B_src; \
-/*		if (trigger_index < 0 && *chan_A_dest_12 > realThreshold) \
+		if (currentState == TRIGGER_STATE_ARMED && *chan_A_dest_12 > realThreshold) \
 		{ \
-			trigger_index = offset + i; \
-		} */\
+			trigger_index = chan_A_dest_12 - channel_A_samples_12; \
+			TriggerSetState(TRIGGER_STATE_TRIGGERED); \
+		} \
 		chan_A_dest_12++; \
 		chan_A_src++; \
 		chan_B_dest_12++;*\
@@ -69,6 +71,7 @@
 	} \
 }
 
+static void SendSamples(uint32_t start_pos, uint32_t num);
 static void ResetBuffers(void);
 
 Event_Handle AcqEvent;
@@ -88,20 +91,23 @@ static uint32_t offset = 0;
 static const char* TriggerModeNames[] = {"Auto", "Normal", "Single"};
 static const char* TriggerTypeNames[] = {"Rising", "Falling", "Level"};
 
-static TriggerType currentType = TRIGGER_TYPE_FALLING;
-static TriggerMode currentMode = TRIGGER_MODE_NORMAL;
+static TriggerType currentType = TRIGGER_TYPE_LEVEL;
+static TriggerMode currentMode = TRIGGER_MODE_AUTO;
+static TriggerState currentState = TRIGGER_STATE_ARMED;
 static uint32_t currentChannel = 0;
 
-static int32_t currentThreshold = 0;
-static uint16_t realThreshold = 0x700;
+// Threshold in uV
+static int32_t currentThreshold = 1000000;
+// Actual threshold to use for comparisons
+static uint16_t realThreshold;
 
-static SampleSize samplesize = SAMPLE_SIZE_12_BIT;
+static SampleSize currentSampleSize = SAMPLE_SIZE_12_BIT;
 static uint32_t numSamples = 25000;
 
 static void
 triggerSearchISR(UArg arg0, UArg arg1)
 {
-//	int trigger_index;
+	int trigger_index;
 
 	uint8_t 	*chan_A_dest_8, 	*chan_B_dest_8;
 	uint16_t 	*chan_A_dest_12, 	*chan_B_dest_12;
@@ -109,11 +115,9 @@ triggerSearchISR(UArg arg0, UArg arg1)
 
 	while (1)
 	{
-//		trigger_index = -1;
-
 		Event_pend(AcqEvent, EVENT_ID_A_PRI | EVENT_ID_B_PRI, Event_Id_NONE, BIOS_WAIT_FOREVER);
 
-		if (samplesize == SAMPLE_SIZE_8_BIT)
+		if (currentSampleSize == SAMPLE_SIZE_8_BIT)
 			SAMPLECOPY8(PRI, offset)
 		else
 			SAMPLECOPY12(PRI, offset)
@@ -122,7 +126,7 @@ triggerSearchISR(UArg arg0, UArg arg1)
 
 		offset += ADC_TRANSFER_SIZE;
 
-		if (samplesize == SAMPLE_SIZE_8_BIT)
+		if (currentSampleSize == SAMPLE_SIZE_8_BIT)
 			SAMPLECOPY8(ALT, offset)
 		else
 			SAMPLECOPY12(ALT, offset)
@@ -134,10 +138,18 @@ triggerSearchISR(UArg arg0, UArg arg1)
 			offset = 0;
 		}
 
-//		if (trigger_index >= 0)
-//		{
-//			ForceTrigger();
-//		}
+		if (currentState == TRIGGER_STATE_TRIGGERED)
+		{
+			SendSamples(trigger_index, numSamples);
+			if (TriggerGetMode() == TRIGGER_MODE_SINGLE)
+			{
+				TriggerSetState(TRIGGER_STATE_STOP);
+			}
+			else
+			{
+				TriggerSetState(TRIGGER_STATE_ARMED);
+			}
+		}
 	}
 }
 
@@ -154,9 +166,25 @@ TriggerSetThreshold(int32_t threshold)
 
 	currentThreshold = threshold;
 
+	if (currentSampleSize == SAMPLE_SIZE_8_BIT)
+	{
+		realThreshold = (255 * (currentThreshold + 1650000.0)) / 3300000;
+	}
+	else
+	{
+		realThreshold = (4095 * (currentThreshold + 1650000.0)) / 3300000;
+	}
+
 	SI_Micro_Print(line1, line2, currentThreshold, "V");
 
 	TriggerSetThresholdLevelText(line1, line2);
+
+	Command cmd;
+	cmd.type = COMMAND_TRIGGER_THRESHOLD;
+	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+	cmd.args[0] = currentThreshold;
+
+	NetSend(&cmd, 0);
 }
 
 TriggerMode
@@ -171,6 +199,13 @@ TriggerSetMode(TriggerMode mode)
 	currentMode = mode;
 
 	TriggerSetModeText(TriggerModeNames[mode]);
+
+	Command cmd;
+	cmd.type = COMMAND_TRIGGER_MODE;
+	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+	cmd.args[0] = currentMode;
+
+	NetSend(&cmd, 0);
 }
 
 TriggerType
@@ -185,6 +220,32 @@ TriggerSetType(TriggerType type)
 	currentType = type;
 
 	TriggerSetTypeText(TriggerTypeNames[type]);
+
+	Command cmd;
+	cmd.type = COMMAND_TRIGGER_TYPE;
+	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+	cmd.args[0] = currentType;
+
+	NetSend(&cmd, 0);
+}
+
+TriggerState
+TriggerGetState(void)
+{
+	return currentState;
+}
+
+void
+TriggerSetState(TriggerState state)
+{
+	currentState = state;
+
+	Command cmd;
+	cmd.type = COMMAND_TRIGGER_STATE;
+	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+	cmd.args[0] = currentState;
+
+	NetSend(&cmd, 0);
 }
 
 uint32_t
@@ -253,7 +314,7 @@ TransmitBuffer12(uint16_t* buffer, uint8_t type, uint16_t start_index)
 SampleSize
 TriggerGetSampleSize(void)
 {
-	return samplesize;
+	return currentSampleSize;
 }
 
 void
@@ -263,16 +324,18 @@ TriggerSetSampleSize(SampleSize mode)
 
 	offset = 0;
 
-	if (samplesize == SAMPLE_SIZE_8_BIT && mode == SAMPLE_SIZE_12_BIT)
+	if (currentSampleSize == SAMPLE_SIZE_8_BIT && mode == SAMPLE_SIZE_12_BIT)
 	{
 		TriggerSetNumSamples(TriggerGetNumSamples() / 2);
 	}
-	else if (samplesize == SAMPLE_SIZE_12_BIT && mode == SAMPLE_SIZE_8_BIT)
+	else if (currentSampleSize == SAMPLE_SIZE_12_BIT && mode == SAMPLE_SIZE_8_BIT)
 	{
 		TriggerSetNumSamples(TriggerGetNumSamples() * 2);
 	}
 
-	samplesize = mode;
+	currentSampleSize = mode;
+
+	TriggerSetThreshold(TriggerGetThreshold());
 
 	Command cmd;
 	cmd.type = COMMAND_SAMPLE_LENGTH;
@@ -316,6 +379,12 @@ TriggerGetNumSamples(void)
 void
 ForceTrigger(void)
 {
+	TriggerSetState(TRIGGER_STATE_TRIGGERED);
+}
+
+static void
+SendSamples(uint32_t start_pos, uint32_t num)
+{
 	static uint32_t last = 0;
 
 	// Ignore trigger if too soon
@@ -331,7 +400,7 @@ ForceTrigger(void)
 
 	ADCPause();
 
-	if (samplesize == SAMPLE_SIZE_8_BIT)
+	if (currentSampleSize == SAMPLE_SIZE_8_BIT)
 	{
 		TransmitBuffer8(channel_A_samples_8, SAMPLE_PACKET_A_8, 0);
 		TransmitBuffer8(channel_B_samples_8, SAMPLE_PACKET_B_8, 0);

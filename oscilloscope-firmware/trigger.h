@@ -18,17 +18,24 @@
 
 typedef enum TriggerMode
 {
-	TRIGGER_MODE_AUTO,
-	TRIGGER_MODE_NORMAL,
-	TRIGGER_MODE_SINGLE
+	TRIGGER_MODE_AUTO = 0,
+	TRIGGER_MODE_SINGLE = 1,
+	TRIGGER_MODE_NORMAL = 2
 } TriggerMode;
 
 typedef enum TriggerType
 {
-	TRIGGER_TYPE_RISING,
-	TRIGGER_TYPE_FALLING,
-	TRIGGER_TYPE_LEVEL
+	TRIGGER_TYPE_LEVEL = 0,
+	TRIGGER_TYPE_RISING = 1,
+	TRIGGER_TYPE_FALLING = 2
 } TriggerType;
+
+typedef enum TriggerState
+{
+	TRIGGER_STATE_ARMED = 0,
+	TRIGGER_STATE_TRIGGERED = 1,
+	TRIGGER_STATE_STOP = 2
+} TriggerState;
 
 typedef enum SampleSize
 {
@@ -50,9 +57,10 @@ extern uint32_t TriggerGetChannel(void);
 extern void TriggerSetChannel(uint32_t channel);
 extern SampleSize TriggerGetSampleSize(void);
 extern void TriggerSetSampleSize(SampleSize mode);
+extern TriggerState TriggerGetState(void);
+extern void TriggerSetState(TriggerState state);
 extern uint32_t TriggerGetNumSamples(void);
 extern void TriggerSetNumSamples(uint32_t newNum);
-
 
 extern volatile uint8_t channel_a_pri_full;
 extern volatile uint8_t channel_a_alt_full;

@@ -314,6 +314,15 @@ UI_Task(UArg arg0, UArg arg1)
     		case COMMAND_TRIGGER_FORCE:
     			ForceTrigger();
     			break;
+    		case COMMAND_TRIGGER_MODE:
+    			TriggerSetMode((TriggerMode)cmd.args[0]);
+    			break;
+    		case COMMAND_TRIGGER_TYPE:
+    			TriggerSetType((TriggerType)cmd.args[0]);
+    			break;
+    		case COMMAND_TRIGGER_THRESHOLD:
+    			TriggerSetThreshold(cmd.args[0]);
+    			break;
     		case COMMAND_NUM_SAMPLES:
     			TriggerSetNumSamples(cmd.args[0]);
     		case COMMAND_COUPLING_A:
