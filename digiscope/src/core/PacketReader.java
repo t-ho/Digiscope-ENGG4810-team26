@@ -129,7 +129,7 @@ public class PacketReader {
 				}
 				samples = new short[nSamples];
 				for(short i = 0; i < nSamples; i++) {
-					samples[i] = (short) dis_.readByte();
+					samples[i] = (short) dis_.readUnsignedByte();
 				}
 				packet = new DataPacket(type, sequenceNumber, nSamples, period, samples);
 				break;
