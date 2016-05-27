@@ -75,44 +75,24 @@ public class InputStreamHandler extends Thread {
 								mainWindow_.setHorizontalRange(commandPacket.getArgument());
 								break;
 								
-							case PacketType.TRIGGER_STATE_A:
-								mainWindow_.setTriggerState(Constant.CHANNEL_A, commandPacket.getArgument());
+							case PacketType.TRIGGER_STATE:
+								mainWindow_.setTriggerState(commandPacket.getArgument());
 								break;
 								
-							case PacketType.TRIGGER_STATE_B:
-								mainWindow_.setTriggerState(Constant.CHANNEL_B, commandPacket.getArgument());
+							case PacketType.TRIGGER_MODE:
+								mainWindow_.setTriggerMode(commandPacket.getArgument());
 								break;
 
-							case PacketType.TRIGGER_MODE_A:
-								mainWindow_.setTriggerMode(Constant.CHANNEL_A, commandPacket.getArgument());
+							case PacketType.TRIGGER_TYPE:
+								mainWindow_.setTriggerType(commandPacket.getArgument());
 								break;
 
-							case PacketType.TRIGGER_MODE_B:
-								mainWindow_.setTriggerMode(Constant.CHANNEL_B, commandPacket.getArgument());
-								break;
-
-							case PacketType.TRIGGER_TYPE_A:
-								mainWindow_.setTriggerType(Constant.CHANNEL_A, commandPacket.getArgument());
-								break;
-
-							case PacketType.TRIGGER_TYPE_B:
-								mainWindow_.setTriggerType(Constant.CHANNEL_B, commandPacket.getArgument());
-								break;
-
-							case PacketType.TRIGGER_THRESHOLD_A:
-								mainWindow_.setTriggerThreshold(Constant.CHANNEL_A, commandPacket.getArgument());
+							case PacketType.TRIGGER_THRESHOLD:
+								mainWindow_.setTriggerThreshold(commandPacket.getArgument());
 								break;
 								
-							case PacketType.TRIGGER_THRESHOLD_B:
-								mainWindow_.setTriggerThreshold(Constant.CHANNEL_B, commandPacket.getArgument());
-								break;
-								
-							case PacketType.TRIGGER_ARM_A:
-								mainWindow_.setReArmTrigger(Constant.CHANNEL_A, commandPacket.getArgument());
-								break;
-								
-							case PacketType.TRIGGER_ARM_B:
-								mainWindow_.setReArmTrigger(Constant.CHANNEL_B, commandPacket.getArgument());
+							case PacketType.TRIGGER_ARM:
+								mainWindow_.setReArmTrigger(commandPacket.getArgument());
 								break;
 
 							case PacketType.CHANNEL_COUPLING_A:
@@ -123,12 +103,8 @@ public class InputStreamHandler extends Thread {
 								mainWindow_.setChannelCoupling(Constant.CHANNEL_B, commandPacket.getArgument());
 								break;
 
-							case PacketType.CHANNEL_MODE_A:
-								mainWindow_.setChannelMode(Constant.CHANNEL_A, commandPacket.getArgument());
-								break;
-
-							case PacketType.CHANNEL_MODE_B:
-								mainWindow_.setChannelMode(Constant.CHANNEL_B, commandPacket.getArgument());
+							case PacketType.SAMPLING_MODE:
+								mainWindow_.setSamplingMode(commandPacket.getArgument());
 								break;
 
 							case PacketType.DC_OFFSET_A:
@@ -195,7 +171,7 @@ public class InputStreamHandler extends Thread {
 								if (aCurrentTime >= maxDisplayTime) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, true);
 									isUpdatedA = true;
-								} else if (aTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_A)) {
+								} else if (aTotalOfSamples == mainWindow_.getNoOfSamples()) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, true);
 									isUpdatedA = false;
 								}
@@ -227,7 +203,7 @@ public class InputStreamHandler extends Thread {
 								if (bCurrentTime >= maxDisplayTime) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, true);
 									isUpdatedB = true;
-								} else if (bTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_B)) {
+								} else if (bTotalOfSamples == mainWindow_.getNoOfSamples()) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, true);
 									isUpdatedB = false;
 								}
@@ -259,7 +235,7 @@ public class InputStreamHandler extends Thread {
 								if (aCurrentTime >= maxDisplayTime) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, true);
 									isUpdatedA = true;
-								} else if (aTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_A)) {
+								} else if (aTotalOfSamples == mainWindow_.getNoOfSamples()) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_A, aSeries, true);
 									isUpdatedA = false;
 								}
@@ -291,7 +267,7 @@ public class InputStreamHandler extends Thread {
 								if (bCurrentTime >= maxDisplayTime) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, true);
 									isUpdatedB = true;
-								} else if (bTotalOfSamples == mainWindow_.getNoOfSamples(Constant.CHANNEL_B)) {
+								} else if (bTotalOfSamples == mainWindow_.getNoOfSamples()) {
 									mainWindow_.setXYSeries(Constant.CHANNEL_B, bSeries, true);
 									isUpdatedB = false;
 								}

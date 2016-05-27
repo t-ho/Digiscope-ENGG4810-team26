@@ -64,20 +64,16 @@ public class Server {
 										message = "Horizontal Range B: " + commandPacket.getArgument();
 										break;
 
-									case PacketType.TRIGGER_MODE_A:
+									case PacketType.TRIGGER_MODE:
 										message = "Trigger mode A: " + commandPacket.getArgument();
 										break;
 
-									case PacketType.TRIGGER_TYPE_A:
+									case PacketType.TRIGGER_TYPE:
 										message = "Trigger type A: " + commandPacket.getArgument();
 										break;
 										
-									case PacketType.CHANNEL_MODE_A:
+									case PacketType.SAMPLING_MODE:
 										message = "Channel mode A: " + commandPacket.getArgument();
-										break;
-										
-									case PacketType.CHANNEL_MODE_B:
-										message = "Channel mode B: " + commandPacket.getArgument();
 										break;
 										
 									case PacketType.CHANNEL_COUPLING_A:

@@ -75,7 +75,6 @@ public class ExpressionDialog extends ExpressionDialogUi implements ActionListen
 					if (isValid == true) {
 						mainWindow.setExpressionForMathChannel(expression);
 						mainWindow.setEnabledExpressionControls(true);
-						mainWindow.setEnabledMathChannelControls(true);
 						mainWindow.updateInputChannelComboBox();
 						this.dispose();
 					} else {

@@ -64,20 +64,16 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	private int previousVerticalRangeAIndex_;
 	private int previousVerticalRangeBIndex_;
 	private int previousHorizontalRangeIndex_;
-	private int previousTriggerModeAIndex_;
-	private int previousTriggerModeBIndex_;
-	private int previousTriggerTypeAIndex_;
-	private int previousTriggerTypeBIndex_;
+	private int previousTriggerModeIndex_;
+	private int previousTriggerTypeIndex_;
 	private int previousVerticalOffsetAValue_;
 	private int previousVerticalOffsetBValue_;
 	private boolean sentVerticalOffsetACommand_;
 	private boolean sentVerticalOffsetBCommand_;
 	private int previousWaveTypeIndex_;
 	private int previousNoOfSamples_;
-	private boolean sentTriggerThresholdACommand_;
-	private boolean sentTriggerThresholdBCommand_;
-	private int previousTriggerThresholdAValue_;
-	private int previousTriggerThresholdBValue_;
+	private boolean sentTriggerThresholdCommand_;
+	private int previousTriggerThresholdValue_;
 	private boolean sentVerticalOffsetGeneratorCommand_;
 	private int previousVerticalOffsetGeneratorValue_;
 	private boolean sentP2PVoltageCommand_;
@@ -112,23 +108,18 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		filterFile_ = new FilterFile();
 		previousVerticalRangeAIndex_ = verticalRangeAComboBox.getSelectedIndex();
 		previousVerticalRangeBIndex_ = verticalRangeBComboBox.getSelectedIndex();
-		previousHorizontalRangeIndex_ = horizontalRangeAComboBox.getSelectedIndex();
-		previousTriggerModeAIndex_ = triggerModeAComboBox.getSelectedIndex();
-		previousTriggerModeBIndex_ = triggerModeBComboBox.getSelectedIndex();
-		triggerTypeAComboBox.setSelectedIndex(Constant.RISING);
-		triggerTypeBComboBox.setSelectedIndex(Constant.RISING);
-		previousTriggerTypeAIndex_ = triggerTypeAComboBox.getSelectedIndex();
-		previousTriggerTypeBIndex_ = triggerTypeBComboBox.getSelectedIndex();
+		previousHorizontalRangeIndex_ = horizontalRangeComboBox.getSelectedIndex();
+		previousTriggerModeIndex_ = triggerModeComboBox.getSelectedIndex();
+		triggerTypeComboBox.setSelectedIndex(Constant.RISING);
+		previousTriggerTypeIndex_ = triggerTypeComboBox.getSelectedIndex();
 		previousVerticalOffsetAValue_ = (int) verticalOffsetASpinner.getValue();
 		previousVerticalOffsetBValue_ = (int) verticalOffsetBSpinner.getValue();
 		sentVerticalOffsetACommand_ = false;
 		sentVerticalOffsetBCommand_ = false;
 		previousWaveTypeIndex_ = waveTypeComboBox.getSelectedIndex();
-		previousNoOfSamples_ = (int) noOfSamplesASpinner.getValue();
-		sentTriggerThresholdACommand_ = false;
-		sentTriggerThresholdBCommand_ = false;
-		previousTriggerThresholdAValue_ = (int) triggerThresholdASpinner.getValue();
-		previousTriggerThresholdBValue_ = (int) triggerThresholdBSpinner.getValue();
+		previousNoOfSamples_ = (int) noOfSamplesSpinner.getValue();
+		sentTriggerThresholdCommand_ = false;
+		previousTriggerThresholdValue_ = (int) triggerThresholdSpinner.getValue();
 		sentVerticalOffsetGeneratorCommand_ = false;
 		previousVerticalOffsetGeneratorValue_ = (int) verticalOffsetGeneratorSpinner.getValue();
 		sentP2PVoltageCommand_ = false;
@@ -187,6 +178,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			}
 		});
 		
+		channelTabbedPane.addChangeListener(this);
+		
 		channelACheckBox.addItemListener(this);
 
 		channelBCheckBox.addItemListener(this);
@@ -201,18 +194,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		
 		channelCouplingBToggleButton.addActionListener(this);
 		
-		channelModeAToggleButton.addActionListener(this);
+		samplingModeToggleButton.addActionListener(this);
 		
-		channelModeBToggleButton.addActionListener(this);
-
-		horizontalRangeAComboBox.addActionListener(this);
+		horizontalRangeComboBox.addActionListener(this);
 		
-		horizontalRangeBComboBox.addActionListener(this);
-
-		horizontalRangeMathComboBox.addActionListener(this);
-		
-		horizontalRangeFilterComboBox.addActionListener(this);
-
 		verticalRangeAComboBox.addActionListener(this);
 		
 		verticalRangeBComboBox.addActionListener(this);
@@ -221,17 +206,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 
 		verticalRangeFilterComboBox.addActionListener(this);
 		
-		forceTriggerAButton.addActionListener(this);
+		forceTriggerButton.addActionListener(this);
 
-		forceTriggerBButton.addActionListener(this);
-		
-		triggerModeAComboBox.addActionListener(this);
+		triggerModeComboBox.addActionListener(this);
 
-		triggerModeBComboBox.addActionListener(this);
-		
-		triggerTypeAComboBox.addActionListener(this);
-		
-		triggerTypeBComboBox.addActionListener(this);
+		triggerTypeComboBox.addActionListener(this);
 		
 		verticalOffsetUnitAComboBox.addActionListener(this);
 		
@@ -249,9 +228,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		
 		waveTypeComboBox.addActionListener(this);
 		
-		noOfSamplesASpinner.addChangeListener(this);
-		
-		noOfSamplesBSpinner.addChangeListener(this);
+		noOfSamplesSpinner.addChangeListener(this);
 		
 		measureAToggleButton.addActionListener(this);
 		
@@ -261,17 +238,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		
 		measureFilterToggleButton.addActionListener(this);
 		
-		triggerThresholdUnitAComboBox.addActionListener(this);
+		triggerThresholdUnitComboBox.addActionListener(this);
 		
-		triggerThresholdUnitBComboBox.addActionListener(this);
+		triggerThresholdSpinner.addChangeListener(this);
 		
-		triggerThresholdASpinner.addChangeListener(this);
-		
-		triggerThresholdBSpinner.addChangeListener(this);
-		
-		rearmTriggerAToggleButton.addActionListener(this);
-		
-		rearmTriggerBToggleButton.addActionListener(this);
+		rearmTriggerToggleButton.addActionListener(this);
 		
 		verticalOffsetGeneratorSpinner.addChangeListener(this);
 		
@@ -322,13 +293,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			@Override
 			public void itemStateChanged(ItemEvent event) {
 				verticalOffsetUnitFilterComboBoxItemStateChanged();
-			}
-		});
-		
-		verticalOffsetUnitGeneratorComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				verticalOffsetUnitGeneratorComboBoxItemStateChanged();
 			}
 		});
 		
@@ -419,7 +383,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				return;
 			}
 		}
-		setEnabledFilterChannelControls(false);
 		browseButton.setEnabled(true);
 		inputChannelComboBox.setEnabled(true);
 		removeChannelPlotFromChartPanel(Constant.FILTER_CHANNEL);
@@ -431,12 +394,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 
 	private void inputChannelComboBoxActionPerformed() {
 		calculateFilterChannel();
-		String inputChannel = (String) inputChannelComboBox.getSelectedItem();
-		if(inputChannel != null) {
-			if(filterFile_.isValid() && (!inputChannel.equals("Select channel"))) {
-				setEnabledFilterChannelControls(true);
-			}
-		}
 	}
 
 	private void browseButtonActionPerformed() {
@@ -452,12 +409,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				csvFilePathTextField.setText(csvFile.getName());
 				csvFilePathTextField.setToolTipText(csvFile.getAbsolutePath());
 				calculateFilterChannel();
-				String inputChannel = (String) inputChannelComboBox.getSelectedItem();
-				if(inputChannel != null) {
-					if(filterFile_.isValid() && (!inputChannel.equals("Select channel"))) {
-						setEnabledFilterChannelControls(true);
-					}
-				}
 			} else {
 				csvFilePathTextField.setForeground(Color.RED);
 				csvFilePathTextField.setText("The choosen file is not valid!");
@@ -485,7 +436,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		}
 		expressionTextArea.setText("");
 		setEnabledExpressionControls(false);
-		setEnabledMathChannelControls(false);
 		newExpressionButton.setEnabled(true);
 		removeChannelPlotFromChartPanel(Constant.MATH_CHANNEL);
 		rawXYSeries.remove(Constant.MATH_CHANNEL);
@@ -510,10 +460,6 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 
 	private void verticalOffsetUnitFilterComboBoxItemStateChanged() {
 		verticalOffsetFilterSpinner.setValue(0);
-	}
-
-	private void verticalOffsetUnitGeneratorComboBoxItemStateChanged() {
-		verticalOffsetGeneratorSpinner.setValue(0);
 	}
 
 	private void horizontalOffsetUnitAComboBoxItemStateChanged() {
@@ -1069,20 +1015,24 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			int channelIndex = 0;
 			if (channelName == Constant.CHANNEL_A) {
 				channelIndex = Constant.A_INDEX;
+				aDivisionInfoLabel.setEnabled(true);
 			} else if (channelName == Constant.CHANNEL_B) {
 				channelIndex = Constant.B_INDEX;
+				bDivisionInfoLabel.setEnabled(true);
 			} else if (channelName == Constant.MATH_CHANNEL) {
 				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetMathSpinner.getValue(),
 						(String) horizontalOffsetUnitMathComboBox.getSelectedItem());
 				verticalOffset = getVerticalOffsetValueInVolt((int) verticalOffsetMathSpinner.getValue(),
 						(String) verticalOffsetUnitMathComboBox.getSelectedItem());
 				channelIndex = Constant.MATH_INDEX;
+				mathDivisionInfoLabel.setEnabled(true);
 			} else if (channelName == Constant.FILTER_CHANNEL) {
 				horizontalOffset = getHorizontalOffsetValue((int) horizontalOffsetFilterSpinner.getValue(),
 						(String) horizontalOffsetUnitFilterComboBox.getSelectedItem());
 				verticalOffset = getVerticalOffsetValueInVolt((int) verticalOffsetFilterSpinner.getValue(),
 						(String) verticalOffsetUnitFilterComboBox.getSelectedItem());
 				channelIndex = Constant.FILTER_INDEX;
+				filterDivisionInfoLabel.setEnabled(true);
 			}
 			XYSeries xYSeries = createXYSeriesWithOffsets(channelName, rawSeries, horizontalOffset, verticalOffset);
 			visualizer_.addSeriesToDataset(channelIndex, xYSeries);
@@ -1098,12 +1048,16 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		int channelIndex = 0;
 		if(channelName == Constant.CHANNEL_A) {
 			channelIndex = Constant.A_INDEX;
+			aDivisionInfoLabel.setEnabled(false);
 		} else if(channelName == Constant.CHANNEL_B) {
 			channelIndex = Constant.B_INDEX;
+			bDivisionInfoLabel.setEnabled(false);
 		} else if(channelName == Constant.MATH_CHANNEL) {
 			channelIndex = Constant.MATH_INDEX;
+			mathDivisionInfoLabel.setEnabled(false);
 		} else if(channelName == Constant.FILTER_CHANNEL) {
 			channelIndex = Constant.FILTER_INDEX;
+			filterDivisionInfoLabel.setEnabled(false);
 		}
 		visualizer_.removeAllSeriesFromDataset(channelIndex);
 		hideMeasurementResults(channelIndex);
@@ -1521,24 +1475,13 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 */
 	public void setHorizontalRange(int microSeconds) {
 		String timeString = convertMicroSecondsToTimeString(microSeconds);
-		horizontalRangeAComboBox.removeActionListener(this);
-		horizontalRangeBComboBox.removeActionListener(this);
-		horizontalRangeMathComboBox.removeActionListener(this);
-		horizontalRangeFilterComboBox.removeActionListener(this);
-
-		horizontalRangeAComboBox.setSelectedItem(timeString);
-		horizontalRangeBComboBox.setSelectedItem(timeString);
-		horizontalRangeMathComboBox.setSelectedItem(timeString);
-		horizontalRangeFilterComboBox.setSelectedItem(timeString);
-
-		horizontalRangeAComboBox.addActionListener(this);
-		horizontalRangeBComboBox.addActionListener(this);
-		horizontalRangeMathComboBox.addActionListener(this);
-		horizontalRangeFilterComboBox.addActionListener(this);
+		horizontalRangeComboBox.removeActionListener(this);
+		horizontalRangeComboBox.setSelectedItem(timeString);
+		horizontalRangeComboBox.addActionListener(this);
 
 		int horizontalRange = microSeconds;
 		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
-		if(horizontalRangeAComboBox.getSelectedIndex() > previousHorizontalRangeIndex_) {
+		if(horizontalRangeComboBox.getSelectedIndex() > previousHorizontalRangeIndex_) {
 			if (rawXYSeries.containsKey(Constant.MATH_CHANNEL)) {
 				calculateMathChannel(expressionTextArea.getText().trim());
 			}
@@ -1551,7 +1494,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		showMeasurementResults(Constant.MATH_INDEX);
 		showMeasurementResults(Constant.FILTER_INDEX);
 		horizontalDivisionInfoLabel.setText("Horizontal: " + timeString + "/div");
-		previousHorizontalRangeIndex_ = horizontalRangeAComboBox.getSelectedIndex();
+		previousHorizontalRangeIndex_ = horizontalRangeComboBox.getSelectedIndex();
 	}
 	
 	/**
@@ -1702,24 +1645,13 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 * @param channelName
 	 * @param state ON or OFF
 	 */
-	public void setReArmTrigger(String channelName, int state) {
-		if (channelName.equals(Constant.CHANNEL_A)) {
-			if (state == Constant.REARM_TRIGGER_OFF) {
-				rearmTriggerAToggleButton.setSelected(false);
-				rearmTriggerAToggleButton.setText("Re-arm - OFF");
-			} else {
-				rearmTriggerAToggleButton.setSelected(true);
-				rearmTriggerAToggleButton.setText("Re-arm - ON");
-			}
-		} else if (channelName.equals(Constant.CHANNEL_B)) {
-			if (state == Constant.REARM_TRIGGER_OFF) {
-				rearmTriggerBToggleButton.setSelected(false);
-				rearmTriggerBToggleButton.setText("Re-arm - OFF");
-			} else {
-				rearmTriggerBToggleButton.setSelected(true);
-				rearmTriggerBToggleButton.setText("Re-arm - ON");
-			}
-
+	public void setReArmTrigger(int state) {
+		if (state == Constant.REARM_TRIGGER_OFF) {
+			rearmTriggerToggleButton.setSelected(false);
+			rearmTriggerToggleButton.setText("Re-arm - OFF");
+		} else {
+			rearmTriggerToggleButton.setSelected(true);
+			rearmTriggerToggleButton.setText("Re-arm - ON");
 		}
 	}
 	
@@ -1728,38 +1660,21 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 * @param channelName
 	 * @param state
 	 */
-	public void setTriggerState(String channelName, int state) {
+	public void setTriggerState(int state) {
 		if (state >= 0 && state <= 2) {
-			if (channelName.equals(Constant.CHANNEL_A)) {
 				switch (state) {
 				case Constant.ARMED_STATE:
-					triggerStateALabel.setText("ARMED");
+					triggerStateLabel.setText("ARMED");
 					break;
 
 				case Constant.TRIGGERED_STATE:
-					triggerStateALabel.setText("TRIGGERED");
+					triggerStateLabel.setText("TRIGGERED");
 					break;
 
 				case Constant.STOPPED_STATE:
-					triggerStateALabel.setText("STOPPED");
+					triggerStateLabel.setText("STOP");
 					break;
 				}
-
-			} else if (channelName.equals(Constant.CHANNEL_B)) {
-				switch (state) {
-				case Constant.ARMED_STATE:
-					triggerStateBLabel.setText("ARMED");
-					break;
-
-				case Constant.TRIGGERED_STATE:
-					triggerStateBLabel.setText("TRIGGERED");
-					break;
-
-				case Constant.STOPPED_STATE:
-					triggerStateBLabel.setText("STOPPED");
-					break;
-				}
-			}
 		} else {
 			System.out.println("Invalid trigger state: " + state);
 		}
@@ -1770,47 +1685,25 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 * @param channelName
 	 * @param microvolts
 	 */
-	public void setTriggerThreshold(String channelName, int microvolts) {
-		if (channelName.equals(Constant.CHANNEL_A)) {
+	public void setTriggerThreshold(int microvolts) {
 			if (microvolts == 0) {
-				triggerThresholdASpinner.removeChangeListener(this);
-				triggerThresholdASpinner.setValue(0);
-				triggerThresholdASpinner.addChangeListener(this);
+				triggerThresholdSpinner.removeChangeListener(this);
+				triggerThresholdSpinner.setValue(0);
+				triggerThresholdSpinner.addChangeListener(this);
 			} else {
-				if (sentTriggerThresholdACommand_ == false) {
-					triggerThresholdUnitAComboBox.removeActionListener(this);
-					triggerThresholdUnitAComboBox.setSelectedItem(Constant.ONE_MILIVOLT);
-					triggerThresholdUnitAComboBox.addActionListener(this);
+				if (sentTriggerThresholdCommand_ == false) {
+					triggerThresholdUnitComboBox.removeActionListener(this);
+					triggerThresholdUnitComboBox.setSelectedItem(Constant.ONE_MILIVOLT);
+					triggerThresholdUnitComboBox.addActionListener(this);
 				}
-				sentTriggerThresholdACommand_ = false;
-				triggerThresholdASpinner.removeChangeListener(this);
+				sentTriggerThresholdCommand_ = false;
+				triggerThresholdSpinner.removeChangeListener(this);
 				int spinnerValue = calculateValueForSpinner(microvolts,
-						(String) triggerThresholdUnitAComboBox.getSelectedItem());
-				triggerThresholdASpinner.setValue(spinnerValue);
-				triggerThresholdASpinner.addChangeListener(this);
-				previousTriggerThresholdAValue_ = (int) triggerThresholdASpinner.getValue();
+						(String) triggerThresholdUnitComboBox.getSelectedItem());
+				triggerThresholdSpinner.setValue(spinnerValue);
+				triggerThresholdSpinner.addChangeListener(this);
+				previousTriggerThresholdValue_ = (int) triggerThresholdSpinner.getValue();
 			}
-		} else if (channelName.equals(Constant.CHANNEL_B)) {
-			if (microvolts == 0) {
-				triggerThresholdBSpinner.removeChangeListener(this);
-				triggerThresholdBSpinner.setValue(0);
-				triggerThresholdBSpinner.addChangeListener(this);
-			} else {
-				if (sentTriggerThresholdBCommand_ == false) {
-					triggerThresholdUnitBComboBox.removeActionListener(this);
-					triggerThresholdUnitBComboBox.setSelectedItem(Constant.ONE_MILIVOLT);
-					triggerThresholdUnitBComboBox.addActionListener(this);
-				}
-				sentTriggerThresholdBCommand_ = false;
-				triggerThresholdBSpinner.removeChangeListener(this);
-				int spinnerValue = calculateValueForSpinner(microvolts,
-						(String) triggerThresholdUnitBComboBox.getSelectedItem());
-				triggerThresholdBSpinner.setValue(spinnerValue);
-				triggerThresholdBSpinner.addChangeListener(this);
-				previousTriggerThresholdBValue_ = (int) triggerThresholdBSpinner.getValue();
-			}
-
-		}
 	}
 	
 	/**
@@ -1818,13 +1711,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 * @param noOfSamples
 	 */
 	public void setNoOfSamples(int noOfSamples) {
-		noOfSamplesASpinner.removeChangeListener(this);
-		noOfSamplesBSpinner.removeChangeListener(this);
-		noOfSamplesASpinner.setValue(noOfSamples);
-		noOfSamplesBSpinner.setValue(noOfSamples);
-		noOfSamplesASpinner.addChangeListener(this);
-		noOfSamplesBSpinner.addChangeListener(this);
-		previousNoOfSamples_ = (int) noOfSamplesASpinner.getValue();
+		noOfSamplesSpinner.removeChangeListener(this);
+		noOfSamplesSpinner.setValue(noOfSamples);
+		noOfSamplesSpinner.addChangeListener(this);
+		previousNoOfSamples_ = (int) noOfSamplesSpinner.getValue();
 	}
 	
 	/**
@@ -1851,29 +1741,17 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 * Set trigger mode
 	 * @param triggerMode
 	 */
-	public void setTriggerMode(String channelName, int triggerMode) {
+	public void setTriggerMode(int triggerMode) {
 		if(triggerMode >= 0 && triggerMode <= 2) {
-			if(channelName.equals(Constant.CHANNEL_A)) {
-				triggerModeAComboBox.removeActionListener(this);
-				triggerModeAComboBox.setSelectedIndex(triggerMode);
-				triggerModeAComboBox.addActionListener(this);
-				previousTriggerModeAIndex_ = triggerMode;
+				triggerModeComboBox.removeActionListener(this);
+				triggerModeComboBox.setSelectedIndex(triggerMode);
+				triggerModeComboBox.addActionListener(this);
+				previousTriggerModeIndex_ = triggerMode;
 				if(triggerMode == Constant.SINGLE_MODE) {
-					rearmTriggerAToggleButton.setEnabled(true);
+					rearmTriggerToggleButton.setEnabled(true);
 				} else {
-					rearmTriggerAToggleButton.setEnabled(false);
+					rearmTriggerToggleButton.setEnabled(false);
 				}
-			} else if(channelName.equals(Constant.CHANNEL_B)) {
-				triggerModeBComboBox.removeActionListener(this);
-				triggerModeBComboBox.setSelectedIndex(triggerMode);
-				triggerModeBComboBox.addActionListener(this);
-				previousTriggerModeBIndex_ = triggerMode;
-				if(triggerMode == Constant.SINGLE_MODE) {
-					rearmTriggerBToggleButton.setEnabled(true);
-				} else {
-					rearmTriggerBToggleButton.setEnabled(false);
-				}
-			}
 		} else {
 			System.err.println("Trigger mode is out of range.");
 		}
@@ -1884,19 +1762,12 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 * @param channelName
 	 * @param triggerType
 	 */
-	public void setTriggerType(String channelName, int triggerType) {
+	public void setTriggerType(int triggerType) {
 		if(triggerType >= 0 && triggerType <= 2) {
-			if(channelName.equals(Constant.CHANNEL_A)) {
-				triggerTypeAComboBox.removeActionListener(this);
-				triggerTypeAComboBox.setSelectedIndex(triggerType);
-				triggerTypeAComboBox.addActionListener(this);
-				previousTriggerTypeAIndex_ = triggerType;
-			} else if(channelName.equals(Constant.CHANNEL_B)) {
-				triggerTypeBComboBox.removeActionListener(this);
-				triggerTypeBComboBox.setSelectedIndex(triggerType);
-				triggerTypeBComboBox.addActionListener(this);
-				previousTriggerTypeBIndex_ = triggerType;
-			}
+				triggerTypeComboBox.removeActionListener(this);
+				triggerTypeComboBox.setSelectedIndex(triggerType);
+				triggerTypeComboBox.addActionListener(this);
+				previousTriggerTypeIndex_ = triggerType;
 		} else {
 			System.err.println("Trigger type is out of range.");
 		}
@@ -1956,27 +1827,18 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	}
 	
 	/**
-	 * Set channel mode
+	 * Set sampling mode
+	 * 
 	 * @param channelName
 	 * @param mode
 	 */
-	public void setChannelMode(String channelName, int mode) {
-		if(channelName.equals(Constant.CHANNEL_A)) {
-			if(mode == Constant.MODE_8BIT) {
-				channelModeAToggleButton.setSelected(true);
-				channelModeAToggleButton.setText("8-bit");
-			} else {
-				channelModeAToggleButton.setSelected(false);
-				channelModeAToggleButton.setText("12-bit");
-			}
-		} else if(channelName.equals(Constant.CHANNEL_B)) {
-			if(mode == Constant.MODE_8BIT) {
-				channelModeBToggleButton.setSelected(true);
-				channelModeBToggleButton.setText("8-bit");
-			} else {
-				channelModeBToggleButton.setSelected(false);
-				channelModeBToggleButton.setText("12-bit");
-			}
+	public void setSamplingMode(int mode) {
+		if (mode == Constant.MODE_8BIT) {
+			samplingModeToggleButton.setSelected(true);
+			samplingModeToggleButton.setText("8-bit");
+		} else {
+			samplingModeToggleButton.setSelected(false);
+			samplingModeToggleButton.setText("12-bit");
 		}
 	}
 	
@@ -1988,6 +1850,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 */
 	public void setXYSeries(String channelName, XYSeries xYSeries, boolean isUpdatePlot) {
 		rawXYSeries.put(channelName, xYSeries);
+		updateInputChannelComboBox();
 		if (isUpdatePlot= true) {
 			if (channelName.equals(Constant.CHANNEL_A)) {
 				String expression = expressionTextArea.getText().trim();
@@ -2048,14 +1911,8 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	 * @param channelName
 	 * @return number of samples or -1 if channel name is neither channel A or B
 	 */
-	public int getNoOfSamples(String channelName) {
-		if(channelName.equals(Constant.CHANNEL_A)) {
-			return (int) noOfSamplesASpinner.getValue();
-		} else if(channelName.equals(Constant.CHANNEL_B)) {
-			return (int) noOfSamplesBSpinner.getValue();
-		} else {
-			return -1;
-		}
+	public int getNoOfSamples() {
+			return (int) noOfSamplesSpinner.getValue();
 	}
 	
 	@Override
@@ -2064,42 +1921,34 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		Object source = event.getSource();
 		if (source == channelACheckBox) {
 			if (channelACheckBox.isSelected()) {
-				setEnabledChannelAControls(true);
 				showTab(Constant.TAB.CHANNEL_A);
 				showChannelPlotOnChartPanel(Constant.CHANNEL_A);
 			} else {
-				setEnabledChannelAControls(false);
 				removeChannelPlotFromChartPanel(Constant.CHANNEL_A);
 			}
 
 		} else if (source == channelBCheckBox) {
 			if (channelBCheckBox.isSelected()) {
-				setEnabledChannelBControls(true);
 				showTab(Constant.TAB.CHANNEL_B);
 				showChannelPlotOnChartPanel(Constant.CHANNEL_B);
 			} else {
-				setEnabledChannelBControls(false);
 				removeChannelPlotFromChartPanel(Constant.CHANNEL_B);
 			}
 
 		} else if (source == mathChannelCheckBox) {
 			if (mathChannelCheckBox.isSelected()) {
-				setEnabledMathChannelControls(true);
 				showTab(Constant.TAB.MATH_CHANNEL);
 				showChannelPlotOnChartPanel(Constant.MATH_CHANNEL);
 			} else {
-				setEnabledMathChannelControls(false);
 				removeChannelPlotFromChartPanel(Constant.MATH_CHANNEL);
 			}
 
 		} else if (source == filterChannelCheckBox) {
 			if (filterChannelCheckBox.isSelected()) {
-				setEnabledFilterChannelControls(true);
 				showTab(Constant.TAB.FILTER_CHANNEL);
 				updateInputChannelComboBox();
 				showChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
 			} else {
-				setEnabledFilterChannelControls(false);
 				removeChannelPlotFromChartPanel(Constant.FILTER_CHANNEL);
 			}
 
@@ -2152,57 +2001,22 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			}
 			sendCommand(PacketType.CHANNEL_COUPLING_B, coupling);
 		
-		} else if(source == channelModeAToggleButton) {
+		} else if(source == samplingModeToggleButton) {
 			int mode;
-			if(channelModeAToggleButton.isSelected()) {
+			if(samplingModeToggleButton.isSelected()) {
 				mode = Constant.MODE_8BIT;
-				channelModeAToggleButton.setSelected(false);
+				samplingModeToggleButton.setSelected(false);
 			} else {
 				mode = Constant.MODE_12_BIT;
-				channelModeAToggleButton.setSelected(true);
+				samplingModeToggleButton.setSelected(true);
 			}
-			sendCommand(PacketType.CHANNEL_MODE_A, mode);
+			sendCommand(PacketType.SAMPLING_MODE, mode);
 			
-		}else if(source == channelModeBToggleButton) {
-			int mode;
-			if(channelModeBToggleButton.isSelected()) {
-				mode = Constant.MODE_8BIT;
-				channelModeBToggleButton.setSelected(false);
-			} else {
-				mode = Constant.MODE_12_BIT;
-				channelModeBToggleButton.setSelected(true);
-			}
-			sendCommand(PacketType.CHANNEL_MODE_B, mode);
-			
-		} else if (source == horizontalRangeAComboBox) {
-			String timeString = (String) horizontalRangeAComboBox.getSelectedItem();
-			horizontalRangeAComboBox.removeActionListener(this);
-			horizontalRangeAComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
-			horizontalRangeAComboBox.addActionListener(this);
-			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
-			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
-			
-		} else if (source == horizontalRangeBComboBox) {
-			String timeString = (String) horizontalRangeBComboBox.getSelectedItem();
-			horizontalRangeBComboBox.removeActionListener(this);
-			horizontalRangeBComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
-			horizontalRangeBComboBox.addActionListener(this);
-			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
-			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
-			
-		} else if (source == horizontalRangeMathComboBox) {
-			String timeString = (String) horizontalRangeMathComboBox.getSelectedItem();
-			horizontalRangeMathComboBox.removeActionListener(this);
-			horizontalRangeMathComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
-			horizontalRangeMathComboBox.addActionListener(this);
-			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
-			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
-			
-		} else if (source == horizontalRangeFilterComboBox) {
-			String timeString = (String) horizontalRangeFilterComboBox.getSelectedItem();
-			horizontalRangeFilterComboBox.removeActionListener(this);
-			horizontalRangeFilterComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
-			horizontalRangeFilterComboBox.addActionListener(this);
+		} else if (source == horizontalRangeComboBox) {
+			String timeString = (String) horizontalRangeComboBox.getSelectedItem();
+			horizontalRangeComboBox.removeActionListener(this);
+			horizontalRangeComboBox.setSelectedIndex(previousHorizontalRangeIndex_);
+			horizontalRangeComboBox.addActionListener(this);
 			int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 			sendCommand(PacketType.HORIZONTAL_RANGE, horizontalRange);
 			
@@ -2242,39 +2056,22 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			}
 			filterDivisionInfoLabel.setText("Filter: " + selectedItem + "/div");
 
-		} else if(source == forceTriggerAButton) {
-			sendCommand(PacketType.TRIGGER_FORCE_A, Constant.IGNORE);
+		} else if(source == forceTriggerButton) {
+			sendCommand(PacketType.TRIGGER_FORCE, Constant.IGNORE);
 
-		} else if(source == forceTriggerBButton) {
-			sendCommand(PacketType.TRIGGER_FORCE_B, Constant.IGNORE);
-
-		} else if (source == triggerModeAComboBox) {
-			int mode = triggerModeAComboBox.getSelectedIndex();
-			triggerModeAComboBox.removeActionListener(this);
-			triggerModeAComboBox.setSelectedIndex(previousTriggerModeAIndex_);
-			triggerModeAComboBox.addActionListener(this);
-			sendCommand(PacketType.TRIGGER_MODE_A, mode);
+		} else if (source == triggerModeComboBox) {
+			int mode = triggerModeComboBox.getSelectedIndex();
+			triggerModeComboBox.removeActionListener(this);
+			triggerModeComboBox.setSelectedIndex(previousTriggerModeIndex_);
+			triggerModeComboBox.addActionListener(this);
+			sendCommand(PacketType.TRIGGER_MODE, mode);
 			
-		}else if(source == triggerModeBComboBox) {
-			int mode = triggerModeBComboBox.getSelectedIndex();
-			triggerModeBComboBox.removeActionListener(this);
-			triggerModeBComboBox.setSelectedIndex(previousTriggerModeBIndex_);
-			triggerModeBComboBox.addActionListener(this);
-			sendCommand(PacketType.TRIGGER_MODE_B, mode);
-			
-		} else if (source == triggerTypeAComboBox) {
-			int mode = triggerTypeAComboBox.getSelectedIndex();
-			triggerTypeAComboBox.removeActionListener(this);
-			triggerTypeAComboBox.setSelectedIndex(previousTriggerTypeAIndex_);
-			triggerTypeAComboBox.addActionListener(this);
-			sendCommand(PacketType.TRIGGER_TYPE_A, mode);
-			
-		} else if (source == triggerTypeBComboBox) {
-			int mode = triggerTypeBComboBox.getSelectedIndex();
-			triggerTypeBComboBox.removeActionListener(this);
-			triggerTypeBComboBox.setSelectedIndex(previousTriggerTypeBIndex_);
-			triggerTypeBComboBox.addActionListener(this);
-			sendCommand(PacketType.TRIGGER_TYPE_B, mode);
+		} else if (source == triggerTypeComboBox) {
+			int mode = triggerTypeComboBox.getSelectedIndex();
+			triggerTypeComboBox.removeActionListener(this);
+			triggerTypeComboBox.setSelectedIndex(previousTriggerTypeIndex_);
+			triggerTypeComboBox.addActionListener(this);
+			sendCommand(PacketType.TRIGGER_TYPE, mode);
 			
 		} else if (source == verticalOffsetUnitAComboBox) {
 			sendCommand(PacketType.DC_OFFSET_A, 0);
@@ -2334,35 +2131,20 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			}
 			showMeasurementResults(Constant.FILTER_INDEX);
 
-		} else if(source == triggerThresholdUnitAComboBox) {
-			sendCommand(PacketType.TRIGGER_THRESHOLD_A, 0);
-			sentTriggerThresholdACommand_ = true;
+		} else if(source == triggerThresholdUnitComboBox) {
+			sendCommand(PacketType.TRIGGER_THRESHOLD, 0);
+			sentTriggerThresholdCommand_ = true;
 
-		} else if(source == triggerThresholdUnitBComboBox) {
-			sendCommand(PacketType.TRIGGER_THRESHOLD_B, 0);
-			sentTriggerThresholdBCommand_ = true;
-
-		} else if(source == rearmTriggerAToggleButton) {
+		} else if(source == rearmTriggerToggleButton) {
 			int state;
-			if(rearmTriggerAToggleButton.isSelected()) {
+			if(rearmTriggerToggleButton.isSelected()) {
 				state = Constant.REARM_TRIGGER_ON;
-				rearmTriggerAToggleButton.setSelected(false);
+				rearmTriggerToggleButton.setSelected(false);
 			} else {
 				state = Constant.REARM_TRIGGER_OFF;
-				rearmTriggerAToggleButton.setSelected(true);
+				rearmTriggerToggleButton.setSelected(true);
 			}
-			sendCommand(PacketType.TRIGGER_ARM_A, state);
-
-		} else if(source == rearmTriggerBToggleButton) {
-			int state;
-			if(rearmTriggerBToggleButton.isSelected()) {
-				state = Constant.REARM_TRIGGER_ON;
-				rearmTriggerBToggleButton.setSelected(false);
-			} else {
-				state = Constant.REARM_TRIGGER_OFF;
-				rearmTriggerBToggleButton.setSelected(true);
-			}
-			sendCommand(PacketType.TRIGGER_ARM_B, state);
+			sendCommand(PacketType.TRIGGER_ARM, state);
 
 		} else if (source == verticalOffsetUnitGeneratorComboBox) {
 			sendCommand(PacketType.GENERATOR_OFFSET, 0);
@@ -2378,7 +2160,26 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	public void stateChanged(ChangeEvent e) {
 		// TODO
 		Object source = e.getSource();
-		if(source == verticalOffsetASpinner) {
+		if(source == channelTabbedPane) {
+			switch (channelTabbedPane.getSelectedIndex()) {
+			case Constant.A_INDEX:
+				showTriggerControls(Constant.TAB.CHANNEL_A);
+				break;
+				
+			case Constant.B_INDEX:
+				showTriggerControls(Constant.TAB.CHANNEL_B);
+				break;
+				
+			case Constant.MATH_INDEX:
+				showTriggerControls(Constant.TAB.MATH_CHANNEL);
+				break;
+				
+			case Constant.FILTER_INDEX:
+				showTriggerControls(Constant.TAB.FILTER_CHANNEL);
+				break;
+			}
+			
+		} else if(source == verticalOffsetASpinner) {
 			int offset = convertToMicrovolt((int) verticalOffsetASpinner.getValue(),
 					(String) verticalOffsetUnitAComboBox.getSelectedItem());
 			verticalOffsetASpinner.removeChangeListener(this);
@@ -2402,45 +2203,25 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		} else if(source == verticalOffsetFilterSpinner) {
 			refreshChannelPlotOnChartPanel(Constant.FILTER_CHANNEL);
 
-		} else if(source == noOfSamplesASpinner) {
-			int nSamples = (int) noOfSamplesASpinner.getValue();
-			noOfSamplesASpinner.removeChangeListener(this);
-			noOfSamplesASpinner.setValue(previousNoOfSamples_);
-			noOfSamplesASpinner.addChangeListener(this);
+		} else if(source == noOfSamplesSpinner) {
+			int nSamples = (int) noOfSamplesSpinner.getValue();
+			noOfSamplesSpinner.removeChangeListener(this);
+			noOfSamplesSpinner.setValue(previousNoOfSamples_);
+			noOfSamplesSpinner.addChangeListener(this);
 			if(nSamples > 0) {
 				sendCommand(PacketType.NUMBER_OF_SAMPLES, nSamples);
 			} else {
 				// Ignore
 			}
 
-		} else if(source == noOfSamplesBSpinner) {
-			int nSamples = (int) noOfSamplesBSpinner.getValue();
-			noOfSamplesBSpinner.removeChangeListener(this);
-			noOfSamplesBSpinner.setValue(previousNoOfSamples_);
-			noOfSamplesBSpinner.addChangeListener(this);
-			if(nSamples > 0) {
-				sendCommand(PacketType.NUMBER_OF_SAMPLES, nSamples);
-			} else {
-				// Ignore
-			}
-
-		} else if(source == triggerThresholdASpinner) {
-			int threshold = convertToMicrovolt((int) triggerThresholdASpinner.getValue(),
-					(String) triggerThresholdUnitAComboBox.getSelectedItem());
-			triggerThresholdASpinner.removeChangeListener(this);;
-			triggerThresholdASpinner.setValue(previousTriggerThresholdAValue_);
-			triggerThresholdASpinner.addChangeListener(this);
-			sendCommand(PacketType.TRIGGER_THRESHOLD_A, threshold);
-			sentTriggerThresholdACommand_ = true;
-
-		} else if(source == triggerThresholdBSpinner) {
-			int threshold = convertToMicrovolt((int) triggerThresholdBSpinner.getValue(),
-					(String) triggerThresholdUnitBComboBox.getSelectedItem());
-			triggerThresholdBSpinner.removeChangeListener(this);;
-			triggerThresholdBSpinner.setValue(previousTriggerThresholdBValue_);
-			triggerThresholdBSpinner.addChangeListener(this);
-			sendCommand(PacketType.TRIGGER_THRESHOLD_B, threshold);
-			sentTriggerThresholdBCommand_ = true;
+		} else if(source == triggerThresholdSpinner) {
+			int threshold = convertToMicrovolt((int) triggerThresholdSpinner.getValue(),
+					(String) triggerThresholdUnitComboBox.getSelectedItem());
+			triggerThresholdSpinner.removeChangeListener(this);;
+			triggerThresholdSpinner.setValue(previousTriggerThresholdValue_);
+			triggerThresholdSpinner.addChangeListener(this);
+			sendCommand(PacketType.TRIGGER_THRESHOLD, threshold);
+			sentTriggerThresholdCommand_ = true;
 
 		} else if (source == verticalOffsetGeneratorSpinner) {
 			int offset = convertToMicrovolt((int) verticalOffsetGeneratorSpinner.getValue(),
