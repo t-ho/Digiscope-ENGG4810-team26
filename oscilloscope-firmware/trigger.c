@@ -40,8 +40,10 @@
 		*chan_B_dest_8 = *chan_B_src >> 4; \
 		if (currentState == TRIGGER_STATE_ARMED && *chan_A_dest_8 > realThreshold) \
 		{ \
-			trigger_index = chan_A_dest_8 - channel_A_samples_8; \
+			trigger_index = (chan_A_dest_8 - channel_A_samples_8) - (currentNumSamples / 2); \
+			if (trigger_index < 0) trigger_index += TRIGGER_BUF_8_SIZE; \
 			TriggerSetState(TRIGGER_STATE_TRIGGERED); \
+			countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4); \
 		} \
 		chan_A_dest_8++; \
 		chan_A_src++; \
@@ -61,8 +63,10 @@
 		*chan_B_dest_12 = *chan_B_src; \
 		if (currentState == TRIGGER_STATE_ARMED && *chan_A_dest_12 > realThreshold) \
 		{ \
-			trigger_index = chan_A_dest_12 - channel_A_samples_12; \
+			trigger_index = (chan_A_dest_12 - channel_A_samples_12) - (currentNumSamples / 2); \
+			if (trigger_index < 0) trigger_index += TRIGGER_BUF_12_SIZE; \
 			TriggerSetState(TRIGGER_STATE_TRIGGERED); \
+			countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4); \
 		} \
 		chan_A_dest_12++; \
 		chan_A_src++; \
@@ -88,8 +92,8 @@ static uint8_t* channel_B_samples_8 = (uint8_t*) &_channel_B_samples;
 
 static uint32_t offset = 0;
 
-static const char* TriggerModeNames[] = {"Auto", "Normal", "Single"};
-static const char* TriggerTypeNames[] = {"Rising", "Falling", "Level"};
+static const char* TriggerModeNames[] = {"Auto", "Single", "Normal"};
+static const char* TriggerTypeNames[] = {"Level", "Rising", "Falling"};
 
 static TriggerType currentType = TRIGGER_TYPE_LEVEL;
 static TriggerMode currentMode = TRIGGER_MODE_AUTO;
@@ -102,12 +106,12 @@ static int32_t currentThreshold = 1000000;
 static uint16_t realThreshold;
 
 static SampleSize currentSampleSize = SAMPLE_SIZE_12_BIT;
-static uint32_t numSamples = 25000;
+static uint32_t currentNumSamples = 25000;
 
 static void
 triggerSearchISR(UArg arg0, UArg arg1)
 {
-	int trigger_index;
+	int trigger_index, countdown;
 
 	uint8_t 	*chan_A_dest_8, 	*chan_B_dest_8;
 	uint16_t 	*chan_A_dest_12, 	*chan_B_dest_12;
@@ -127,27 +131,45 @@ triggerSearchISR(UArg arg0, UArg arg1)
 		offset += ADC_TRANSFER_SIZE;
 
 		if (currentSampleSize == SAMPLE_SIZE_8_BIT)
+		{
 			SAMPLECOPY8(ALT, offset)
+
+			offset += ADC_TRANSFER_SIZE;
+
+			if (offset >= TRIGGER_BUF_8_SIZE)
+			{
+				offset = 0;
+			}
+		}
 		else
+		{
 			SAMPLECOPY12(ALT, offset)
 
-		offset += ADC_TRANSFER_SIZE;
+			offset += ADC_TRANSFER_SIZE;
 
-		if (offset >= numSamples)
-		{
-			offset = 0;
+			if (offset >= TRIGGER_BUF_12_SIZE)
+			{
+				offset = 0;
+			}
 		}
 
 		if (currentState == TRIGGER_STATE_TRIGGERED)
 		{
-			SendSamples(trigger_index, numSamples);
-			if (TriggerGetMode() == TRIGGER_MODE_SINGLE)
+			if (countdown < 0)
 			{
-				TriggerSetState(TRIGGER_STATE_STOP);
+				SendSamples(trigger_index, currentNumSamples);
+				if (TriggerGetMode() == TRIGGER_MODE_SINGLE)
+				{
+					TriggerSetState(TRIGGER_STATE_STOP);
+				}
+				else
+				{
+					TriggerSetState(TRIGGER_STATE_ARMED);
+				}
 			}
 			else
 			{
-				TriggerSetState(TRIGGER_STATE_ARMED);
+				countdown--;
 			}
 		}
 	}
@@ -266,49 +288,67 @@ TriggerSetChannel(uint32_t channel)
 }
 
 static void
-TransmitBuffer8(uint8_t* buffer, uint8_t type, uint16_t start_index)
+TransmitBuffer8(uint8_t* buffer, uint8_t type, uint16_t start_index, uint16_t numSamples)
 {
-	int seqnum = 0;
+	int seqnum;
+
+	int numPackets = numSamples / MAX_8_BIT_SAMPLES;
 
 	SampleCommand scmd;
 	scmd.num_samples = MAX_8_BIT_SAMPLES;
 	scmd.period = 1;
 	scmd.type = type;
 
-	while ((seqnum + 1) * MAX_8_BIT_SAMPLES < numSamples)
+	for (seqnum = 0; seqnum <= numPackets; seqnum++)
 	{
 		scmd.seq_num = seqnum;
-		scmd.buffer = &buffer[seqnum * MAX_8_BIT_SAMPLES];
+
+		uint8_t* trans = &buffer[start_index + seqnum * MAX_8_BIT_SAMPLES];
+		if (trans > &buffer[TRIGGER_BUF_8_SIZE])
+		{
+			trans -= TRIGGER_BUF_8_SIZE;
+		}
+		scmd.buffer = trans;
+
+		if (seqnum == numPackets)
+		{
+			scmd.num_samples = numSamples - MAX_8_BIT_SAMPLES * numPackets;
+		}
+
 		NetSend((Command *) &scmd, 0);
-		seqnum++;
 	}
-	scmd.seq_num = seqnum;
-	scmd.buffer = &buffer[seqnum * MAX_8_BIT_SAMPLES];
-	scmd.num_samples = numSamples - seqnum * MAX_8_BIT_SAMPLES;
-	NetSend((Command *) &scmd, 0);
 }
 
 static void
-TransmitBuffer12(uint16_t* buffer, uint8_t type, uint16_t start_index)
+TransmitBuffer12(uint16_t* buffer, uint8_t type, uint16_t start_index, uint16_t numSamples)
 {
-	int seqnum = 0;
+	int seqnum;
+
+	int numPackets = numSamples / MAX_12_BIT_SAMPLES;
 
 	SampleCommand scmd;
 	scmd.num_samples = MAX_12_BIT_SAMPLES;
 	scmd.period = 1;
 	scmd.type = type;
 
-	while ((seqnum + 1) * MAX_12_BIT_SAMPLES < numSamples)
+	for (seqnum = 0; seqnum <= numPackets; seqnum++)
 	{
 		scmd.seq_num = seqnum;
-		scmd.buffer = &buffer[seqnum * MAX_12_BIT_SAMPLES];
+
+		uint16_t* trans = &buffer[start_index + seqnum * MAX_12_BIT_SAMPLES];
+		if (trans > &buffer[TRIGGER_BUF_12_SIZE])
+		{
+			trans -= TRIGGER_BUF_12_SIZE;
+		}
+		scmd.buffer = trans;
+
+		if (seqnum == numPackets)
+		{
+			scmd.num_samples = numSamples - MAX_12_BIT_SAMPLES * numPackets;
+		}
+
 		NetSend((Command *) &scmd, 0);
-		seqnum++;
 	}
-	scmd.seq_num = seqnum;
-	scmd.buffer = &buffer[seqnum * MAX_12_BIT_SAMPLES];
-	scmd.num_samples = numSamples - seqnum * MAX_12_BIT_SAMPLES;
-	NetSend((Command *) &scmd, 0);
 }
 
 SampleSize
@@ -346,25 +386,25 @@ TriggerSetSampleSize(SampleSize mode)
 }
 
 void
-TriggerSetNumSamples(uint32_t newNum)
+TriggerSetNumSamples(uint32_t numSamples)
 {
-	uint32_t max = (TriggerGetSampleSize() == SAMPLE_SIZE_8_BIT) ? TRIGGER_BUF_8_SIZE : TRIGGER_BUF_12_SIZE;
+	uint32_t max = (TriggerGetSampleSize() == SAMPLE_SIZE_8_BIT) ? TRIGGER_BUF_8_SIZE - 4096 : TRIGGER_BUF_12_SIZE - 2048;
 
-	if (newNum >= max)
+	if (numSamples >= max)
 	{
-		newNum = max;
+		numSamples = max;
 	}
 
-	if (newNum < 1024)
+	if (numSamples < 1024)
 	{
-		newNum = 1024;
+		numSamples = 1024;
 	}
 
-	numSamples = newNum;
+	currentNumSamples = numSamples;
 
 	Command cmd;
 	cmd.type = COMMAND_NUM_SAMPLES;
-	cmd.args[0] = numSamples;
+	cmd.args[0] = currentNumSamples;
 	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
 
 	NetSend(&cmd, 0);
@@ -373,7 +413,7 @@ TriggerSetNumSamples(uint32_t newNum)
 uint32_t
 TriggerGetNumSamples(void)
 {
-	return numSamples;
+	return currentNumSamples;
 }
 
 void
@@ -402,13 +442,13 @@ SendSamples(uint32_t start_pos, uint32_t num)
 
 	if (currentSampleSize == SAMPLE_SIZE_8_BIT)
 	{
-		TransmitBuffer8(channel_A_samples_8, SAMPLE_PACKET_A_8, 0);
-		TransmitBuffer8(channel_B_samples_8, SAMPLE_PACKET_B_8, 0);
+		TransmitBuffer8(channel_A_samples_8, SAMPLE_PACKET_A_8, start_pos, num);
+		TransmitBuffer8(channel_B_samples_8, SAMPLE_PACKET_B_8, start_pos, num);
 	}
 	else
 	{
-		TransmitBuffer12(channel_A_samples_12, SAMPLE_PACKET_A_12, 0);
-		TransmitBuffer12(channel_B_samples_12, SAMPLE_PACKET_B_12, 0);
+		TransmitBuffer12(channel_A_samples_12, SAMPLE_PACKET_A_12, start_pos, num);
+		TransmitBuffer12(channel_B_samples_12, SAMPLE_PACKET_B_12, start_pos, num);
 	}
 
 	offset = 0;
