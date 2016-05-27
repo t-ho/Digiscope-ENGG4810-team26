@@ -21,7 +21,6 @@ public class Constant {
 	
 	public static final int PORT_NUMBER = 4810;
 	public static final String DEFAULT_IP_ADDRESS = "192.168.137.8";
-//	public static final String DEFAULT_IP_ADDRESS = "127.0.0.1";
 	
 	public static final int DEFAULT_NUMBER_OF_SAMPLES = 25000;
 	
@@ -42,12 +41,9 @@ public class Constant {
 		TWENTY_MILIVOLTS, FIFTY_MILIVOLTS, ONE_HUNDRED_MILIVOLTS, TWO_HUNDRED_MILIVOLTS,
 		FIVE_HUNDRED_MILIVOLTS, ONE_VOLT, TWO_VOLTS };
 	
-	public static final String[] VERTICAL_OFFSET_UNITS = new String[] {
+	public static final String[] VOLTAGE_UNITS = new String[] {
 		ONE_MILIVOLT, TEN_MILIVOLTS, ONE_HUNDRED_MILIVOLTS, ONE_VOLT};
         
-        public static final String[] VOLTAGE_UNITS = new String[] { ONE_MILIVOLT,
-                ONE_VOLT };
-
 	public static final String ONE_MICROSECOND = "1 us";
 	public static final String TWO_MICROSECONDS = "2 us";
 	public static final String FIVE_MICROSECONDS = "5 us";

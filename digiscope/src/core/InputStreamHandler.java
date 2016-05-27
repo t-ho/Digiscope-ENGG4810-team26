@@ -146,7 +146,19 @@ public class InputStreamHandler extends Thread {
 							case PacketType.WAVE_TYPE:
 								mainWindow_.setWaveType(commandPacket.getArgument());
 								break;
-							
+
+							case PacketType.GENERATOR_VOLTAGE:
+								mainWindow_.setP2PVoltage(commandPacket.getArgument());
+								break;
+
+							case PacketType.GENERATOR_OFFSET:
+								mainWindow_.setVerticalOffset(Constant.GENERATOR_CHANNEL, commandPacket.getArgument());
+								break;
+
+							case PacketType.GENERATOR_FREQUENCY:
+								mainWindow_.setGeneratorFrequency(commandPacket.getArgument());
+								break;
+
 							case PacketType.NUMBER_OF_SAMPLES:
 								mainWindow_.setNoOfSamples(commandPacket.getArgument());
 								break;

@@ -734,7 +734,7 @@ public class MainWindowUi extends JFrame {
         verticalOffsetALabel2_.setText("x");
         verticalARightPanel_.add(verticalOffsetALabel2_);
 
-        verticalOffsetUnitAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
+        verticalOffsetUnitAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VOLTAGE_UNITS));
         verticalOffsetUnitAComboBox.setEnabled(false);
         verticalOffsetUnitAComboBox.setPreferredSize(new Dimension(75, 20));
         verticalARightPanel_.add(verticalOffsetUnitAComboBox);
@@ -921,7 +921,7 @@ public class MainWindowUi extends JFrame {
         thresholdALabel2_.setText("x");
         triggerABottomRightPanel3_.add(thresholdALabel2_);
 
-        triggerThresholdUnitAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
+        triggerThresholdUnitAComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VOLTAGE_UNITS));
         triggerThresholdUnitAComboBox.setPreferredSize(new Dimension(75, 20));
         triggerABottomRightPanel3_.add(triggerThresholdUnitAComboBox);
 
@@ -1021,7 +1021,7 @@ public class MainWindowUi extends JFrame {
         verticalOffsetBLabel2_.setText("x");
         verticalBRightPanel_.add(verticalOffsetBLabel2_);
 
-        verticalOffsetUnitBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
+        verticalOffsetUnitBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VOLTAGE_UNITS));
         verticalOffsetUnitBComboBox.setEnabled(false);
         verticalOffsetUnitBComboBox.setPreferredSize(new Dimension(75, 20));
         verticalBRightPanel_.add(verticalOffsetUnitBComboBox);
@@ -1208,7 +1208,7 @@ public class MainWindowUi extends JFrame {
         thresholdBLabel2_.setText("x");
         triggerBBottomRightPanel3_.add(thresholdBLabel2_);
 
-        triggerThresholdUnitBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
+        triggerThresholdUnitBComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VOLTAGE_UNITS));
         triggerThresholdUnitBComboBox.setPreferredSize(new Dimension(75, 20));
         triggerBBottomRightPanel3_.add(triggerThresholdUnitBComboBox);
 
@@ -1337,7 +1337,7 @@ public class MainWindowUi extends JFrame {
         verticalOffsetMathLabel2_.setText("x");
         verticalMathRightPanel_.add(verticalOffsetMathLabel2_);
 
-        verticalOffsetUnitMathComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
+        verticalOffsetUnitMathComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VOLTAGE_UNITS));
         verticalOffsetUnitMathComboBox.setEnabled(false);
         verticalOffsetUnitMathComboBox.setPreferredSize(new Dimension(75, 20));
         verticalMathRightPanel_.add(verticalOffsetUnitMathComboBox);
@@ -1554,7 +1554,7 @@ public class MainWindowUi extends JFrame {
         verticalOffsetFilterLabel2_.setText("x");
         verticalFilterRightPanel_.add(verticalOffsetFilterLabel2_);
 
-        verticalOffsetUnitFilterComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
+        verticalOffsetUnitFilterComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VOLTAGE_UNITS));
         verticalOffsetUnitFilterComboBox.setEnabled(false);
         verticalOffsetUnitFilterComboBox.setPreferredSize(new Dimension(75, 20));
         verticalFilterRightPanel_.add(verticalOffsetUnitFilterComboBox);
@@ -1715,7 +1715,7 @@ public class MainWindowUi extends JFrame {
         verticalOffsetGeneratorLabel2_.setText("x");
         generatorControlFourthPanel_.add(verticalOffsetGeneratorLabel2_);
 
-        verticalOffsetUnitGeneratorComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VERTICAL_OFFSET_UNITS));
+        verticalOffsetUnitGeneratorComboBox.setModel(new DefaultComboBoxModel<String>(Constant.VOLTAGE_UNITS));
         verticalOffsetUnitGeneratorComboBox.setEnabled(false);
         verticalOffsetUnitGeneratorComboBox.setPreferredSize(new Dimension(75, 20));
         generatorControlFourthPanel_.add(verticalOffsetUnitGeneratorComboBox);

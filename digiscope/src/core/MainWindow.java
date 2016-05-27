@@ -78,6 +78,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 	private boolean sentTriggerThresholdBCommand_;
 	private int previousTriggerThresholdAValue_;
 	private int previousTriggerThresholdBValue_;
+	private boolean sentVerticalOffsetGeneratorCommand_;
+	private int previousVerticalOffsetGeneratorValue_;
+	private boolean sentP2PVoltageCommand_;
+	private int previousP2PVoltageValue_;
+	private int previousGeneratorFrequency_;
 	
 	public MainWindow(LaunchWindow launchWindow) {
 		super();
@@ -124,6 +129,11 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		sentTriggerThresholdBCommand_ = false;
 		previousTriggerThresholdAValue_ = (int) triggerThresholdASpinner.getValue();
 		previousTriggerThresholdBValue_ = (int) triggerThresholdBSpinner.getValue();
+		sentVerticalOffsetGeneratorCommand_ = false;
+		previousVerticalOffsetGeneratorValue_ = (int) verticalOffsetGeneratorSpinner.getValue();
+		sentP2PVoltageCommand_ = false;
+		previousP2PVoltageValue_ = (int) p2pVoltageSpinner.getValue();
+		previousGeneratorFrequency_ = (int) generatorFrequencySpinner.getValue();
 		// test
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
@@ -262,6 +272,16 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		rearmTriggerAToggleButton.addActionListener(this);
 		
 		rearmTriggerBToggleButton.addActionListener(this);
+		
+		verticalOffsetGeneratorSpinner.addChangeListener(this);
+		
+		verticalOffsetUnitGeneratorComboBox.addActionListener(this);
+		
+		p2pVoltageSpinner.addChangeListener(this);
+		
+		p2pVoltageUnitComboBox.addActionListener(this);
+		
+		generatorFrequencySpinner.addChangeListener(this);
 
 		horizontalOffsetASpinner.addChangeListener(new ChangeListener() {
 			@Override
@@ -1597,6 +1617,7 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				verticalOffsetASpinner.addChangeListener(this);
 				previousVerticalOffsetAValue_ = (int) verticalOffsetASpinner.getValue();
 			}
+
 		} else if(channelName.equals(Constant.CHANNEL_B)) {
 			if(microvolts == 0) {
 				verticalOffsetBSpinner.removeChangeListener(this);
@@ -1616,7 +1637,64 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 				verticalOffsetBSpinner.addChangeListener(this);
 				previousVerticalOffsetBValue_ = (int) verticalOffsetBSpinner.getValue();
 			}
+
+		} else if(channelName.equals(Constant.GENERATOR_CHANNEL)) {
+			if(microvolts == 0) {
+				verticalOffsetGeneratorSpinner.removeChangeListener(this);
+				verticalOffsetGeneratorSpinner.setValue(0);
+				verticalOffsetGeneratorSpinner.addChangeListener(this);
+			} else {
+				if (sentVerticalOffsetGeneratorCommand_ == false) {
+					verticalOffsetUnitGeneratorComboBox.removeActionListener(this);
+					verticalOffsetUnitGeneratorComboBox.setSelectedItem(Constant.ONE_MILIVOLT);
+					verticalOffsetUnitGeneratorComboBox.addActionListener(this);
+				}
+				sentVerticalOffsetGeneratorCommand_ = false;
+				verticalOffsetGeneratorSpinner.removeChangeListener(this);
+				int spinnerValue = calculateValueForSpinner(microvolts,
+						(String) verticalOffsetUnitGeneratorComboBox.getSelectedItem());
+				verticalOffsetGeneratorSpinner.setValue(spinnerValue);
+				verticalOffsetGeneratorSpinner.addChangeListener(this);
+				previousVerticalOffsetGeneratorValue_ = (int) verticalOffsetBSpinner.getValue();
+			}
+			
 		}
+	}
+	
+	/**
+	 * Set peak to peak voltage for function generator
+	 * @param microvolts
+	 */
+	public void setP2PVoltage(int microvolts) {
+		if(microvolts == 0) {
+			p2pVoltageSpinner.removeChangeListener(this);
+			p2pVoltageSpinner.setValue(0);
+			p2pVoltageSpinner.addChangeListener(this);
+		} else {
+			if(sentP2PVoltageCommand_ == false) {
+				p2pVoltageUnitComboBox.removeActionListener(this);
+				p2pVoltageUnitComboBox.setSelectedItem(Constant.ONE_MILIVOLT);
+				p2pVoltageUnitComboBox.addActionListener(this);
+			}
+			sentP2PVoltageCommand_ = false;
+			p2pVoltageSpinner.removeChangeListener(this);
+			int spinnerValue = calculateValueForSpinner(microvolts,
+					(String) p2pVoltageUnitComboBox.getSelectedItem());
+			p2pVoltageSpinner.setValue(spinnerValue);
+			p2pVoltageSpinner.addChangeListener(this);
+			previousP2PVoltageValue_ = (int) p2pVoltageSpinner.getValue();
+		}
+	}
+	
+	/**
+	 * Set the frequency for function generator
+	 * @param frequency
+	 */
+	public void setGeneratorFrequency(int frequency) {
+		generatorFrequencySpinner.removeChangeListener(this);
+		generatorFrequencySpinner.setValue(frequency);
+		generatorFrequencySpinner.addChangeListener(this);
+		previousGeneratorFrequency_ = (int) generatorFrequencySpinner.getValue();
 	}
 
 	/**
@@ -1866,6 +1944,10 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 		}
 	}
 
+	/**
+	 * Set the wave type of function generator
+	 * @param waveType
+	 */
 	public void setWaveType(int waveType) {
 		waveTypeComboBox.removeActionListener(this);
 		waveTypeComboBox.setSelectedIndex(waveType);
@@ -2282,6 +2364,13 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			}
 			sendCommand(PacketType.TRIGGER_ARM_B, state);
 
+		} else if (source == verticalOffsetUnitGeneratorComboBox) {
+			sendCommand(PacketType.GENERATOR_OFFSET, 0);
+			sentVerticalOffsetGeneratorCommand_ = true;
+
+		} else if (source == p2pVoltageUnitComboBox) {
+			sendCommand(PacketType.GENERATOR_VOLTAGE, 0);
+			sentP2PVoltageCommand_ = true;
 		}
 	}
 
@@ -2352,6 +2441,31 @@ public class MainWindow extends MainWindowUi implements ChartMouseListener, Item
 			triggerThresholdBSpinner.addChangeListener(this);
 			sendCommand(PacketType.TRIGGER_THRESHOLD_B, threshold);
 			sentTriggerThresholdBCommand_ = true;
+
+		} else if (source == verticalOffsetGeneratorSpinner) {
+			int offset = convertToMicrovolt((int) verticalOffsetGeneratorSpinner.getValue(),
+					(String) verticalOffsetUnitGeneratorComboBox.getSelectedItem());
+			verticalOffsetGeneratorSpinner.removeChangeListener(this);
+			verticalOffsetGeneratorSpinner.setValue(previousVerticalOffsetGeneratorValue_);
+			verticalOffsetGeneratorSpinner.addChangeListener(this);
+			sendCommand(PacketType.GENERATOR_OFFSET, offset);
+			sentVerticalOffsetGeneratorCommand_ = true;
+
+		} else if (source == p2pVoltageSpinner) {
+			int p2pVoltage = convertToMicrovolt((int) p2pVoltageSpinner.getValue(),
+					(String) p2pVoltageUnitComboBox.getSelectedItem());
+			p2pVoltageSpinner.removeChangeListener(this);
+			p2pVoltageSpinner.setValue(previousP2PVoltageValue_);
+			p2pVoltageSpinner.addChangeListener(this);
+			sendCommand(PacketType.GENERATOR_VOLTAGE, p2pVoltage);
+			sentP2PVoltageCommand_ = true;
+			
+		} else if (source == generatorFrequencySpinner) {
+			int frequency = (int) generatorFrequencySpinner.getValue();
+			generatorFrequencySpinner.removeChangeListener(this);
+			generatorFrequencySpinner.setValue(previousGeneratorFrequency_);
+			generatorFrequencySpinner.addChangeListener(this);
+			sendCommand(PacketType.GENERATOR_FREQUENCY, frequency);
 
 		}
 	}
