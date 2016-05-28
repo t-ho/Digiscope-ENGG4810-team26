@@ -1,5 +1,7 @@
 package core;
 
+import java.awt.Color;
+
 import org.jfree.chart.ChartTheme;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
@@ -12,6 +14,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.Range;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+
 import data.Constant;
 
 /**
@@ -46,24 +49,38 @@ public class Visualizer {
 		currentTheme.apply(chart);
 	}
 
-	public Visualizer(int channelIndex, XYSeries xYSeries) {
-		this();
-		addSeriesToDataset(channelIndex, xYSeries);
-	}
-	
 	/**
 	 * Add XYSeries to Dataset of the specified channel. The data will be visualized on the canvas
 	 * @param channelIndex the index of specified channel
 	 * @param xYSeries 
+	 * @param noOfSamples
 	 */
-	public void addSeriesToDataset(int channelIndex, XYSeries xYSeries) {
+	public void addSeriesToDataset(int channelIndex, XYSeries xYSeries, int noOfSamples) {
 		if(xYSeries != null) {
 			datasets[channelIndex].removeAllSeries();
 			datasets[channelIndex].addSeries(xYSeries);
 			if(channelIndex == Constant.A_INDEX) {
 				renderers[channelIndex].setSeriesPaint(0, Constant.A_COLOR);
+				XYSeries marker = new XYSeries("Trigger Marker");
+				double x = noOfSamples / 2;
+				double y1 = - Constant.VERTICAL_GRID_SPACINGS;
+				double y2 = Constant.VERTICAL_GRID_SPACINGS;
+				marker.add(x, y1);
+				marker.add(x, y2);
+				datasets[channelIndex].addSeries(marker);
+				renderers[channelIndex].setSeriesPaint(1, Color.CYAN);
+				renderers[channelIndex].setSeriesVisibleInLegend(1, false);
 			} else if(channelIndex == Constant.B_INDEX) {
 				renderers[channelIndex].setSeriesPaint(0, Constant.B_COLOR);
+				XYSeries marker = new XYSeries("Trigger Marker");
+				double x = noOfSamples / 2;
+				double y1 = - Constant.VERTICAL_GRID_SPACINGS;
+				double y2 = Constant.VERTICAL_GRID_SPACINGS;
+				marker.add(x, y1);
+				marker.add(x, y2);
+				datasets[channelIndex].addSeries(marker);
+				renderers[channelIndex].setSeriesPaint(1, Color.CYAN);
+				renderers[channelIndex].setSeriesVisibleInLegend(1, false);
 			} else if(channelIndex == Constant.MATH_INDEX) {
 				renderers[channelIndex].setSeriesPaint(0, Constant.MATH_COLOR);
 			} else if(channelIndex == Constant.FILTER_INDEX) {

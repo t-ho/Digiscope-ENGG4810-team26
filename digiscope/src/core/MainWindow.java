@@ -854,7 +854,7 @@ public class MainWindow extends MainWindowUi
 				filterDivisionInfoLabel.setEnabled(true);
 			}
 			XYSeries xYSeries = createXYSeriesWithOffsets(channelName, rawSeries, horizontalOffset, verticalOffset);
-			visualizer_.addSeriesToDataset(channelIndex, xYSeries);
+			visualizer_.addSeriesToDataset(channelIndex, xYSeries, (int) noOfSamplesSpinner.getValue());
 			showMeasurementResults(channelIndex);
 		}
 	}
