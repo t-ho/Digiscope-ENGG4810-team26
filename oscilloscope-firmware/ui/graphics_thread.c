@@ -26,6 +26,8 @@
 
 static const char * const menu_titles[] = { "Team 26 Oscilloscope", "Channel X", "Trigger - Force/Arm", "Trigger - Threshold", "Wave Generator", "Wave Generator", "Brightness", "Overvoltage Warning!" };
 
+static tContext sContext;
+
 tCanvasWidget g_sTitle;
 
 tPushButtonWidget main_menu_buttons[];
@@ -51,28 +53,28 @@ uint8_t current_menu = MAIN_MENU;
 tCanvasWidget menus[] =
 {
 	// Main menu
-    CanvasStruct(0, 0, &main_menu_buttons, &SSD1289_Display, 0, 24,
+    CanvasStruct(0, 0, &main_menu_buttons, &SSD1289_Display, 0, 25,
                  320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
 	// Range menu
-    CanvasStruct(0, 0, &RangeBack, &SSD1289_Display, 0, 24,
+    CanvasStruct(0, 0, &RangeBack, &SSD1289_Display, 0, 25,
                  320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
 	// Trigger Arm menu
-	CanvasStruct(0, 0, &TriggerArmBack, &SSD1289_Display, 0, 24,
+	CanvasStruct(0, 0, &TriggerArmBack, &SSD1289_Display, 0, 25,
 				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
 	// Trigger Threshold menu
-	CanvasStruct(0, 0, &TriggerThresholdBack, &SSD1289_Display, 0, 24,
+	CanvasStruct(0, 0, &TriggerThresholdBack, &SSD1289_Display, 0, 25,
 				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
 	// Wavegen1 menu
-	CanvasStruct(0, 0, &WaveGen1Back, &SSD1289_Display, 0, 24,
+	CanvasStruct(0, 0, &WaveGen1Back, &SSD1289_Display, 0, 25,
 				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
 	// Wavegen2 menu
-	CanvasStruct(0, 0, &WaveGen2Back, &SSD1289_Display, 0, 24,
+	CanvasStruct(0, 0, &WaveGen2Back, &SSD1289_Display, 0, 25,
 				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
 	// Brightness menu
-	CanvasStruct(0, 0, &BrightnessBack, &SSD1289_Display, 0, 24,
+	CanvasStruct(0, 0, &BrightnessBack, &SSD1289_Display, 0, 25,
 				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
 	// Overvoltage menu
-	CanvasStruct(0, 0, &OverVoltageAcknowledge, &SSD1289_Display, 0, 24,
+	CanvasStruct(0, 0, &OverVoltageAcknowledge, &SSD1289_Display, 0, 25,
 				 320, 180, CANVAS_STYLE_FILL, ClrBlack, 0, 0, 0, 0, 0, 0),
 };
 
@@ -217,6 +219,55 @@ Standard_Step(uint32_t val, int8_t dir)
 	return val;
 }
 
+static void
+DrawTriggerIndicator(TriggerState state)
+{
+	static uint8_t arrow[] =
+	{
+		IMAGE_FMT_1BPP_UNCOMP, 16, 0, 16, 0,
+
+		0b00000000, 0b01000000,
+		0b00000000, 0b11100000,
+		0b00000001, 0b11110000,
+		0b00000011, 0b11111000,
+		0b00000111, 0b11111100,
+		0b00001111, 0b11111110,
+		0b00011111, 0b11111111,
+		0b00000001, 0b11110000,
+		0b00000001, 0b11110000,
+		0b00000001, 0b11110000,
+		0b00000001, 0b11110000,
+		0b00000001, 0b11110000,
+		0b00000001, 0b11110000,
+		0b00000001, 0b11110000,
+		0b00000001, 0b11110000,
+		0b00000001, 0b11110000
+	};
+
+    static uint16_t clrSquare[] = { 298, 3, 316, 21 };
+    static uint16_t stopSquare[] = { 300, 5, 314, 19 };
+
+    GrContextForegroundSet(&sContext, ClrBlack);
+    GrRectFill(&sContext, (tRectangle*)&clrSquare);
+
+    switch (state)
+    {
+    case TRIGGER_STATE_ARMED:
+        GrContextForegroundSet(&sContext, ClrYellow);
+        GrCircleFill(&sContext, 307, 12, 9);
+        break;
+    case TRIGGER_STATE_TRIGGERED:
+        GrContextForegroundSet(&sContext, ClrLightGreen);
+        GrImageDraw(&sContext, arrow, 299, 5);
+    	break;
+    case TRIGGER_STATE_STOP:
+    default:
+        GrContextForegroundSet(&sContext, ClrRed);
+        GrRectFill(&sContext, (tRectangle*)&stopSquare);
+    	break;
+    }
+}
+
 void
 UISend(Command *cmd, uint32_t timeout)
 {
@@ -228,7 +279,6 @@ UI_Task(UArg arg0, UArg arg1)
 {
 	uint32_t ipaddr = 0;
 
-    tContext sContext;
     tRectangle sRect;
 
     GrContextInit(&sContext, &SSD1289_Display);
@@ -237,7 +287,7 @@ UI_Task(UArg arg0, UArg arg1)
     sRect.i16XMin = 0;
     sRect.i16YMin = 0;
     sRect.i16XMax = GrContextDpyWidthGet(&sContext) - 1;
-    sRect.i16YMax = 23;
+    sRect.i16YMax = 24;
 
     // GrContextForegroundSet(&sContext, ClrDarkBlue);
     // GrRectFill(&sContext, &sRect);
@@ -263,6 +313,7 @@ UI_Task(UArg arg0, UArg arg1)
 	cmd.type = COMMAND_UNKNOWN;
 
 	Mailbox_post(GraphicsMailbox, &cmd, 0);
+	DrawTriggerIndicator((TriggerState) cmd.args[0]);
 
     while (1)
     {
@@ -352,6 +403,9 @@ UI_Task(UArg arg0, UArg arg1)
     		case _COMMAND_REPAINT:
     			WidgetPaint((tWidget *)cmd.args[0]);
     			break;
+    		case _COMMAND_TRIGGER_INDICATOR:
+    			DrawTriggerIndicator((TriggerState) cmd.args[0]);
+    			break;
     		case COMMAND_UNKNOWN:
     			/* Fallthrough */
     		default:
@@ -393,5 +447,5 @@ Init_UI(void)
 	Mailbox_Params_init(&mbparams);
 	static Error_Block eb;
 
-	GraphicsMailbox = Mailbox_create(sizeof(Command),10,&mbparams,&eb);
+	GraphicsMailbox = Mailbox_create(sizeof(Command),20,&mbparams,&eb);
 }

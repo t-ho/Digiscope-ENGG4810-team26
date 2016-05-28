@@ -27,7 +27,7 @@ static RectangularButton(TriggerToThreshold, &menus[TRIGGER_ARM_MENU], &TriggerM
 	100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE | PB_STYLE_RELEASE_NOTIFY, ClrGray, ClrYellow, ClrWhite,
 	ClrWhite, &g_sFontCm18b, "More", 0, 0, 0, 0, OnTRIGGER_THRESHOLD);
 static RectangularButton(TriggerForce, &menus[TRIGGER_ARM_MENU], &TriggerToThreshold, 0, &SSD1289_Display, 220, 30,
-	100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrRed, ClrGreen, ClrWhite,
+	100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrRed, ClrLightGreen, ClrWhite,
 	ClrWhite, &g_sFontCm18b, "Force", 0, 0, 0, 0, OnTriggerForce);
 static RectangularButton(TriggerArm, &menus[TRIGGER_ARM_MENU], &TriggerForce, 0, &SSD1289_Display, 110, 30,
 	100, 80, PB_STYLE_FILL | PB_STYLE_TEXT | PB_STYLE_OUTLINE, ClrRed, ClrYellow, ClrWhite,
@@ -79,6 +79,10 @@ OnTriggerForce(tWidget *psWidget)
 static void
 OnTriggerArm(tWidget *psWidget)
 {
+	if (TriggerGetState() == TRIGGER_STATE_STOP)
+	{
+		TriggerSetState(TRIGGER_STATE_ARMED);
+	}
 }
 
 static void

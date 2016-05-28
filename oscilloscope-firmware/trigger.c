@@ -306,6 +306,19 @@ TriggerGetState(void)
 void
 TriggerSetState(TriggerState state)
 {
+	static uint32_t last = 0;
+
+	// Ignore trigger if too soon
+	uint32_t now = Clock_getTicks();
+	if (now - last < MIN_TRIGGER_PERIOD)
+	{
+		return;
+	}
+	else
+	{
+		last = now;
+	}
+
 	currentState = state;
 
 	Command cmd;
@@ -314,6 +327,9 @@ TriggerSetState(TriggerState state)
 	cmd.args[0] = currentState;
 
 	NetSend(&cmd, 0);
+
+	cmd.type = _COMMAND_TRIGGER_INDICATOR;
+	UISend(&cmd, 0);
 }
 
 uint32_t
@@ -475,19 +491,6 @@ ForceTrigger(void)
 static void
 SendSamples(uint32_t start_pos, uint32_t num)
 {
-	static uint32_t last = 0;
-
-	// Ignore trigger if too soon
-	uint32_t current = Clock_getTicks();
-	if (current - last < MIN_TRIGGER_PERIOD)
-	{
-		return;
-	}
-	else
-	{
-		last = current;
-	}
-
 	ADCPause();
 
 	if (currentSampleSize == SAMPLE_SIZE_8_BIT)
