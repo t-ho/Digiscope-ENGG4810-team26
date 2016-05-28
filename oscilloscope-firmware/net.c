@@ -92,7 +92,14 @@ NetGetClients(void)
 int
 NetSend(Command *cmd, uint32_t timeout)
 {
-	return Mailbox_post(NetCommandMailbox, cmd, timeout);
+	if (NetGetClients())
+	{
+		return Mailbox_post(NetCommandMailbox, cmd, timeout);
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /*
