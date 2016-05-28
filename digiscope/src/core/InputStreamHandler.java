@@ -91,10 +91,6 @@ public class InputStreamHandler extends Thread {
 								mainWindow_.setTriggerThreshold(commandPacket.getArgument());
 								break;
 								
-							case PacketType.TRIGGER_ARM:
-								mainWindow_.setReArmTrigger(commandPacket.getArgument());
-								break;
-
 							case PacketType.CHANNEL_COUPLING_A:
 								mainWindow_.setChannelCoupling(Constant.CHANNEL_A, commandPacket.getArgument());
 								break;
