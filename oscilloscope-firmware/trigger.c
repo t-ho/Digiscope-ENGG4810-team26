@@ -25,6 +25,8 @@
 #define TRIGGER_BUF_8_SIZE (TRIGGER_BUF_12_SIZE * 2)
 #define TRIGGER_BUF_CURRENT_SIZE ((currentSampleSize == SAMPLE_SIZE_12_BIT)?(TRIGGER_BUF_12_SIZE):(TRIGGER_BUF_8_SIZE))
 
+#define MIN_SAMPLES 32
+
 #define MAX_8_BIT_SAMPLES (1024 - COMMANDLENGTH)
 #define MAX_12_BIT_SAMPLES (MAX_8_BIT_SAMPLES / 2)
 
@@ -68,22 +70,24 @@ static bool forceTriggerFlag = false;
 static Semaphore_Struct _bufferlock;
 Semaphore_Handle bufferlock;
 
+static uint16_t sample_divisor = 1;
+
 static Semaphore_Struct _settingslock;
 static Semaphore_Handle settingslock;
 
 static inline void
-sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_index, uint32_t countdown)
+sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_index, int32_t countdown, uint32_t skip)
 {
 
 	uint8_t *trig_src = currentChannel ? channel_B_samples_8 : channel_A_samples_8;
 
 	int i;
-	for (i = 0; i < ADC_TRANSFER_SIZE; i++)
+	for (i = 0; i < ADC_TRANSFER_SIZE / skip; i++)
 	{
-		channel_A_samples_8[offset + i] = src_a[i] >> 4;
-		channel_B_samples_8[offset + i] = src_b[i] >> 4;
+		channel_A_samples_8[offset + i] = src_a[i * skip] >> 4;
+		channel_B_samples_8[offset + i] = src_b[i * skip] >> 4;
 
-		if (currentState == TRIGGER_STATE_ARMED && countdown == 0)
+		if (currentState == TRIGGER_STATE_ARMED && countdown <= 0)
 		{
 
 			switch(currentType)
@@ -110,18 +114,18 @@ sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_
 
 
 static inline void
-sampleCopy12(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_index, uint32_t countdown)
+sampleCopy12(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_index, int32_t countdown, uint32_t skip)
 {
 
 	uint16_t *trig_src = currentChannel ? channel_B_samples_12 : channel_A_samples_12;
 
 	int i;
-	for (i = 0; i < ADC_TRANSFER_SIZE; i++)
+	for (i = 0; i < ADC_TRANSFER_SIZE / skip; i++)
 	{
-		channel_A_samples_12[offset + i] = src_a[i];
-		channel_B_samples_12[offset + i] = src_b[i];
+		channel_A_samples_12[offset + i] = src_a[i * skip];
+		channel_B_samples_12[offset + i] = src_b[i * skip];
 
-		if (currentState == TRIGGER_STATE_ARMED && countdown == 0)
+		if (currentState == TRIGGER_STATE_ARMED && countdown <= 0)
 		{
 			switch(currentType)
 			{
@@ -146,10 +150,10 @@ sampleCopy12(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger
 }
 
 static void
-triggerSearchTaskISR(UArg arg0, UArg arg1)
+triggerSearchTask(UArg arg0, UArg arg1)
 {
 	int32_t trigger_index;
-	uint32_t countdown = 0;
+	int32_t countdown = 0;
 
 	while (1)
 	{
@@ -160,35 +164,35 @@ triggerSearchTaskISR(UArg arg0, UArg arg1)
 
 		if (currentSampleSize == SAMPLE_SIZE_8_BIT)
 		{
-			sampleCopy8(adc_buffer_A_PRI, adc_buffer_B_PRI, offset, &trigger_index, countdown);
+			sampleCopy8(adc_buffer_A_PRI, adc_buffer_B_PRI, offset, &trigger_index, countdown, sample_divisor);
 		}
 		else
 		{
-			sampleCopy12(adc_buffer_A_PRI, adc_buffer_B_PRI, offset, &trigger_index, countdown);
+			sampleCopy12(adc_buffer_A_PRI, adc_buffer_B_PRI, offset, &trigger_index, countdown, sample_divisor);
 		}
 		Event_pend(AcqEvent, Event_Id_NONE, EVENT_ID_A_PRI | EVENT_ID_B_PRI | EVENT_ID_A_ALT | EVENT_ID_B_ALT, BIOS_NO_WAIT);
 
-		offset += ADC_TRANSFER_SIZE;
+		offset += ADC_TRANSFER_SIZE / sample_divisor;
 
 		// Wait for alternate buffers
 		Event_pend(AcqEvent, EVENT_ID_A_ALT | EVENT_ID_B_ALT, Event_Id_NONE, BIOS_WAIT_FOREVER);
 
 		if (currentSampleSize == SAMPLE_SIZE_8_BIT)
 		{
-			sampleCopy8(adc_buffer_A_ALT, adc_buffer_B_ALT, offset, &trigger_index, countdown);
+			sampleCopy8(adc_buffer_A_ALT, adc_buffer_B_ALT, offset, &trigger_index, countdown, sample_divisor);
 		}
 		else
 		{
-			sampleCopy12(adc_buffer_A_ALT, adc_buffer_B_ALT, offset, &trigger_index, countdown);
+			sampleCopy12(adc_buffer_A_ALT, adc_buffer_B_ALT, offset, &trigger_index, countdown, sample_divisor);
 		}
 		Event_pend(AcqEvent, Event_Id_NONE, EVENT_ID_A_PRI | EVENT_ID_B_PRI | EVENT_ID_A_ALT | EVENT_ID_B_ALT, BIOS_NO_WAIT);
 
-		offset += ADC_TRANSFER_SIZE;
+		offset += ADC_TRANSFER_SIZE / sample_divisor;
 		if (offset >= TRIGGER_BUF_CURRENT_SIZE) offset = 0;
 
 		if (countdown > 0)
 		{
-			countdown--;
+			countdown -= (ADC_TRANSFER_SIZE / sample_divisor);
 		}
 		else if (currentState == TRIGGER_STATE_TRIGGERED)
 		{
@@ -206,7 +210,7 @@ triggerSearchTaskISR(UArg arg0, UArg arg1)
 				// Wait for the net task to finish transmitting
 				Semaphore_pend(bufferlock, BIOS_WAIT_FOREVER);
 
-				countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 2);
+				countdown = currentNumSamples / 2;
 			}
 		}
 		// Check if trigger has been forced
@@ -373,7 +377,7 @@ TransmitBuffer8(uint8_t* buffer, uint8_t type, int32_t triggerindex, uint16_t nu
 
 	SampleCommand scmd;
 	scmd.num_samples = MAX_8_BIT_SAMPLES;
-	scmd.period = 1;
+	scmd.period = ADCGetPeriod() * sample_divisor;
 	scmd.type = type;
 
 	for (seqnum = 0; seqnum <= numPackets; seqnum++)
@@ -406,7 +410,7 @@ TransmitBuffer12(uint16_t* buffer, uint8_t type, int32_t triggerindex, uint16_t 
 
 	SampleCommand scmd;
 	scmd.num_samples = MAX_12_BIT_SAMPLES;
-	scmd.period = 1;
+	scmd.period = ADCGetPeriod() * sample_divisor;
 	scmd.type = type;
 
 	for (seqnum = 0; seqnum <= numPackets; seqnum++)
@@ -483,9 +487,9 @@ TriggerSetNumSamples(uint32_t numSamples)
 		numSamples = max;
 	}
 
-	if (numSamples < 1024)
+	if (numSamples < MIN_SAMPLES)
 	{
-		numSamples = 1024;
+		numSamples = MIN_SAMPLES;
 	}
 
 	currentNumSamples = numSamples;
@@ -503,6 +507,23 @@ uint32_t
 TriggerGetNumSamples(void)
 {
 	return currentNumSamples;
+}
+
+void
+TriggerSetSampleDivisor(uint16_t divisor)
+{
+	Semaphore_pend(settingslock, BIOS_WAIT_FOREVER);
+
+	offset = 0;
+	sample_divisor = divisor;
+
+	Semaphore_post(settingslock);
+}
+
+uint16_t
+TriggerGetSampleDivisor(void)
+{
+	return sample_divisor;
 }
 
 void
@@ -552,7 +573,7 @@ Trigger_Init(void)
     Task_Params_init(&taskParams);
 	taskParams.stackSize = 768;
     taskParams.priority = 10;
-    taskHandle = Task_create((Task_FuncPtr)triggerSearchTaskISR, &taskParams, &task_eb);
+    taskHandle = Task_create((Task_FuncPtr)triggerSearchTask, &taskParams, &task_eb);
 
     if (taskHandle == NULL)
     {

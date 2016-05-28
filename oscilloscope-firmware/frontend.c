@@ -5,10 +5,14 @@
  *      Author: ryanf
  */
 
+#include <xdc/runtime/System.h>
+
 #include "net.h"
 #include "command.h"
 #include "ui/graphics_thread.h"
 #include "ui/range_menu.h"
+#include "adc.h"
+#include "trigger.h"
 
 #define CHANNEL_A 0
 #define CHANNEL_B 1
@@ -19,6 +23,8 @@
 #define HDIV_MAX 1000000
 #define VDIV_MIN 20000
 #define VDIV_MAX 2000000
+
+#define PREFERRED_SAMPLES_PER_DIV 100
 
 static uint32_t hor_div = 500;
 static uint32_t vert_divs[] = {500, 500};
@@ -48,6 +54,33 @@ FrontEndSetHorDiv(uint32_t us)
 	{
 		hor_div = us;
 	}
+
+	if (hor_div / PREFERRED_SAMPLES_PER_DIV < 1000)
+	{
+		ADCSetFreq(1000);
+	}
+	else if (hor_div / PREFERRED_SAMPLES_PER_DIV < 2000)
+	{
+		ADCSetFreq(500);
+	}
+	else if (hor_div / PREFERRED_SAMPLES_PER_DIV < 5000)
+	{
+		ADCSetFreq(200);
+	}
+	else
+	{
+		ADCSetFreq(100);
+	}
+
+	int samplediv = 2;
+	while (ADCGetPeriod() * samplediv < hor_div / PREFERRED_SAMPLES_PER_DIV && samplediv <= SAMPLE_DIVISOR_MAX)
+	{
+		samplediv <<= 1;
+	}
+
+	TriggerSetSampleDivisor(samplediv >> 1);
+
+	System_printf("Sample period: %d us\n", ADCGetPeriod() * TriggerGetSampleDivisor());
 
 	Command cmd;
 	cmd.type = COMMAND_HORIZONTAL_RANGE;

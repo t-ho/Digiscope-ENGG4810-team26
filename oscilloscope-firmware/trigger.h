@@ -12,6 +12,8 @@
 #ifndef TRIGGER_H_
 #define TRIGGER_H_
 
+#define SAMPLE_DIVISOR_MAX 1024
+
 #define EVENT_ID_A_PRI Event_Id_00
 #define EVENT_ID_A_ALT Event_Id_01
 #define EVENT_ID_B_PRI Event_Id_02
@@ -62,6 +64,8 @@ extern TriggerState TriggerGetState(void);
 extern void TriggerSetState(TriggerState state);
 extern uint32_t TriggerGetNumSamples(void);
 extern void TriggerSetNumSamples(uint32_t newNum);
+extern uint16_t TriggerGetSampleDivisor(void);
+extern void TriggerSetSampleDivisor(uint16_t divisor);
 
 extern Semaphore_Handle bufferlock;
 

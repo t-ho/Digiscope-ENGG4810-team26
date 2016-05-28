@@ -4,7 +4,9 @@
  *  Created on: 12 May 2016
  *      Author: Ryan
  */
+#include <xdc/std.h>
 #include <xdc/runtime/Error.h>
+#include <xdc/runtime/System.h>
 
 #include <ti/sysbios/family/arm/m3/Hwi.h>
 
@@ -25,6 +27,44 @@ static tDMAControlTable *udmaCtrlTable = (tDMAControlTable *)_udmaCtrlTable;
 
 static void adcDmaCallback_A_ISR(unsigned int arg);
 static void adcDmaCallback_B_ISR(unsigned int arg);
+
+static uint32_t period = 1;
+
+uint32_t
+ADCGetPeriod(void)
+{
+	return period;
+}
+
+void
+ADCSetFreq(uint32_t freq_khz)
+{
+	switch (freq_khz)
+	{
+	case 1000:
+	    ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 32);
+	    ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 32);
+	    period = 1;
+		break;
+	case 500:
+    	ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_HALF, 32);
+		ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_HALF, 32);
+		period = 2;
+		break;
+	case 200:
+    	ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FOURTH, 40);
+		ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FOURTH, 40);
+		period = 5;
+		break;
+	case 100:
+    	ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_EIGHTH, 40);
+		ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_EIGHTH, 40);
+		period = 10;
+		break;
+	default:
+		System_printf("Unsupported ADC freq: %d kHz\n", freq_khz);
+	}
+}
 
 void
 ADC_Init(void)
