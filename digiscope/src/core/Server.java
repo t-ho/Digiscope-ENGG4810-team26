@@ -72,8 +72,8 @@ public class Server {
 										message = "Trigger type: " + commandPacket.getArgument();
 										break;
 										
-									case PacketType.CHANNEL_MODE:
-										message = "Channel mode: " + commandPacket.getArgument();
+									case PacketType.SAMPLING_MODE:
+										message = "Sampling mode: " + commandPacket.getArgument();
 										break;
 																				
 									case PacketType.CHANNEL_COUPLING_A:

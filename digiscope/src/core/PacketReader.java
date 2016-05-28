@@ -52,10 +52,10 @@ public class PacketReader {
 			case PacketType.VERTICAL_RANGE_B :
 				// Fallthrough
 
-			case PacketType.TRIGGER_MODE :
-				// Fallthrough
-
 			case PacketType.TRIGGER_STATE:
+				// Fallthrough
+				
+			case PacketType.TRIGGER_MODE :
 				// Fallthrough
 
 			case PacketType.TRIGGER_TYPE :
@@ -85,7 +85,7 @@ public class PacketReader {
 			case PacketType.CHANNEL_COUPLING_B :
 				// Fallthrough
 			
-			case PacketType.CHANNEL_MODE :
+			case PacketType.SAMPLING_MODE :
 				// Fallthrough
 
 			case PacketType.GENERATOR_OUTPUT :
