@@ -365,6 +365,12 @@ UI_Task(UArg arg0, UArg arg1)
     		case COMMAND_TRIGGER_FORCE:
     			ForceTrigger();
     			break;
+    		case COMMAND_TRIGGER_ARM:
+    			if (TriggerGetState() != TRIGGER_STATE_ARMED && TriggerGetMode() == TRIGGER_MODE_SINGLE)
+    			{
+    				TriggerSetState(TRIGGER_STATE_ARMED);
+    			}
+    			break;
     		case COMMAND_TRIGGER_MODE:
     			TriggerSetMode((TriggerMode)cmd.args[0]);
     			break;
