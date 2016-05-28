@@ -68,6 +68,9 @@ static bool forceTriggerFlag = false;
 static Semaphore_Struct _bufferlock;
 Semaphore_Handle bufferlock;
 
+static Semaphore_Struct _settingslock;
+static Semaphore_Handle settingslock;
+
 static inline void
 sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_index, uint32_t countdown)
 {
@@ -120,7 +123,6 @@ sampleCopy12(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger
 
 		if (currentState == TRIGGER_STATE_ARMED && countdown == 0)
 		{
-
 			switch(currentType)
 			{
 			case TRIGGER_TYPE_LEVEL:
@@ -151,6 +153,8 @@ triggerSearchTaskISR(UArg arg0, UArg arg1)
 
 	while (1)
 	{
+		Semaphore_pend(settingslock, BIOS_WAIT_FOREVER);
+
 		// Wait for primary buffers
 		Event_pend(AcqEvent, EVENT_ID_A_PRI | EVENT_ID_B_PRI, Event_Id_NONE, BIOS_WAIT_FOREVER);
 
@@ -197,24 +201,12 @@ triggerSearchTaskISR(UArg arg0, UArg arg1)
 				// Transmit Samples
 				SendSamples(trigger_index, currentNumSamples);
 
-				// Set state as appropriate
-				if (TriggerGetMode() == TRIGGER_MODE_SINGLE)
-				{
-					TriggerSetState(TRIGGER_STATE_STOP);
-				}
-				else
-				{
-					TriggerSetState(TRIGGER_STATE_ARMED);
-				}
+				TriggerSetMode(TriggerGetMode());
 
 				// Wait for the net task to finish transmitting
-				if (Semaphore_pend(bufferlock, BIOS_WAIT_FOREVER))
-				{
-					ResetBuffers();
-					countdown = currentNumSamples / ADC_TRANSFER_SIZE;
-				}
+				Semaphore_pend(bufferlock, BIOS_WAIT_FOREVER);
 
-				while (Event_pend(AcqEvent, Event_Id_NONE, EVENT_ID_A_PRI | EVENT_ID_B_PRI | EVENT_ID_A_ALT | EVENT_ID_B_ALT, 0));
+				countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 2);
 			}
 		}
 		// Check if trigger has been forced
@@ -224,6 +216,8 @@ triggerSearchTaskISR(UArg arg0, UArg arg1)
 			forceTriggerFlag = false;
 			TriggerSetState(TRIGGER_STATE_TRIGGERED);
 		}
+
+		Semaphore_post(settingslock);
 	}
 }
 
@@ -282,6 +276,16 @@ void
 TriggerSetMode(TriggerMode mode)
 {
 	currentMode = mode;
+
+	// Set state as appropriate
+	if (TriggerGetMode() == TRIGGER_MODE_SINGLE)
+	{
+		TriggerSetState(TRIGGER_STATE_STOP);
+	}
+	else
+	{
+		TriggerSetState(TRIGGER_STATE_ARMED);
+	}
 
 	TriggerSetModeText(TriggerModeNames[mode]);
 
@@ -434,6 +438,8 @@ TriggerGetSampleSize(void)
 void
 TriggerSetSampleSize(SampleSize sampleSize)
 {
+	Semaphore_pend(settingslock, BIOS_WAIT_FOREVER);
+
 	ResetBuffers();
 
 	offset = 0;
@@ -455,12 +461,16 @@ TriggerSetSampleSize(SampleSize sampleSize)
 
 	TriggerSetThreshold(TriggerGetThreshold());
 
+	TriggerSetMode(TriggerGetMode());
+
 	Command cmd;
 	cmd.type = COMMAND_SAMPLE_LENGTH;
 	cmd.args[0] = TriggerGetSampleSize();
 	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
 
 	NetSend(&cmd, 0);
+
+	Semaphore_post(settingslock);
 }
 
 void
@@ -487,6 +497,7 @@ TriggerSetNumSamples(uint32_t numSamples)
 
 	NetSend(&cmd, 0);
 }
+
 
 uint32_t
 TriggerGetNumSamples(void)
@@ -550,8 +561,15 @@ Trigger_Init(void)
 
     Semaphore_Params params;
     Semaphore_Params_init(&params);
+    params.mode = Semaphore_Mode_BINARY;
+
     Semaphore_construct(&_bufferlock, 0, &params);
     bufferlock = Semaphore_handle(&_bufferlock);
+
+    Semaphore_construct(&_settingslock, 0, &params);
+    settingslock = Semaphore_handle(&_settingslock);
+
+    Semaphore_post(settingslock);
 
     TriggerSetChannel(TriggerGetChannel());
     TriggerSetMode(TriggerGetMode());

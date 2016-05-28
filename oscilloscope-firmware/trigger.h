@@ -63,11 +63,6 @@ extern void TriggerSetState(TriggerState state);
 extern uint32_t TriggerGetNumSamples(void);
 extern void TriggerSetNumSamples(uint32_t newNum);
 
-extern volatile uint8_t channel_a_pri_full;
-extern volatile uint8_t channel_a_alt_full;
-extern volatile uint8_t channel_b_pri_full;
-extern volatile uint8_t channel_b_alt_full;
-
 extern Semaphore_Handle bufferlock;
 
 #endif /* TRIGGER_H_ */
