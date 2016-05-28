@@ -21,18 +21,17 @@
 #include "ui/graphics_thread.h"
 #include "ui/trigger_menu.h"
 
-#define MIN_TRIGGER_PERIOD 500
-
 #define TRIGGER_BUF_12_SIZE ADC_TRANSFER_SIZE * 28
 #define TRIGGER_BUF_8_SIZE (TRIGGER_BUF_12_SIZE * 2)
+#define TRIGGER_BUF_CURRENT_SIZE ((currentSampleSize == SAMPLE_SIZE_12_BIT)?(TRIGGER_BUF_12_SIZE):(TRIGGER_BUF_8_SIZE))
 
 #define MAX_8_BIT_SAMPLES (1024 - COMMANDLENGTH)
 #define MAX_12_BIT_SAMPLES (MAX_8_BIT_SAMPLES / 2)
 
 #define MAX_THRESHOLD 5000000
 
-static void SendSamples(uint32_t start_pos, uint32_t num);
-static void ResetBuffers(void);
+static inline void SendSamples(uint32_t start_pos, uint32_t num);
+static inline void ResetBuffers(void);
 
 Event_Handle AcqEvent;
 static Error_Block task_eb;
@@ -53,7 +52,7 @@ static const char* TriggerTypeNames[] = {"Level", "Rising", "Falling"};
 
 static TriggerType currentType = TRIGGER_TYPE_LEVEL;
 static TriggerMode currentMode = TRIGGER_MODE_AUTO;
-static TriggerState currentState = TRIGGER_STATE_ARMED;
+static TriggerState currentState = TRIGGER_STATE_STOP;
 static uint32_t currentChannel = 0;
 
 // Threshold in uV
@@ -64,8 +63,13 @@ static uint16_t realThreshold;
 static SampleSize currentSampleSize = SAMPLE_SIZE_12_BIT;
 static uint32_t currentNumSamples = 25000;
 
+static bool forceTriggerFlag = false;
+
+static Semaphore_Struct _bufferlock;
+Semaphore_Handle bufferlock;
+
 static inline void
-sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_index, int32_t *countdown)
+sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_index, uint32_t countdown)
 {
 
 	uint8_t *trig_src = currentChannel ? channel_B_samples_8 : channel_A_samples_8;
@@ -76,7 +80,7 @@ sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_
 		channel_A_samples_8[offset + i] = src_a[i] >> 4;
 		channel_B_samples_8[offset + i] = src_b[i] >> 4;
 
-		if (currentState == TRIGGER_STATE_ARMED)
+		if (currentState == TRIGGER_STATE_ARMED && countdown == 0)
 		{
 
 			switch(currentType)
@@ -95,17 +99,15 @@ sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_
 				break;
 			}
 
-			*trigger_index = offset + i - (currentNumSamples / 2);
-			if (*trigger_index < 0) *trigger_index += TRIGGER_BUF_8_SIZE;
+			*trigger_index = offset + i;
 			TriggerSetState(TRIGGER_STATE_TRIGGERED);
-			*countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4);
 		}
 	}
 }
 
 
 static inline void
-sampleCopy12(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_index, int32_t *countdown)
+sampleCopy12(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_index, uint32_t countdown)
 {
 
 	uint16_t *trig_src = currentChannel ? channel_B_samples_12 : channel_A_samples_12;
@@ -116,7 +118,7 @@ sampleCopy12(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger
 		channel_A_samples_12[offset + i] = src_a[i];
 		channel_B_samples_12[offset + i] = src_b[i];
 
-		if (currentState == TRIGGER_STATE_ARMED)
+		if (currentState == TRIGGER_STATE_ARMED && countdown == 0)
 		{
 
 			switch(currentType)
@@ -135,64 +137,67 @@ sampleCopy12(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger
 				break;
 			}
 
-			*trigger_index = offset + i - (currentNumSamples / 2);
-			if (*trigger_index < 0) *trigger_index += TRIGGER_BUF_12_SIZE;
+			*trigger_index = offset + i;
 			TriggerSetState(TRIGGER_STATE_TRIGGERED);
-			*countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4);
 		}
 	}
 }
 
 static void
-triggerSearchISR(UArg arg0, UArg arg1)
+triggerSearchTaskISR(UArg arg0, UArg arg1)
 {
-	int32_t trigger_index, countdown;
+	int32_t trigger_index;
+	uint32_t countdown = 0;
 
 	while (1)
 	{
+		// Wait for primary buffers
 		Event_pend(AcqEvent, EVENT_ID_A_PRI | EVENT_ID_B_PRI, Event_Id_NONE, BIOS_WAIT_FOREVER);
 
 		if (currentSampleSize == SAMPLE_SIZE_8_BIT)
 		{
-			sampleCopy8(adc_buffer_A_PRI, adc_buffer_B_PRI, offset, &trigger_index, &countdown);
+			sampleCopy8(adc_buffer_A_PRI, adc_buffer_B_PRI, offset, &trigger_index, countdown);
 		}
 		else
 		{
-			sampleCopy12(adc_buffer_A_PRI, adc_buffer_B_PRI, offset, &trigger_index, &countdown);
+			sampleCopy12(adc_buffer_A_PRI, adc_buffer_B_PRI, offset, &trigger_index, countdown);
 		}
-
-		Event_pend(AcqEvent, EVENT_ID_A_ALT | EVENT_ID_B_ALT, Event_Id_NONE, BIOS_WAIT_FOREVER);
+		Event_pend(AcqEvent, Event_Id_NONE, EVENT_ID_A_PRI | EVENT_ID_B_PRI | EVENT_ID_A_ALT | EVENT_ID_B_ALT, BIOS_NO_WAIT);
 
 		offset += ADC_TRANSFER_SIZE;
 
+		// Wait for alternate buffers
+		Event_pend(AcqEvent, EVENT_ID_A_ALT | EVENT_ID_B_ALT, Event_Id_NONE, BIOS_WAIT_FOREVER);
+
 		if (currentSampleSize == SAMPLE_SIZE_8_BIT)
 		{
-			sampleCopy8(adc_buffer_A_ALT, adc_buffer_B_ALT, offset, &trigger_index, &countdown);
-
-			offset += ADC_TRANSFER_SIZE;
-
-			if (offset >= TRIGGER_BUF_8_SIZE)
-			{
-				offset = 0;
-			}
+			sampleCopy8(adc_buffer_A_ALT, adc_buffer_B_ALT, offset, &trigger_index, countdown);
 		}
 		else
 		{
-			sampleCopy12(adc_buffer_A_ALT, adc_buffer_B_ALT, offset, &trigger_index, &countdown);
-
-			offset += ADC_TRANSFER_SIZE;
-
-			if (offset >= TRIGGER_BUF_12_SIZE)
-			{
-				offset = 0;
-			}
+			sampleCopy12(adc_buffer_A_ALT, adc_buffer_B_ALT, offset, &trigger_index, countdown);
 		}
+		Event_pend(AcqEvent, Event_Id_NONE, EVENT_ID_A_PRI | EVENT_ID_B_PRI | EVENT_ID_A_ALT | EVENT_ID_B_ALT, BIOS_NO_WAIT);
 
-		if (currentState == TRIGGER_STATE_TRIGGERED)
+		offset += ADC_TRANSFER_SIZE;
+		if (offset >= TRIGGER_BUF_CURRENT_SIZE) offset = 0;
+
+		if (countdown > 0)
 		{
-			if (countdown < 0)
+			countdown--;
+		}
+		else if (currentState == TRIGGER_STATE_TRIGGERED)
+		{
+			int32_t dist = offset - trigger_index;
+			if (dist < 0) dist += TRIGGER_BUF_CURRENT_SIZE;
+
+			// Check if enough new samples have been taken
+			if (dist > (currentNumSamples / 2))
 			{
+				// Transmit Samples
 				SendSamples(trigger_index, currentNumSamples);
+
+				// Set state as appropriate
 				if (TriggerGetMode() == TRIGGER_MODE_SINGLE)
 				{
 					TriggerSetState(TRIGGER_STATE_STOP);
@@ -201,11 +206,23 @@ triggerSearchISR(UArg arg0, UArg arg1)
 				{
 					TriggerSetState(TRIGGER_STATE_ARMED);
 				}
+
+				// Wait for the net task to finish transmitting
+				if (Semaphore_pend(bufferlock, BIOS_WAIT_FOREVER))
+				{
+					ResetBuffers();
+					countdown = currentNumSamples / ADC_TRANSFER_SIZE;
+				}
+
+				while (Event_pend(AcqEvent, Event_Id_NONE, EVENT_ID_A_PRI | EVENT_ID_B_PRI | EVENT_ID_A_ALT | EVENT_ID_B_ALT, 0));
 			}
-			else
-			{
-				countdown--;
-			}
+		}
+		// Check if trigger has been forced
+		else if (forceTriggerFlag)
+		{
+			trigger_index = offset;
+			forceTriggerFlag = false;
+			TriggerSetState(TRIGGER_STATE_TRIGGERED);
 		}
 	}
 }
@@ -306,17 +323,10 @@ TriggerGetState(void)
 void
 TriggerSetState(TriggerState state)
 {
-	static uint32_t last = 0;
-
-	// Ignore trigger if too soon
-	uint32_t now = Clock_getTicks();
-	if (now - last < MIN_TRIGGER_PERIOD)
+	// Can't trigger without connection
+	if (state == TRIGGER_STATE_TRIGGERED && NetGetClients() == 0)
 	{
 		return;
-	}
-	else
-	{
-		last = now;
 	}
 
 	currentState = state;
@@ -350,11 +360,12 @@ TriggerSetChannel(uint32_t channel)
 }
 
 static void
-TransmitBuffer8(uint8_t* buffer, uint8_t type, uint16_t start_index, uint16_t numSamples)
+TransmitBuffer8(uint8_t* buffer, uint8_t type, int32_t triggerindex, uint16_t numSamples)
 {
 	int seqnum;
-
 	int numPackets = numSamples / MAX_8_BIT_SAMPLES;
+	int start_index = triggerindex - (numSamples / 2);
+	if (start_index < 0) start_index += TRIGGER_BUF_8_SIZE;
 
 	SampleCommand scmd;
 	scmd.num_samples = MAX_8_BIT_SAMPLES;
@@ -382,11 +393,12 @@ TransmitBuffer8(uint8_t* buffer, uint8_t type, uint16_t start_index, uint16_t nu
 }
 
 static void
-TransmitBuffer12(uint16_t* buffer, uint8_t type, uint16_t start_index, uint16_t numSamples)
+TransmitBuffer12(uint16_t* buffer, uint8_t type, int32_t triggerindex, uint16_t numSamples)
 {
 	int seqnum;
-
 	int numPackets = numSamples / MAX_12_BIT_SAMPLES;
+	int start_index = triggerindex - (numSamples / 2);
+	if (start_index < 0) start_index += TRIGGER_BUF_12_SIZE;
 
 	SampleCommand scmd;
 	scmd.num_samples = MAX_12_BIT_SAMPLES;
@@ -485,29 +497,30 @@ TriggerGetNumSamples(void)
 void
 ForceTrigger(void)
 {
-	TriggerSetState(TRIGGER_STATE_TRIGGERED);
+	forceTriggerFlag = true;
 }
 
-static void
-SendSamples(uint32_t start_pos, uint32_t num)
+static inline void
+SendSamples(uint32_t triggerindex, uint32_t num)
 {
-	ADCPause();
-
 	if (currentSampleSize == SAMPLE_SIZE_8_BIT)
 	{
-		TransmitBuffer8(channel_A_samples_8, SAMPLE_PACKET_A_8, start_pos, num);
-		TransmitBuffer8(channel_B_samples_8, SAMPLE_PACKET_B_8, start_pos, num);
+		TransmitBuffer8(channel_A_samples_8, SAMPLE_PACKET_A_8, triggerindex, num);
+		TransmitBuffer8(channel_B_samples_8, SAMPLE_PACKET_B_8, triggerindex, num);
 	}
 	else
 	{
-		TransmitBuffer12(channel_A_samples_12, SAMPLE_PACKET_A_12, start_pos, num);
-		TransmitBuffer12(channel_B_samples_12, SAMPLE_PACKET_B_12, start_pos, num);
+		TransmitBuffer12(channel_A_samples_12, SAMPLE_PACKET_A_12, triggerindex, num);
+		TransmitBuffer12(channel_B_samples_12, SAMPLE_PACKET_B_12, triggerindex, num);
 	}
 
-	offset = 0;
+	Command cmd;
+	cmd.type = _COMMAND_ACQUISITION_SEND_COMPLETE;
+
+	NetSend(&cmd, 0);
 }
 
-static void
+static inline void
 ResetBuffers(void)
 {
     memset(&_channel_A_samples, 0, sizeof(_channel_A_samples));
@@ -528,12 +541,17 @@ Trigger_Init(void)
     Task_Params_init(&taskParams);
 	taskParams.stackSize = 768;
     taskParams.priority = 10;
-    taskHandle = Task_create((Task_FuncPtr)triggerSearchISR, &taskParams, &task_eb);
+    taskHandle = Task_create((Task_FuncPtr)triggerSearchTaskISR, &taskParams, &task_eb);
 
     if (taskHandle == NULL)
     {
         System_printf("Error: Failed to create trigger Task\n");
     }
+
+    Semaphore_Params params;
+    Semaphore_Params_init(&params);
+    Semaphore_construct(&_bufferlock, 0, &params);
+    bufferlock = Semaphore_handle(&_bufferlock);
 
     TriggerSetChannel(TriggerGetChannel());
     TriggerSetMode(TriggerGetMode());

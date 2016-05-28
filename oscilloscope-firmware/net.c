@@ -47,6 +47,7 @@
 #include "net.h"
 #include "adc.h"
 #include "command.h"
+#include "trigger.h"
 #include "ui/graphics_thread.h"
 
 #define TCPPORT 4810
@@ -140,6 +141,10 @@ Void tcpWorker(UArg arg0, UArg arg1)
 		Command cmd;
 		while(Mailbox_pend(NetCommandMailbox, &cmd, 0))
 		{
+			if (cmd.type == _COMMAND_ACQUISITION_SEND_COMPLETE)
+			{
+				Semaphore_post(bufferlock);
+			}
 
 			if (cmd.type == SAMPLE_PACKET_A_8 || cmd.type == SAMPLE_PACKET_B_8
 					|| cmd.type == SAMPLE_PACKET_A_12 || cmd.type == SAMPLE_PACKET_B_12)
@@ -179,7 +184,6 @@ Void tcpWorker(UArg arg0, UArg arg1)
 				}
 			}
     	}
-		ADCResume();
     }
 
 clientlost:
@@ -191,6 +195,16 @@ clientlost:
 	{
 		System_printf("Unable to decrement client count\n");
 	}
+
+	// Clear mailbox
+	Command cmd;
+	while(Mailbox_pend(NetCommandMailbox, &cmd, 0));
+
+	// Don't keep the buffer locked
+	Semaphore_post(bufferlock);
+	Task_sleep(10);
+	// Don't leave the buffer unlocked for next time
+	Semaphore_pend(bufferlock, 0);
 
 	Command connupdate;
 	connupdate.type = _COMMAND_CONN_UPDATE;

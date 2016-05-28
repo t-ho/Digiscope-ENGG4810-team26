@@ -7,6 +7,7 @@
 
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Event.h>
+#include <ti/sysbios/knl/Semaphore.h>
 
 #ifndef TRIGGER_H_
 #define TRIGGER_H_
@@ -66,5 +67,7 @@ extern volatile uint8_t channel_a_pri_full;
 extern volatile uint8_t channel_a_alt_full;
 extern volatile uint8_t channel_b_pri_full;
 extern volatile uint8_t channel_b_alt_full;
+
+extern Semaphore_Handle bufferlock;
 
 #endif /* TRIGGER_H_ */

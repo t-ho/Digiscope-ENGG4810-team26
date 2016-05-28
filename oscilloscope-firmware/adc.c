@@ -44,13 +44,8 @@ ADC_Init(void)
     ADCClockConfigSet(ADC0_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 32);
     ADCClockConfigSet(ADC1_BASE, ADC_CLOCK_SRC_PLL | ADC_CLOCK_RATE_FULL, 32);
 
-//    ADCSequenceConfigure(ADC0_BASE, 0 /*SS0*/, ADC_TRIGGER_PROCESSOR, 3 /*priority*/);  // SS0-SS3 priorities must always be different
-//    ADCSequenceConfigure(ADC0_BASE, 3 /*SS3*/, ADC_TRIGGER_PROCESSOR, 0 /*priority*/);  // so change SS3 to prio0 when SS0 gets set to prio3
-
     ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_ALWAYS, 0);
     ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_ALWAYS, 0);
-
-//    ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
 
     // Channel A Pin set to AIN3 (PE0)
     // Channel B Pin set to AIN2 (PE1)
@@ -77,7 +72,6 @@ ADC_Init(void)
     ADCSequenceDMAEnable(ADC1_BASE, 0);
 
     uDMAChannelAssign(UDMA_CH24_ADC1_0);
-//    uDMAChannelSelectSecondary(UDMA_DEF_SSI1RX_SEC_ADC10);
 
     // disable some bits
     uDMAChannelAttributeDisable(UDMA_CHANNEL_ADC0, UDMA_ATTR_ALTSELECT /*start with ping-pong PRI side*/ |
@@ -119,20 +113,6 @@ ADC_Init(void)
 
 	ADCIntEnableEx(ADC0_BASE, ADC_INT_DMA_SS0);
 	ADCIntEnableEx(ADC1_BASE, ADC_INT_DMA_SS0);
-}
-
-void
-ADCPause(void)
-{
-	ADCSequenceDisable(ADC0_BASE, 0);
-	ADCSequenceDisable(ADC1_BASE, 0);
-}
-
-void
-ADCResume(void)
-{
-	ADCSequenceEnable(ADC0_BASE, 0);
-	ADCSequenceEnable(ADC1_BASE, 0);
 }
 
 static void
