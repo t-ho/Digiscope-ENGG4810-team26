@@ -131,7 +131,7 @@ public class Visualizer {
 		xYPlot.setOrientation(PlotOrientation.VERTICAL);
 		xYPlot.setDomainAxis(0, commonHorizontalAxis); // commonHorizontalAxis's index = 0
 		xYPlot.setRangeAxis(0, commonVerticalAxis); // commonVerticalAxis's index = 0
-		xYPlot.setDomainZeroBaselineVisible(true);
+		//xYPlot.setDomainZeroBaselineVisible(true);
 		xYPlot.setRangeZeroBaselineVisible(true);
 		for (int i = 0; i < Constant.NUMBER_OF_CHANNELS; i++) {
 			xYPlot.setRangeAxis(i + 1, verticalAxes[i]);
@@ -145,18 +145,6 @@ public class Visualizer {
 		return chart;
 	}
 
-	/**
-	 * Set value for horizontal grid spacings.
-	 * The horizontal axis has Constant.HORIZONTAL_GRID_SPACINGS.
-	 * @param value The value in microseconds
-	 */
-	public void setValueForHorizontalGridSpacing(double value) {
-		NumberTickUnit tickUnit = new NumberTickUnit(value);
-		double lower = 0;
-		double upper = Constant.HORIZONTAL_GRID_SPACINGS * value;
-		commonHorizontalAxis.setTickUnit(tickUnit);
-		commonHorizontalAxis.setRange(lower, upper);
-	}
 
 	/**
 	 * Set value for vertical grid spacings.
@@ -207,12 +195,26 @@ public class Visualizer {
 	 */
 	private NumberAxis createDefaultHorizontalAxis() {
 		NumberAxis axis = new NumberAxis();
-		double lower = 0;
-		double upper = Constant.HORIZONTAL_GRID_SPACINGS * Constant.DEFAULT_HORIZONTAL_RANGE;
+		double lower = (Constant.DEFAULT_NUMBER_OF_SAMPLES - Constant.HORIZONTAL_GRID_SPACINGS * Constant.DEFAULT_HORIZONTAL_RANGE) / 2;
+		double upper = lower + Constant.HORIZONTAL_GRID_SPACINGS * Constant.DEFAULT_HORIZONTAL_RANGE;
 		axis.setAutoRange(false);
 		axis.setTickUnit(new NumberTickUnit(Constant.DEFAULT_HORIZONTAL_RANGE));
 		axis.setRange(lower, upper);
 		return axis;
+	}
+
+	/**
+	 * Set value for horizontal grid spacings.
+	 * The horizontal axis has Constant.HORIZONTAL_GRID_SPACINGS.
+	 * @param value The value in microseconds
+	 * @param noOfSamples 
+	 */
+	public void setValueForHorizontalGridSpacing(double value, int noOfSamples) {
+		NumberTickUnit tickUnit = new NumberTickUnit(value);
+		double lower = (noOfSamples - Constant.HORIZONTAL_GRID_SPACINGS * value) / 2;
+		double upper = lower + Constant.HORIZONTAL_GRID_SPACINGS * value;
+		commonHorizontalAxis.setTickUnit(tickUnit);
+		commonHorizontalAxis.setRange(lower, upper);
 	}
 	
 	public Range getHorizontalRange() {

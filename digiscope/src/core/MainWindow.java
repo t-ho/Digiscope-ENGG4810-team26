@@ -129,7 +129,7 @@ public class MainWindow extends MainWindowUi
 		// test
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
-		for (double i = 0, j = 0; i <= 50000; i = i + 1, j = j + 2 * Math.PI/200) {
+		for (double i = 0, j = 0; i < 25000; i = i + 1, j = j + 2 * Math.PI/200) {
 			aSeries.add(i, 1 * Math.sin(j));
 		}
 //		 Test Filter
@@ -143,7 +143,7 @@ public class MainWindow extends MainWindowUi
 
 		// Channel B
 		XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
-		for (double i = 0, j = 0; i <= 50000; i = i + 1, j = j + (2 * Math.PI / 250)) {
+		for (double i = 0, j = 0; i < 25000; i = i + 1, j = j + (2 * Math.PI / 250)) {
 			bSeries.add(i, 1.5 * Math.sin(j));
 		}
 		rawXYSeries.put(Constant.CHANNEL_B, bSeries);
@@ -1147,7 +1147,13 @@ public class MainWindow extends MainWindowUi
 			double minVoltage = Double.MAX_VALUE;
 			double totalVoltage = 0;
 			int nSamples = 0;
-			for (int i = (int) horizontalRange.getLowerBound(); i < xYSeries.getItemCount(); i++) {
+			int startIndex = 0;
+			if(horizontalRange.getLowerBound() < 0) {
+				startIndex = 0;
+			} else {
+				startIndex = (int) horizontalRange.getLowerBound();
+			}
+			for (int i = startIndex; i < xYSeries.getItemCount(); i++) {
 				double time = xYSeries.getDataItem(i).getXValue();
 				double voltage = xYSeries.getDataItem(i).getYValue();
 				if (time <= horizontalRange.getUpperBound()) {
@@ -1181,7 +1187,7 @@ public class MainWindow extends MainWindowUi
 				double firstZeroCrossing = -1;
 				double secondZeroCrossing = -1;
 				boolean isReady = false;
-				for (int i = (int) horizontalRange.getLowerBound(); i < xYSeries.getItemCount(); i++) {
+				for (int i = startIndex; i < xYSeries.getItemCount(); i++) {
 					double time = xYSeries.getDataItem(i).getXValue();
 					double voltage = xYSeries.getDataItem(i).getYValue();
 					if (time <= horizontalRange.getUpperBound()) {
@@ -1381,7 +1387,7 @@ public class MainWindow extends MainWindowUi
 		horizontalRangeComboBox.addActionListener(this);
 
 		int horizontalRange = microSeconds;
-		visualizer_.setValueForHorizontalGridSpacing(horizontalRange);
+		visualizer_.setValueForHorizontalGridSpacing(horizontalRange, (int) noOfSamplesSpinner.getValue());
 		if (horizontalRangeComboBox.getSelectedIndex() > previousHorizontalRangeIndex_) {
 			if (rawXYSeries.containsKey(Constant.MATH_CHANNEL)) {
 				calculateMathChannel(expressionTextArea.getText().trim());
@@ -1624,6 +1630,9 @@ public class MainWindow extends MainWindowUi
 		noOfSamplesSpinner.removeChangeListener(this);
 		noOfSamplesSpinner.setValue(noOfSamples);
 		noOfSamplesSpinner.addChangeListener(this);
+		String timeString = (String) horizontalRangeComboBox.getSelectedItem();
+		int horizontalRange = convertTimeStringToMicroSeconds(timeString);
+		visualizer_.setValueForHorizontalGridSpacing(horizontalRange, noOfSamples);
 		previousNoOfSamples_ = (int) noOfSamplesSpinner.getValue();
 	}
 

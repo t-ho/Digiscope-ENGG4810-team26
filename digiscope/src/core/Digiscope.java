@@ -15,6 +15,11 @@ public class Digiscope {
 	
 	public Digiscope() {
 		launchWindow_ = new LaunchWindow();
+		try {
+			Thread.sleep(1500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		launchWindow_.setVisible(true);
 	}
 
