@@ -1184,6 +1184,7 @@ public class MainWindow extends MainWindowUi
 				result.put(Constant.AVERAGE_VOLTAGE, averageVoltage);
 				result.put(Constant.MAX_P2P_VOLTAGE, maxVoltage - minVoltage);
 				result.put(Constant.STANDARD_DEVIATION_VOLTAGE, deviation);
+				// Calculate frequency
 				double firstZeroCrossing = -1;
 				double secondZeroCrossing = -1;
 				boolean isReady = false;
@@ -1613,10 +1614,19 @@ public class MainWindow extends MainWindowUi
 		noOfSamplesSpinner.removeChangeListener(this);
 		noOfSamplesSpinner.setValue(noOfSamples);
 		noOfSamplesSpinner.addChangeListener(this);
+		previousNoOfSamples_ = (int) noOfSamplesSpinner.getValue();
+	}
+	
+	/**
+	 * Refresh horizontal range with new number of samples.
+	 * Call this method to re-center trigger point
+	 * @param noOfSamples
+	 */
+	public void refreshHorizontalRange(int noOfSamples) {
 		String timeString = (String) horizontalRangeComboBox.getSelectedItem();
 		int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 		visualizer_.setValueForHorizontalGridSpacing(horizontalRange, noOfSamples);
-		previousNoOfSamples_ = (int) noOfSamplesSpinner.getValue();
+		
 	}
 
 	/**
