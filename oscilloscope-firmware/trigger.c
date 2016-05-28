@@ -29,80 +29,6 @@
 #define MAX_8_BIT_SAMPLES (1024 - COMMANDLENGTH)
 #define MAX_12_BIT_SAMPLES (MAX_8_BIT_SAMPLES / 2)
 
-#define SAMPLECOPY8(src, offset) { \
-	chan_A_dest_8 = &channel_A_samples_8[offset]; \
-	chan_A_src = adc_buffer_A_##src; \
-	chan_B_dest_8 = &channel_B_samples_8[offset]; \
-	chan_B_src = adc_buffer_B_##src; \
-	while(chan_A_src <= &adc_buffer_A_##src[ADC_TRANSFER_SIZE]) \
-	{ \
-		*chan_A_dest_8 = *chan_A_src >> 4; \
-		*chan_B_dest_8 = *chan_B_src >> 4; \
-		if (currentState == TRIGGER_STATE_ARMED) \
-		{ \
-			if (**trig_src_8 > realThreshold) \
-			{ \
-				if (currentType == TRIGGER_TYPE_LEVEL \
-				|| (currentType == TRIGGER_TYPE_RISING && **(trig_src_8 - 1) <= realThreshold)) \
-				{ \
-					trigger_index = (chan_A_dest_8 - channel_A_samples_8) - (currentNumSamples / 2); \
-					if (trigger_index < 0) trigger_index += TRIGGER_BUF_8_SIZE; \
-					TriggerSetState(TRIGGER_STATE_TRIGGERED); \
-					countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4); \
-				} \
-			} \
-			else if (currentType == TRIGGER_TYPE_FALLING && **(trig_src_8 - 1) > realThreshold) \
-			{ \
-				trigger_index = (chan_A_dest_8 - channel_A_samples_8) - (currentNumSamples / 2); \
-				if (trigger_index < 0) trigger_index += TRIGGER_BUF_8_SIZE; \
-				TriggerSetState(TRIGGER_STATE_TRIGGERED); \
-				countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4); \
-			} \
-		} \
-		chan_A_dest_8++; \
-		chan_A_src++; \
-		chan_B_dest_8++; \
-		chan_B_src++; \
-	} \
-}
-
-#define SAMPLECOPY12(src, offset) { \
-	chan_A_dest_12 = &channel_A_samples_12[offset]; \
-	chan_A_src = adc_buffer_A_##src; \
-	chan_B_dest_12 = &channel_B_samples_12[offset]; \
-	chan_B_src = adc_buffer_B_##src; \
-	while(chan_A_src <= &adc_buffer_A_##src[ADC_TRANSFER_SIZE]) \
-	{ \
-		*chan_A_dest_12 = *chan_A_src; \
-		*chan_B_dest_12 = *chan_B_src; \
-		if (currentState == TRIGGER_STATE_ARMED) \
-		{ \
-			if (**trig_src_12 > realThreshold) \
-			{ \
-				if (currentType == TRIGGER_TYPE_LEVEL \
-				|| (currentType == TRIGGER_TYPE_RISING && **(trig_src_12 - 1) <= realThreshold)) \
-				{ \
-					trigger_index = (chan_A_dest_12 - channel_A_samples_12) - (currentNumSamples / 2); \
-					if (trigger_index < 0) trigger_index += TRIGGER_BUF_12_SIZE; \
-					TriggerSetState(TRIGGER_STATE_TRIGGERED); \
-					countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4); \
-				} \
-			} \
-			else if (currentType == TRIGGER_TYPE_FALLING && **(trig_src_12 - 1) > realThreshold) \
-			{ \
-				trigger_index = (chan_A_dest_12 - channel_A_samples_12) - (currentNumSamples / 2); \
-				if (trigger_index < 0) trigger_index += TRIGGER_BUF_12_SIZE; \
-				TriggerSetState(TRIGGER_STATE_TRIGGERED); \
-				countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4); \
-			} \
-		} \
-		chan_A_dest_12++; \
-		chan_A_src++; \
-		chan_B_dest_12++;*\
-		chan_B_src++; \
-	} \
-}
-
 static void SendSamples(uint32_t start_pos, uint32_t num);
 static void ResetBuffers(void);
 
@@ -135,26 +61,103 @@ static uint16_t realThreshold;
 
 static SampleSize currentSampleSize = SAMPLE_SIZE_12_BIT;
 static uint32_t currentNumSamples = 25000;
-static uint8_t **trig_src_8 = &channel_A_samples_8;
-static uint16_t **trig_src_12 = &channel_A_samples_12;
+
+static inline void
+sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_index, int32_t *countdown)
+{
+
+	uint8_t *trig_src = currentChannel ? channel_B_samples_8 : channel_A_samples_8;
+
+	int i;
+	for (i = 0; i < ADC_TRANSFER_SIZE; i++)
+	{
+		channel_A_samples_8[offset + i] = src_a[i] >> 4;
+		channel_B_samples_8[offset + i] = src_b[i] >> 4;
+
+		if (currentState == TRIGGER_STATE_ARMED)
+		{
+
+			switch(currentType)
+			{
+			case TRIGGER_TYPE_LEVEL:
+				if (!(trig_src[offset + i] > realThreshold))
+					continue;
+				break;
+			case TRIGGER_TYPE_RISING:
+				if (!(trig_src[offset + i] > realThreshold && trig_src[offset + i - 1] <= realThreshold))
+					continue;
+				break;
+			case TRIGGER_TYPE_FALLING:
+				if (!(trig_src[offset + i] < realThreshold && trig_src[offset + i - 1] >= realThreshold))
+					continue;
+				break;
+			}
+
+			*trigger_index = offset + i - (currentNumSamples / 2);
+			if (*trigger_index < 0) *trigger_index += TRIGGER_BUF_8_SIZE;
+			TriggerSetState(TRIGGER_STATE_TRIGGERED);
+			*countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4);
+		}
+	}
+}
+
+
+static inline void
+sampleCopy12(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_index, int32_t *countdown)
+{
+
+	uint16_t *trig_src = currentChannel ? channel_B_samples_12 : channel_A_samples_12;
+
+	int i;
+	for (i = 0; i < ADC_TRANSFER_SIZE; i++)
+	{
+		channel_A_samples_12[offset + i] = src_a[i];
+		channel_B_samples_12[offset + i] = src_b[i];
+
+		if (currentState == TRIGGER_STATE_ARMED)
+		{
+
+			switch(currentType)
+			{
+			case TRIGGER_TYPE_LEVEL:
+				if (!(trig_src[offset + i] > realThreshold))
+					continue;
+				break;
+			case TRIGGER_TYPE_RISING:
+				if (!(trig_src[offset + i] > realThreshold && trig_src[offset + i - 1] <= realThreshold))
+					continue;
+				break;
+			case TRIGGER_TYPE_FALLING:
+				if (!(trig_src[offset + i] < realThreshold && trig_src[offset + i - 1] >= realThreshold))
+					continue;
+				break;
+			}
+
+			*trigger_index = offset + i - (currentNumSamples / 2);
+			if (*trigger_index < 0) *trigger_index += TRIGGER_BUF_12_SIZE;
+			TriggerSetState(TRIGGER_STATE_TRIGGERED);
+			*countdown = currentNumSamples / (ADC_TRANSFER_SIZE * 4);
+		}
+	}
+}
 
 static void
 triggerSearchISR(UArg arg0, UArg arg1)
 {
-	int trigger_index, countdown;
-
-	uint8_t 	*chan_A_dest_8, 	*chan_B_dest_8;
-	uint16_t 	*chan_A_dest_12, 	*chan_B_dest_12;
-	uint16_t 	*chan_A_src, 		*chan_B_src;
+	int32_t trigger_index, countdown;
 
 	while (1)
 	{
 		Event_pend(AcqEvent, EVENT_ID_A_PRI | EVENT_ID_B_PRI, Event_Id_NONE, BIOS_WAIT_FOREVER);
 
 		if (currentSampleSize == SAMPLE_SIZE_8_BIT)
-			SAMPLECOPY8(PRI, offset)
+		{
+			sampleCopy8(adc_buffer_A_PRI, adc_buffer_B_PRI, offset, &trigger_index, &countdown);
+		}
 		else
-			SAMPLECOPY12(PRI, offset)
+		{
+			sampleCopy12(adc_buffer_A_PRI, adc_buffer_B_PRI, offset, &trigger_index, &countdown);
+		}
 
 		Event_pend(AcqEvent, EVENT_ID_A_ALT | EVENT_ID_B_ALT, Event_Id_NONE, BIOS_WAIT_FOREVER);
 
@@ -162,7 +165,7 @@ triggerSearchISR(UArg arg0, UArg arg1)
 
 		if (currentSampleSize == SAMPLE_SIZE_8_BIT)
 		{
-			SAMPLECOPY8(ALT, offset)
+			sampleCopy8(adc_buffer_A_ALT, adc_buffer_B_ALT, offset, &trigger_index, &countdown);
 
 			offset += ADC_TRANSFER_SIZE;
 
@@ -173,7 +176,7 @@ triggerSearchISR(UArg arg0, UArg arg1)
 		}
 		else
 		{
-			SAMPLECOPY12(ALT, offset)
+			sampleCopy12(adc_buffer_A_ALT, adc_buffer_B_ALT, offset, &trigger_index, &countdown);
 
 			offset += ADC_TRANSFER_SIZE;
 
@@ -312,17 +315,6 @@ void
 TriggerSetChannel(uint32_t channel)
 {
 	static char channelName[] = "Channel A";
-
-	if (channel == 0)
-	{
-		trig_src_12 = &channel_A_samples_12;
-		trig_src_8 = &channel_A_samples_8;
-	}
-	else
-	{
-		trig_src_12 = &channel_B_samples_12;
-		trig_src_8 = &channel_B_samples_8;
-	}
 
 	currentChannel = channel;
 	channelName[8] = 'A' + channel;
