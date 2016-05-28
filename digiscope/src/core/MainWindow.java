@@ -220,7 +220,7 @@ public class MainWindow extends MainWindowUi
 
 		triggerThresholdSpinner.addChangeListener(this);
 
-		rearmTriggerToggleButton.addActionListener(this);
+		rearmTriggerButton.addActionListener(this);
 
 		verticalOffsetGeneratorSpinner.addChangeListener(this);
 
@@ -1552,23 +1552,6 @@ public class MainWindow extends MainWindowUi
 	}
 
 	/**
-	 * Set re-arm trigger state
-	 * 
-	 * @param channelName
-	 * @param state
-	 *            ON or OFF
-	 */
-	public void setReArmTrigger(int state) {
-		if (state == Constant.REARM_TRIGGER_OFF) {
-			rearmTriggerToggleButton.setSelected(false);
-			rearmTriggerToggleButton.setText("Re-arm - OFF");
-		} else {
-			rearmTriggerToggleButton.setSelected(true);
-			rearmTriggerToggleButton.setText("Re-arm - ON");
-		}
-	}
-
-	/**
 	 * Set trigger state
 	 * 
 	 * @param channelName
@@ -1669,9 +1652,9 @@ public class MainWindow extends MainWindowUi
 			triggerModeComboBox.addActionListener(this);
 			previousTriggerModeIndex_ = triggerMode;
 			if (triggerMode == Constant.SINGLE_MODE) {
-				rearmTriggerToggleButton.setEnabled(true);
+				rearmTriggerButton.setEnabled(true);
 			} else {
-				rearmTriggerToggleButton.setEnabled(false);
+				rearmTriggerButton.setEnabled(false);
 			}
 		} else {
 			System.err.println("Trigger mode is out of range.");
@@ -2084,16 +2067,8 @@ public class MainWindow extends MainWindowUi
 			sendCommand(PacketType.TRIGGER_THRESHOLD, 0);
 			sentTriggerThresholdCommand_ = true;
 
-		} else if (source == rearmTriggerToggleButton) {
-			int state;
-			if (rearmTriggerToggleButton.isSelected()) {
-				state = Constant.REARM_TRIGGER_ON;
-				rearmTriggerToggleButton.setSelected(false);
-			} else {
-				state = Constant.REARM_TRIGGER_OFF;
-				rearmTriggerToggleButton.setSelected(true);
-			}
-			sendCommand(PacketType.TRIGGER_ARM, state);
+		} else if (source == rearmTriggerButton) {
+			sendCommand(PacketType.TRIGGER_ARM, Constant.IGNORE);
 
 		} else if (source == verticalOffsetUnitGeneratorComboBox) {
 			sendCommand(PacketType.GENERATOR_OFFSET, 0);

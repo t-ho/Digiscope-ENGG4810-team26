@@ -199,7 +199,7 @@ public class MainWindowUi extends JFrame {
     private JLabel p2pVoltageLabel_;
     protected JSpinner p2pVoltageSpinner;
     protected JComboBox<String> p2pVoltageUnitComboBox;
-    protected JToggleButton rearmTriggerToggleButton;
+    protected JButton rearmTriggerButton;
     protected JButton removeExpressionButton;
     protected JButton removeFilterButton;
     private JPanel rightPanel_;
@@ -365,7 +365,7 @@ public class MainWindowUi extends JFrame {
         triggerTypeLabel_ = new JLabel();
         triggerTypeComboBox = new JComboBox<String>();
         triggerMiddleRightPanel2_ = new JPanel();
-        rearmTriggerToggleButton = new JToggleButton();
+        rearmTriggerButton = new JButton();
         triggerBottomLeftPanel3_ = new JPanel();
         noOfSamplesLabel_ = new JLabel();
         noOfSamplesSpinner = new JSpinner();
@@ -826,11 +826,11 @@ public class MainWindowUi extends JFrame {
         triggerMiddleRightPanel2_.setPreferredSize(new Dimension(155, 30));
         triggerMiddleRightPanel2_.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 3));
 
-        rearmTriggerToggleButton.setText("Re-arm - OFF");
-        rearmTriggerToggleButton.setEnabled(false);
-        rearmTriggerToggleButton.setFocusable(false);
-        rearmTriggerToggleButton.setPreferredSize(new Dimension(130, 23));
-        triggerMiddleRightPanel2_.add(rearmTriggerToggleButton);
+        rearmTriggerButton.setText("Re-arm");
+        rearmTriggerButton.setEnabled(false);
+        rearmTriggerButton.setFocusable(false);
+        rearmTriggerButton.setPreferredSize(new Dimension(130, 23));
+        triggerMiddleRightPanel2_.add(rearmTriggerButton);
 
         triggerPanel_.add(triggerMiddleRightPanel2_);
 
