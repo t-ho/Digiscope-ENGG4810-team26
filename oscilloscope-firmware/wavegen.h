@@ -17,6 +17,8 @@ typedef enum WaveType
 	NOISE,
 } WaveType;
 
+extern void WaveGenNotify(void);
+
 extern void WaveGenEnableSet(bool on);
 extern bool WaveGenEnableGet(void);
 

@@ -167,3 +167,10 @@ FrontEndSetCoupling(uint32_t channel, uint32_t coupling)
 		RangeCouplingSetText(channel, current_coupling[channel] ? "AC" : "DC");
 	}
 }
+
+void
+FrontEndNotify(void)
+{
+	SetDisplayChannel(0);
+	SetDisplayChannel(1);
+}

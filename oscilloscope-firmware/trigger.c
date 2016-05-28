@@ -592,6 +592,12 @@ Trigger_Init(void)
 
     Semaphore_post(settingslock);
 
+    TriggerNotify();
+}
+
+void
+TriggerNotify(void)
+{
     TriggerSetChannel(TriggerGetChannel());
     TriggerSetMode(TriggerGetMode());
     TriggerSetType(TriggerGetType());

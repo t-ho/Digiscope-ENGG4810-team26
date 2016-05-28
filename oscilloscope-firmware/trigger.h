@@ -46,10 +46,11 @@ typedef enum SampleSize
 	SAMPLE_SIZE_12_BIT = 1,
 } SampleSize;
 
-extern void Trigger_Init(void);
 extern Event_Handle AcqEvent;
-extern void ForceTrigger(void);
+extern Semaphore_Handle bufferlock;
 
+extern void Trigger_Init(void);
+extern void ForceTrigger(void);
 extern int32_t TriggerGetThreshold(void);
 extern void TriggerSetThreshold(int32_t threshold);
 extern TriggerMode TriggerGetMode(void);
@@ -66,7 +67,6 @@ extern uint32_t TriggerGetNumSamples(void);
 extern void TriggerSetNumSamples(uint32_t newNum);
 extern uint16_t TriggerGetSampleDivisor(void);
 extern void TriggerSetSampleDivisor(uint16_t divisor);
-
-extern Semaphore_Handle bufferlock;
+extern void TriggerNotify(void);
 
 #endif /* TRIGGER_H_ */

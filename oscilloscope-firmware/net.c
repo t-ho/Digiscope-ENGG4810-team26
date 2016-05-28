@@ -48,6 +48,8 @@
 #include "adc.h"
 #include "command.h"
 #include "trigger.h"
+#include "frontend.h"
+#include "wavegen.h"
 #include "ui/graphics_thread.h"
 
 #define TCPPORT 4810
@@ -121,6 +123,10 @@ Void tcpWorker(UArg arg0, UArg arg1)
 	Command msg;
 	msg.type = _COMMAND_CONN_UPDATE;
 	UISend(&msg, 0);
+
+	FrontEndNotify();
+	TriggerNotify();
+	WaveGenNotify();
 
     while (1)
     {

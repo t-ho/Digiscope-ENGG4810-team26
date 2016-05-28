@@ -407,6 +407,12 @@ WaveGen_Init(void)
 
 	TimerIntEnable(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
 
+	WaveGenNotify();
+}
+
+void
+WaveGenNotify(void)
+{
 	WaveGenSetAmplitude(WaveGenGetAmplitude());
 	WaveGenSetFreq(WaveGenGetFreq());
 	WaveGenEnableSet(WaveGenEnableGet());

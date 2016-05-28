@@ -14,5 +14,6 @@ extern uint32_t FrontEndGetVerDiv(uint32_t channel);
 extern void FrontEndSetVerDiv(uint32_t channel, uint32_t uV);
 extern uint32_t FrontEndGetCoupling(uint32_t channel);
 extern void FrontEndSetCoupling(uint32_t channel, uint32_t coupling);
+extern void FrontEndNotify(void);
 
 #endif /* FRONTEND_H_ */
