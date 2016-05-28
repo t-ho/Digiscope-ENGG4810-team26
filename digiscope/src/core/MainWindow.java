@@ -129,8 +129,8 @@ public class MainWindow extends MainWindowUi
 		// test
 		// Channel A
 		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
-		for (double i = 0; i <= 50000; i = i + 0.1) {
-			aSeries.add(i * 500, 1 * Math.sin(i));
+		for (double i = 0, j = 0; i <= 50000; i = i + 1, j = j + 2 * Math.PI/200) {
+			aSeries.add(i, 1 * Math.sin(j));
 		}
 //		 Test Filter
 //		 aSeries = new XYSeries(Constant.CHANNEL_A);
@@ -143,8 +143,8 @@ public class MainWindow extends MainWindowUi
 
 		// Channel B
 		XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
-		for (double i = 0; i <= 50000; i = i + 0.1) {
-			bSeries.add(i * 500, 1.5 + 1.5 * Math.sin(i));
+		for (double i = 0, j = 0; i <= 50000; i = i + 1, j = j + (2 * Math.PI / 250)) {
+			bSeries.add(i, 1.5 * Math.sin(j));
 		}
 		rawXYSeries.put(Constant.CHANNEL_B, bSeries);
 	}
@@ -752,6 +752,21 @@ public class MainWindow extends MainWindowUi
 		String result = Constant.roundString(voltage) + " V";
 		return result;
 	}
+	
+	/**
+	 * Convert frequency to string
+	 * @param frequency
+	 * @return frequency string
+	 */
+	private String convertFrequencyToString(double frequency) {
+		if(frequency >= 1000) {
+			String result = Constant.roundString(frequency / 1000) + "kHz";
+			return result;
+		} else {
+			String result = Constant.roundString(frequency) + "Hz";
+			return result;
+		}
+	}
 
 	/**
 	 * Create a XYSeries with given offset
@@ -1132,7 +1147,7 @@ public class MainWindow extends MainWindowUi
 			double minVoltage = Double.MAX_VALUE;
 			double totalVoltage = 0;
 			int nSamples = 0;
-			for (int i = 0; i < xYSeries.getItemCount(); i++) {
+			for (int i = (int) horizontalRange.getLowerBound(); i < xYSeries.getItemCount(); i++) {
 				double time = xYSeries.getDataItem(i).getXValue();
 				double voltage = xYSeries.getDataItem(i).getYValue();
 				if (time <= horizontalRange.getUpperBound()) {
@@ -1163,6 +1178,36 @@ public class MainWindow extends MainWindowUi
 				result.put(Constant.AVERAGE_VOLTAGE, averageVoltage);
 				result.put(Constant.MAX_P2P_VOLTAGE, maxVoltage - minVoltage);
 				result.put(Constant.STANDARD_DEVIATION_VOLTAGE, deviation);
+				double firstZeroCrossing = -1;
+				double secondZeroCrossing = -1;
+				boolean isReady = false;
+				for (int i = (int) horizontalRange.getLowerBound(); i < xYSeries.getItemCount(); i++) {
+					double time = xYSeries.getDataItem(i).getXValue();
+					double voltage = xYSeries.getDataItem(i).getYValue();
+					if (time <= horizontalRange.getUpperBound()) {
+						if ((voltage <= verticalRange.getUpperBound()) && (voltage >= verticalRange.getLowerBound())) {
+							//if ((voltage <= (9 * minVoltage) / 10) || voltage >= (9 * maxVoltage) / 10)  {
+							if(voltage <= (0.95 * minVoltage)) {
+								isReady = true;
+							}
+							if (voltage >= -0.05 && voltage <= 0.05 && isReady == true) {
+								if (firstZeroCrossing == -1) {
+									firstZeroCrossing = time;
+									isReady = false;
+								} else if (secondZeroCrossing == -1) {
+									secondZeroCrossing = time;
+									break;
+								}
+							}
+						}
+					} else {
+						break;
+					}
+				}
+				if (firstZeroCrossing != -1 && secondZeroCrossing != -1) {
+					double frequency = 1 / (((secondZeroCrossing - firstZeroCrossing)) / 1000000);
+					result.put(Constant.FREQUENCY, frequency);
+				}
 			} else {
 				result = null;
 			}
@@ -1188,6 +1233,13 @@ public class MainWindow extends MainWindowUi
 				averageVoltageALabel.setText(convertVoltsToVoltageString(results.get(Constant.AVERAGE_VOLTAGE)));
 				String deviation = Constant.roundString(results.get(Constant.STANDARD_DEVIATION_VOLTAGE));
 				standardDeviationVoltageALabel.setText(deviation);
+				if(results.containsKey(Constant.FREQUENCY)) {
+					String frequency = convertFrequencyToString(results.get(Constant.FREQUENCY));
+					frequencyALabel.setText(frequency);
+				} else {
+					frequencyALabel.setText("N/A");
+				}
+				
 			} else if (channelIndex == Constant.B_INDEX) {
 				maxVoltageBLabel.setText(convertVoltsToVoltageString(results.get(Constant.MAX_VOLTAGE)));
 				minVoltageBLabel.setText(convertVoltsToVoltageString(results.get(Constant.MIN_VOLTAGE)));
@@ -1195,6 +1247,13 @@ public class MainWindow extends MainWindowUi
 				averageVoltageBLabel.setText(convertVoltsToVoltageString(results.get(Constant.AVERAGE_VOLTAGE)));
 				String deviation = Constant.roundString(results.get(Constant.STANDARD_DEVIATION_VOLTAGE));
 				standardDeviationVoltageBLabel.setText(deviation);
+				if(results.containsKey(Constant.FREQUENCY)) {
+					String frequency = convertFrequencyToString(results.get(Constant.FREQUENCY));
+					frequencyBLabel.setText(frequency);
+				} else {
+					frequencyBLabel.setText("N/A");
+				}
+
 			} else if (channelIndex == Constant.MATH_INDEX) {
 				maxVoltageMathLabel.setText(convertVoltsToVoltageString(results.get(Constant.MAX_VOLTAGE)));
 				minVoltageMathLabel.setText(convertVoltsToVoltageString(results.get(Constant.MIN_VOLTAGE)));
@@ -1202,6 +1261,13 @@ public class MainWindow extends MainWindowUi
 				averageVoltageMathLabel.setText(convertVoltsToVoltageString(results.get(Constant.AVERAGE_VOLTAGE)));
 				String deviation = Constant.roundString(results.get(Constant.STANDARD_DEVIATION_VOLTAGE));
 				standardDeviationVoltageMathLabel.setText(deviation);
+				if(results.containsKey(Constant.FREQUENCY)) {
+					String frequency = convertFrequencyToString(results.get(Constant.FREQUENCY));
+					frequencyMathLabel.setText(frequency);
+				} else {
+					frequencyMathLabel.setText("N/A");
+				}
+
 			} else if (channelIndex == Constant.FILTER_INDEX) {
 				maxVoltageFilterLabel.setText(convertVoltsToVoltageString(results.get(Constant.MAX_VOLTAGE)));
 				minVoltageFilterLabel.setText(convertVoltsToVoltageString(results.get(Constant.MIN_VOLTAGE)));
@@ -1209,6 +1275,13 @@ public class MainWindow extends MainWindowUi
 				averageVoltageFilterLabel.setText(convertVoltsToVoltageString(results.get(Constant.AVERAGE_VOLTAGE)));
 				String deviation = Constant.roundString(results.get(Constant.STANDARD_DEVIATION_VOLTAGE));
 				standardDeviationVoltageFilterLabel.setText(deviation);
+				if(results.containsKey(Constant.FREQUENCY)) {
+					String frequency = convertFrequencyToString(results.get(Constant.FREQUENCY));
+					frequencyFilterLabel.setText(frequency);
+				} else {
+					frequencyFilterLabel.setText("N/A");
+				}
+
 			}
 		} else {
 			hideMeasurementResults(channelIndex);
@@ -1228,24 +1301,28 @@ public class MainWindow extends MainWindowUi
 			maxP2pVoltageALabel.setText("N/A");
 			averageVoltageALabel.setText("N/A");
 			standardDeviationVoltageALabel.setText("N/A");
+			frequencyALabel.setText("N/A");
 		} else if (channelIndex == Constant.B_INDEX) {
 			maxVoltageBLabel.setText("N/A");
 			minVoltageBLabel.setText("N/A");
 			maxP2pVoltageBLabel.setText("N/A");
 			averageVoltageBLabel.setText("N/A");
 			standardDeviationVoltageBLabel.setText("N/A");
+			frequencyBLabel.setText("N/A");
 		} else if (channelIndex == Constant.MATH_INDEX) {
 			maxVoltageMathLabel.setText("N/A");
 			minVoltageMathLabel.setText("N/A");
 			maxP2pVoltageMathLabel.setText("N/A");
 			averageVoltageMathLabel.setText("N/A");
 			standardDeviationVoltageMathLabel.setText("N/A");
+			frequencyMathLabel.setText("N/A");
 		} else if (channelIndex == Constant.FILTER_INDEX) {
 			maxVoltageFilterLabel.setText("N/A");
 			minVoltageFilterLabel.setText("N/A");
 			maxP2pVoltageFilterLabel.setText("N/A");
 			averageVoltageFilterLabel.setText("N/A");
 			standardDeviationVoltageFilterLabel.setText("N/A");
+			frequencyFilterLabel.setText("N/A");
 		}
 	}
 
