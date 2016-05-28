@@ -84,11 +84,13 @@ OnTriggerArm(tWidget *psWidget)
 static void
 OnTriggerThresholdIncrease(tWidget *psWidget)
 {
+	TriggerSetThreshold(TriggerGetThreshold() + 100000);
 }
 
 static void
 OnTriggerThresholdDecrease(tWidget *psWidget)
 {
+	TriggerSetThreshold(TriggerGetThreshold() - 100000);
 }
 
 static void

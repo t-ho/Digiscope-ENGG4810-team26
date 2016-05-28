@@ -371,7 +371,7 @@ SI_Print(char* line1, char* line2, int32_t val, char* suffix, char* prefixes)
 
 	while (abs(val) >= 1000)
 	{
-		dec = val % 1000;
+		dec = abs(val) % 1000;
 		val /= 1000;
 		mag++;
 	}

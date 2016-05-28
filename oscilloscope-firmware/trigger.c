@@ -29,6 +29,8 @@
 #define MAX_8_BIT_SAMPLES (1024 - COMMANDLENGTH)
 #define MAX_12_BIT_SAMPLES (MAX_8_BIT_SAMPLES / 2)
 
+#define MAX_THRESHOLD 5000000
+
 static void SendSamples(uint32_t start_pos, uint32_t num);
 static void ResetBuffers(void);
 
@@ -219,6 +221,15 @@ TriggerSetThreshold(int32_t threshold)
 {
 	static char line1[16], line2[16];
 
+	if (threshold > MAX_THRESHOLD)
+	{
+		threshold = MAX_THRESHOLD;
+	}
+	else if (threshold < -MAX_THRESHOLD)
+	{
+		threshold = -MAX_THRESHOLD;
+	}
+
 	currentThreshold = threshold;
 
 	if (currentSampleSize == SAMPLE_SIZE_8_BIT)
@@ -393,22 +404,26 @@ TriggerGetSampleSize(void)
 }
 
 void
-TriggerSetSampleSize(SampleSize mode)
+TriggerSetSampleSize(SampleSize sampleSize)
 {
 	ResetBuffers();
 
 	offset = 0;
 
-	if (currentSampleSize == SAMPLE_SIZE_8_BIT && mode == SAMPLE_SIZE_12_BIT)
+	if (currentSampleSize == SAMPLE_SIZE_8_BIT && sampleSize == SAMPLE_SIZE_12_BIT)
 	{
+		currentSampleSize = sampleSize;
 		TriggerSetNumSamples(TriggerGetNumSamples() / 2);
 	}
-	else if (currentSampleSize == SAMPLE_SIZE_12_BIT && mode == SAMPLE_SIZE_8_BIT)
+	else if (currentSampleSize == SAMPLE_SIZE_12_BIT && sampleSize == SAMPLE_SIZE_8_BIT)
 	{
+		currentSampleSize = sampleSize;
 		TriggerSetNumSamples(TriggerGetNumSamples() * 2);
 	}
-
-	currentSampleSize = mode;
+	else
+	{
+		currentSampleSize = sampleSize;
+	}
 
 	TriggerSetThreshold(TriggerGetThreshold());
 
