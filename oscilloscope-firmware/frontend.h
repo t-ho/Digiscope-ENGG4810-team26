@@ -20,6 +20,7 @@ typedef enum FrontendCoupling
 	COUPLING_AC = 1
 } FrontendCoupling;
 
+extern void FrontEnd_Init(void);
 extern uint32_t FrontEndGetHorDiv(void);
 extern void FrontEndSetHorDiv(uint32_t us);
 extern uint32_t FrontEndGetVerDiv(Channel channel);

@@ -13,6 +13,7 @@
 #include "ui/range_menu.h"
 #include "adc.h"
 #include "trigger.h"
+#include "drivers/multiplexer.h"
 
 #define HDIV_MIN 1
 #define HDIV_MAX 1000000
@@ -23,6 +24,9 @@
 
 static uint32_t hor_div = 500;
 static uint32_t vert_divs[] = {500, 500};
+
+static Multiplexer mult1[2];
+static Multiplexer mult2[2];
 
 static FrontendCoupling current_coupling[] = { COUPLING_DC, COUPLING_DC };
 
@@ -169,4 +173,40 @@ FrontEndNotify(void)
 {
 	SetDisplayChannel(CHANNEL_A);
 	SetDisplayChannel(CHANNEL_B);
+}
+
+void
+FrontEnd_Init(void)
+{
+	mult1[CHANNEL_A].ports[0] = GPIO_PORTA_BASE;
+	mult1[CHANNEL_A].ports[1] = GPIO_PORTA_BASE;
+	mult1[CHANNEL_A].ports[2] = GPIO_PORTA_BASE;
+	mult1[CHANNEL_A].pins[0] = GPIO_PIN_0;
+	mult1[CHANNEL_A].pins[1] = GPIO_PIN_0;
+	mult1[CHANNEL_A].pins[2] = GPIO_PIN_0;
+	Multiplexer_Init(&mult1[CHANNEL_A]);
+
+	mult1[CHANNEL_A].ports[0] = GPIO_PORTA_BASE;
+	mult1[CHANNEL_A].ports[1] = GPIO_PORTA_BASE;
+	mult1[CHANNEL_A].ports[2] = GPIO_PORTA_BASE;
+	mult1[CHANNEL_A].pins[0] = GPIO_PIN_0;
+	mult1[CHANNEL_A].pins[1] = GPIO_PIN_0;
+	mult1[CHANNEL_A].pins[2] = GPIO_PIN_0;
+	Multiplexer_Init(&mult1[CHANNEL_B]);
+
+	mult2[CHANNEL_A].ports[0] = GPIO_PORTA_BASE;
+	mult2[CHANNEL_A].ports[1] = GPIO_PORTA_BASE;
+	mult2[CHANNEL_A].ports[2] = GPIO_PORTA_BASE;
+	mult2[CHANNEL_A].pins[0] = GPIO_PIN_0;
+	mult2[CHANNEL_A].pins[1] = GPIO_PIN_0;
+	mult2[CHANNEL_A].pins[2] = GPIO_PIN_0;
+	Multiplexer_Init(&mult2[CHANNEL_A]);
+
+	mult2[CHANNEL_B].ports[0] = GPIO_PORTA_BASE;
+	mult2[CHANNEL_B].ports[1] = GPIO_PORTA_BASE;
+	mult2[CHANNEL_B].ports[2] = GPIO_PORTA_BASE;
+	mult2[CHANNEL_B].pins[0] = GPIO_PIN_0;
+	mult2[CHANNEL_B].pins[1] = GPIO_PIN_0;
+	mult2[CHANNEL_B].pins[2] = GPIO_PIN_0;
+	Multiplexer_Init(&mult2[CHANNEL_B]);
 }

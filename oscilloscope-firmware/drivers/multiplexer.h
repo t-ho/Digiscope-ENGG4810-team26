@@ -5,7 +5,7 @@
  *      Author: Ryan
  */
 
-
+#include "driverlib/gpio.h"
 
 #ifndef DRIVERS_MULTIPLEXER_H_
 #define DRIVERS_MULTIPLEXER_H_

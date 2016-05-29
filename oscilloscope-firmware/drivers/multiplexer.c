@@ -5,20 +5,18 @@
  *      Author: Ryan
  */
 
+#include <stdint.h>
 #include <stdbool.h>
-
-#include <ti/drivers/GPIO.h>
 
 #include "Board.h"
 
-#include "driverlib/gpio.h"
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
 
 #include "multiplexer.h"
 
 #define MULTPINWRITE_0(pin) MAP_GPIOPinWrite(mult->ports[pin], mult->pins[pin], 0);
-#define MULTINWRITE_1(pin) MAP_GPIOPinWrite(mult->ports[pin], mult->pins[pin], mult->pins[pin]);
+#define MULTPINWRITE_1(pin) MAP_GPIOPinWrite(mult->ports[pin], mult->pins[pin], mult->pins[pin]);
 
 void
 MultiplexerSet(Multiplexer *mult, uint8_t val)
