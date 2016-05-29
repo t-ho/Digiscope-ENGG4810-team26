@@ -48,6 +48,8 @@ static Mailbox_Handle GraphicsMailbox;
     WidgetPaint(WIDGET_ROOT); \
 }
 
+static bool ignoreptrup = false;
+
 uint8_t current_menu = MAIN_MENU;
 
 tCanvasWidget menus[] =
@@ -153,6 +155,7 @@ void
 EnterSleep(tWidget *psWidget)
 {
 	SSD1289_Set_Backlight_On(false);
+	ignoreptrup = true;
 }
 
 uint32_t
@@ -337,16 +340,19 @@ UI_Task(UArg arg0, UArg arg1)
 				{
     				break;
 				}
-
     			WidgetPointerMessage(WIDGET_MSG_PTR_DOWN, cmd.args[0], cmd.args[1]);
     			break;
     		case _COMMAND_PTR_UP:
-    			if (!SSD1289_Get_Backlight_On())
+    			if (ignoreptrup)
+    			{
+    				ignoreptrup = false;
+    				break;
+    			}
+    			else if (!SSD1289_Get_Backlight_On())
     			{
         			SSD1289_Set_Backlight_On(true);
     				break;
     			}
-
     			WidgetPointerMessage(WIDGET_MSG_PTR_UP, cmd.args[0], cmd.args[1]);
     			break;
     		case _COMMAND_OVERVOLTAGE:
