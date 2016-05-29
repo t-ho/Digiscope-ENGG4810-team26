@@ -77,8 +77,8 @@
 #include "grlib/grlib.h"
 #include "grlib/widget.h"
 
-#include "net.h"
-#include "adc.h"
+#include "net_task.h"
+#include "acquisition.h"
 #include "overvolt.h"
 #include "wavegen.h"
 #include "trigger.h"

@@ -1,5 +1,5 @@
 /*
- * adc.h
+ * acquisition.h
  *
  *  Created on: 12 May 2016
  *      Author: Ryan
@@ -18,8 +18,8 @@
 #include "inc/hw_udma.h"
 #include "inc/hw_memmap.h"
 
-#ifndef ADC_H_
-#define ADC_H_
+#ifndef ACQUISITION_H_
+#define ACQUISITION_H_
 
 #define ADC_TRANSFER_SIZE 1024
 
@@ -32,4 +32,4 @@ extern uint16_t adc_buffer_A_ALT[ADC_TRANSFER_SIZE] __attribute__(( aligned(8) )
 extern uint16_t adc_buffer_B_PRI[ADC_TRANSFER_SIZE] __attribute__(( aligned(8) ));
 extern uint16_t adc_buffer_B_ALT[ADC_TRANSFER_SIZE] __attribute__(( aligned(8) ));
 
-#endif /* ADC_H_ */
+#endif /* ACQUISITION_H_ */

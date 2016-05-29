@@ -6,7 +6,7 @@
  */
 
 #include "graphics_thread.h"
-#include "adc.h"
+#include "acquisition.h"
 #include "trigger.h"
 
 static void OnTriggerType(tWidget *psWidget);

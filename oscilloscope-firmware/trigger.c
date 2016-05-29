@@ -15,8 +15,8 @@
 #include <xdc/runtime/Error.h>
 
 #include "trigger.h"
-#include "adc.h"
-#include "net.h"
+#include "acquisition.h"
+#include "net_task.h"
 #include "eeprom.h"
 
 #include "ui/graphics_thread.h"

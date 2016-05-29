@@ -31,7 +31,7 @@
 
 #include "command.h"
 #include "wavegen.h"
-#include "net.h"
+#include "net_task.h"
 #include "ui/graphics_thread.h"
 #include "ui/wavegen_menu.h"
 

@@ -1,5 +1,5 @@
 /*
- * adc.c
+ * acquisition.c
  *
  *  Created on: 12 May 2016
  *      Author: Ryan
@@ -13,7 +13,7 @@
 #include "inc/hw_types.h"
 
 #include "command.h"
-#include "adc.h"
+#include "acquisition.h"
 #include "trigger.h"
 
 uint16_t adc_buffer_A_PRI[ADC_TRANSFER_SIZE] __attribute__(( aligned(8) ));

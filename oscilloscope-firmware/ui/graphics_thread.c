@@ -12,8 +12,8 @@
 
 #include <xdc/runtime/Error.h>
 
-#include "net.h"
-#include "adc.h"
+#include "net_task.h"
+#include "acquisition.h"
 #include "overvolt.h"
 #include "frontend.h"
 #include "wavegen.h"

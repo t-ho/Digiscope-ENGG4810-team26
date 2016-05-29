@@ -7,11 +7,11 @@
 
 #include <xdc/runtime/System.h>
 
-#include "net.h"
+#include "net_task.h"
 #include "command.h"
 #include "ui/graphics_thread.h"
 #include "ui/range_menu.h"
-#include "adc.h"
+#include "acquisition.h"
 #include "trigger.h"
 #include "drivers/multiplexer.h"
 

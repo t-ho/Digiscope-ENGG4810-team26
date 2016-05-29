@@ -44,8 +44,8 @@
 
 #include <sys/socket.h>
 
-#include "net.h"
-#include "adc.h"
+#include "net_task.h"
+#include "acquisition.h"
 #include "command.h"
 #include "trigger.h"
 #include "frontend.h"
