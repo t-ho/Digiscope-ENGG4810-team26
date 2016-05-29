@@ -1197,33 +1197,42 @@ public class MainWindow extends MainWindowUi
 				double firstZeroCrossing = -1;
 				double secondZeroCrossing = -1;
 				boolean isReady = false;
-				for (int i = startIndex; i < xYSeries.getItemCount(); i++) {
-					double time = xYSeries.getDataItem(i).getXValue();
-					double voltage = xYSeries.getDataItem(i).getYValue();
-					if (time <= horizontalRange.getUpperBound()) {
-						if ((voltage <= verticalRange.getUpperBound()) && (voltage >= verticalRange.getLowerBound())) {
-							//if ((voltage <= (9 * minVoltage) / 10) || voltage >= (9 * maxVoltage) / 10)  {
-							if(voltage <= (0.95 * minVoltage)) {
-								isReady = true;
-							}
-							if (voltage >= -0.05 && voltage <= 0.05 && isReady == true) {
-								if (firstZeroCrossing == -1) {
-									firstZeroCrossing = time;
-									isReady = false;
-								} else if (secondZeroCrossing == -1) {
-									secondZeroCrossing = time;
-									break;
-								}
-							}
-						}
-					} else {
+				
+				ArrayList<Double> zeroCrossings = new ArrayList<>();
+				
+				for (int i = startIndex + 1; i < xYSeries.getItemCount(); i++) {
+					double time1 = xYSeries.getDataItem(i).getXValue();
+					double voltage1 = xYSeries.getDataItem(i).getYValue();
+					double voltage2 = xYSeries.getDataItem(i - 1).getYValue();
+
+					if (time1 > horizontalRange.getUpperBound())
+					{
 						break;
 					}
+					
+					if ((voltage1 > 0 && voltage2 < 0) || (voltage1 < 0 && voltage2 > 0))
+					{
+						zeroCrossings.add(time1);
+					}
 				}
-				if (firstZeroCrossing != -1 && secondZeroCrossing != -1) {
-					double frequency = 1 / (((secondZeroCrossing - firstZeroCrossing)) / 1000000);
+				
+				if (zeroCrossings.size() > 1)
+				{				
+					double total = 0;
+					
+					for (int i = 1; i < zeroCrossings.size(); i++)
+					{
+						total += (zeroCrossings.get(i) - zeroCrossings.get(i - 1));
+					}
+					
+					double avgPeriod = (2 * total / 1000000) / (zeroCrossings.size() - 1);
+					
+					System.out.println(avgPeriod);
+					
+					double frequency = 1 / avgPeriod;
 					result.put(Constant.FREQUENCY, frequency);
 				}
+				
 			} else {
 				result = null;
 			}
