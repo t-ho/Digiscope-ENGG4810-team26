@@ -56,7 +56,7 @@ static const char* TriggerTypeNames[] = {"Level", "Rising", "Falling"};
 static TriggerType currentType = TRIGGER_TYPE_LEVEL;
 static TriggerMode currentMode = TRIGGER_MODE_AUTO;
 static TriggerState currentState = TRIGGER_STATE_STOP;
-static uint32_t currentChannel = 0;
+static Channel currentChannel = CHANNEL_A;
 
 // Threshold in uV
 static int32_t currentThreshold = 1000000;
@@ -376,14 +376,14 @@ TriggerSetState(TriggerState state)
 	UISend(&cmd, 0);
 }
 
-uint32_t
+Channel
 TriggerGetChannel(void)
 {
 	return currentChannel;
 }
 
 void
-TriggerSetChannel(uint32_t channel)
+TriggerSetChannel(Channel channel)
 {
 	static char channelName[] = "Channel A";
 
@@ -477,41 +477,47 @@ TriggerSetSampleSize(SampleSize sampleSize)
 		sampleSize = SAMPLE_SIZE_12_BIT;
 	}
 
-	Semaphore_pend(settingslock, BIOS_WAIT_FOREVER);
-
-	ResetBuffers();
-
-	offset = 0;
-
-	if (currentSampleSize == SAMPLE_SIZE_8_BIT && sampleSize == SAMPLE_SIZE_12_BIT)
+	if (Semaphore_pend(settingslock, 1000))
 	{
-		currentSampleSize = sampleSize;
-		TriggerSetNumSamples(TriggerGetNumSamples() / 2);
-	}
-	else if (currentSampleSize == SAMPLE_SIZE_12_BIT && sampleSize == SAMPLE_SIZE_8_BIT)
-	{
-		currentSampleSize = sampleSize;
-		TriggerSetNumSamples(TriggerGetNumSamples() * 2);
+		ResetBuffers();
+
+		offset = 0;
+
+		if (currentSampleSize == SAMPLE_SIZE_8_BIT && sampleSize == SAMPLE_SIZE_12_BIT)
+		{
+			currentSampleSize = sampleSize;
+			TriggerSetNumSamples(TriggerGetNumSamples() / 2);
+		}
+		else if (currentSampleSize == SAMPLE_SIZE_12_BIT && sampleSize == SAMPLE_SIZE_8_BIT)
+		{
+			currentSampleSize = sampleSize;
+			TriggerSetNumSamples(TriggerGetNumSamples() * 2);
+		}
+		else
+		{
+			currentSampleSize = sampleSize;
+		}
+
+		EEPROMSave(EEPROM_TRIGGER_SAMPLESIZE, currentSampleSize);
+
+		TriggerSetThreshold(TriggerGetThreshold());
+
+		TriggerSetMode(TriggerGetMode());
+
+		Command cmd;
+		cmd.type = COMMAND_SAMPLE_LENGTH;
+
+		cmd.args[0] = TriggerGetSampleSize();
+		cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
+
+		NetSend(&cmd, 0);
+
+		Semaphore_post(settingslock);
 	}
 	else
 	{
-		currentSampleSize = sampleSize;
+		System_printf("Unable to change sample size");
 	}
-
-	EEPROMSave(EEPROM_TRIGGER_SAMPLESIZE, currentSampleSize);
-
-	TriggerSetThreshold(TriggerGetThreshold());
-
-	TriggerSetMode(TriggerGetMode());
-
-	Command cmd;
-	cmd.type = COMMAND_SAMPLE_LENGTH;
-	cmd.args[0] = TriggerGetSampleSize();
-	cmd.is_confirmation = COMMAND_IS_CONFIRMATION;
-
-	NetSend(&cmd, 0);
-
-	Semaphore_post(settingslock);
 }
 
 void
@@ -551,12 +557,17 @@ TriggerGetNumSamples(void)
 void
 TriggerSetSampleDivisor(uint16_t divisor)
 {
-	Semaphore_pend(settingslock, BIOS_WAIT_FOREVER);
+	if (Semaphore_pend(settingslock, 1000))
+	{
+		offset = 0;
+		sample_divisor = divisor;
 
-	offset = 0;
-	sample_divisor = divisor;
-
-	Semaphore_post(settingslock);
+		Semaphore_post(settingslock);
+	}
+	else
+	{
+		System_printf("Unable to change sample divisor");
+	}
 }
 
 uint16_t

@@ -8,12 +8,24 @@
 #ifndef FRONTEND_H_
 #define FRONTEND_H_
 
+typedef enum Channel
+{
+	CHANNEL_A = 0,
+	CHANNEL_B = 1
+} Channel;
+
+typedef enum FrontendCoupling
+{
+	COUPLING_DC = 0,
+	COUPLING_AC = 1
+} FrontendCoupling;
+
 extern uint32_t FrontEndGetHorDiv(void);
 extern void FrontEndSetHorDiv(uint32_t us);
-extern uint32_t FrontEndGetVerDiv(uint32_t channel);
-extern void FrontEndSetVerDiv(uint32_t channel, uint32_t uV);
-extern uint32_t FrontEndGetCoupling(uint32_t channel);
-extern void FrontEndSetCoupling(uint32_t channel, uint32_t coupling);
+extern uint32_t FrontEndGetVerDiv(Channel channel);
+extern void FrontEndSetVerDiv(Channel channel, uint32_t uV);
+extern FrontendCoupling FrontEndGetCoupling(Channel channel);
+extern void FrontEndSetCoupling(Channel channel, FrontendCoupling coupling);
 extern void FrontEndNotify(void);
 
 #endif /* FRONTEND_H_ */

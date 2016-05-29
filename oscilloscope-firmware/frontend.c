@@ -14,11 +14,6 @@
 #include "adc.h"
 #include "trigger.h"
 
-#define CHANNEL_A 0
-#define CHANNEL_B 1
-#define COUPLING_DC 0
-#define COUPLING_AC 1
-
 #define HDIV_MIN 1
 #define HDIV_MAX 1000000
 #define VDIV_MIN 20000
@@ -29,7 +24,7 @@
 static uint32_t hor_div = 500;
 static uint32_t vert_divs[] = {500, 500};
 
-static uint8_t current_coupling[] = { COUPLING_DC, COUPLING_DC };
+static FrontendCoupling current_coupling[] = { COUPLING_DC, COUPLING_DC };
 
 uint32_t
 FrontEndGetHorDiv(void)
@@ -94,7 +89,7 @@ FrontEndSetHorDiv(uint32_t us)
 }
 
 uint32_t
-FrontEndGetVerDiv(uint32_t channel)
+FrontEndGetVerDiv(Channel channel)
 {
 	if (channel < 2)
 	{
@@ -107,7 +102,7 @@ FrontEndGetVerDiv(uint32_t channel)
 }
 
 void
-FrontEndSetVerDiv(uint32_t channel, uint32_t uV)
+FrontEndSetVerDiv(Channel channel, uint32_t uV)
 {
 	static char line1[16], line2[16];
 
@@ -138,8 +133,8 @@ FrontEndSetVerDiv(uint32_t channel, uint32_t uV)
 	}
 }
 
-uint32_t
-FrontEndGetCoupling(uint32_t channel)
+FrontendCoupling
+FrontEndGetCoupling(Channel channel)
 {
 	if (channel < 2)
 	{
@@ -147,12 +142,13 @@ FrontEndGetCoupling(uint32_t channel)
 	}
 	else
 	{
-		return 9;
+		FrontEndSetCoupling(channel, COUPLING_DC);
+		return current_coupling[channel];
 	}
 }
 
 void
-FrontEndSetCoupling(uint32_t channel, uint32_t coupling)
+FrontEndSetCoupling(Channel channel, FrontendCoupling coupling)
 {
 	if (channel < 2)
 	{
@@ -171,6 +167,6 @@ FrontEndSetCoupling(uint32_t channel, uint32_t coupling)
 void
 FrontEndNotify(void)
 {
-	SetDisplayChannel(0);
-	SetDisplayChannel(1);
+	SetDisplayChannel(CHANNEL_A);
+	SetDisplayChannel(CHANNEL_B);
 }

@@ -9,6 +9,8 @@
 #include <ti/sysbios/knl/Event.h>
 #include <ti/sysbios/knl/Semaphore.h>
 
+#include "frontend.h"
+
 #ifndef TRIGGER_H_
 #define TRIGGER_H_
 
@@ -57,8 +59,8 @@ extern TriggerMode TriggerGetMode(void);
 extern void TriggerSetMode(TriggerMode mode);
 extern TriggerType TriggerGetType(void);
 extern void TriggerSetType(TriggerType type);
-extern uint32_t TriggerGetChannel(void);
-extern void TriggerSetChannel(uint32_t channel);
+extern Channel TriggerGetChannel(void);
+extern void TriggerSetChannel(Channel channel);
 extern SampleSize TriggerGetSampleSize(void);
 extern void TriggerSetSampleSize(SampleSize mode);
 extern TriggerState TriggerGetState(void);

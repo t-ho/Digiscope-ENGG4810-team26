@@ -55,6 +55,7 @@
 #define TCPPORT 4810
 
 #define TCPHANDLERSTACK 1024
+#define TCPWORKERSTACK 2048
 
 #define SOCKET_TIMEOUT 100000
 
@@ -120,7 +121,10 @@ Void tcpWorker(UArg arg0, UArg arg1)
 
     Semaphore_post(clients_connected_h);
 
+    // Clear Mailbox
 	Command msg;
+	while(Mailbox_pend(NetCommandMailbox, &msg, 0));
+
 	msg.type = _COMMAND_CONN_UPDATE;
 	UISend(&msg, 0);
 
@@ -183,7 +187,12 @@ Void tcpWorker(UArg arg0, UArg arg1)
 			{
 				SampleCommand *scmd = (SampleCommand*) &cmd;
 
-				uint16_t packetSize = ntohs(scmd->num_samples);
+				int16_t packetSize = ntohs(scmd->num_samples);
+				if (packetSize < 1)
+				{
+					continue;
+				}
+
 				if (cmd.type == SAMPLE_PACKET_A_12 || cmd.type == SAMPLE_PACKET_B_12)
 				{
 					packetSize *= 2;
@@ -292,7 +301,7 @@ void tcpHandler(UArg arg0, UArg arg1)
         /* Initialize the defaults and set the parameters. */
         Task_Params_init(&taskParams);
         taskParams.arg0 = (UArg)clientfd;
-        taskParams.stackSize = 1280;
+        taskParams.stackSize = TCPWORKERSTACK;
         taskHandle = Task_create((Task_FuncPtr)tcpWorker, &taskParams, &eb);
         if (taskHandle == NULL) {
             System_printf("Error: Failed to create new Task\n");

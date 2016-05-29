@@ -9,7 +9,7 @@
 #include "range_menu.h"
 #include "frontend.h"
 
-static uint32_t display_channel = 0;
+static Channel display_channel = CHANNEL_A;
 
 static void OnHorRangeUp(tWidget *psWidget);
 static void OnHorRangeDown(tWidget *psWidget);
@@ -79,7 +79,7 @@ OnRangeCoupling(tWidget *psWidget)
 }
 
 void
-RangeVerSetText(uint32_t channel, const char* line1, const char* line2)
+RangeVerSetText(Channel channel, const char* line1, const char* line2)
 {
 	if (channel == display_channel && current_menu == RANGE_MENU)
 	{
@@ -105,7 +105,7 @@ RangeHorSetText(const char* line1, const char* line2)
 }
 
 void
-RangeCouplingSetText(uint32_t channel, const char* text)
+RangeCouplingSetText(Channel channel, const char* text)
 {
 	if (channel == display_channel && current_menu == RANGE_MENU)
 	{
@@ -115,7 +115,7 @@ RangeCouplingSetText(uint32_t channel, const char* text)
 }
 
 void
-SetDisplayChannel(uint32_t channel)
+SetDisplayChannel(Channel channel)
 {
 	display_channel = channel;
 	FrontEndSetCoupling(channel, FrontEndGetCoupling(channel));

@@ -8,9 +8,11 @@
 #ifndef UI_RANGE_MENU_H_
 #define UI_RANGE_MENU_H_
 
+#include "frontend.h"
+
 extern void RangeHorSetText(const char* line1, const char* line2);
-extern void RangeVerSetText(uint32_t channel, const char* line1, const char* line2);
-extern void SetDisplayChannel(uint32_t channel);
-extern void RangeCouplingSetText(uint32_t channel, const char* text);
+extern void RangeVerSetText(Channel channel, const char* line1, const char* line2);
+extern void SetDisplayChannel(Channel channel);
+extern void RangeCouplingSetText(Channel channel, const char* text);
 
 #endif /* UI_RANGE_MENU_H_ */

@@ -357,10 +357,10 @@ UI_Task(UArg arg0, UArg arg1)
     			FrontEndSetHorDiv(cmd.args[0]);
     			break;
     		case COMMAND_VERTICAL_RANGE_A:
-    			FrontEndSetVerDiv(0, cmd.args[0]);
+    			FrontEndSetVerDiv(CHANNEL_A, cmd.args[0]);
 				break;
     		case COMMAND_VERTICAL_RANGE_B:
-    			FrontEndSetVerDiv(1, cmd.args[0]);
+    			FrontEndSetVerDiv(CHANNEL_B, cmd.args[0]);
 				break;
     		case COMMAND_TRIGGER_FORCE:
     			ForceTrigger();
@@ -383,10 +383,10 @@ UI_Task(UArg arg0, UArg arg1)
     		case COMMAND_NUM_SAMPLES:
     			TriggerSetNumSamples(cmd.args[0]);
     		case COMMAND_COUPLING_A:
-    			FrontEndSetCoupling(0, cmd.args[0]);
+    			FrontEndSetCoupling(CHANNEL_A, cmd.args[0]);
     			break;
     		case COMMAND_COUPLING_B:
-    			FrontEndSetCoupling(1, cmd.args[0]);
+    			FrontEndSetCoupling(CHANNEL_B, cmd.args[0]);
     			break;
     		case COMMAND_SAMPLE_LENGTH:
     			TriggerSetSampleSize((SampleSize)cmd.args[0]);
