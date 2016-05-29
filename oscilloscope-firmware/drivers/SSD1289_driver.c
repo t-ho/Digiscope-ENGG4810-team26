@@ -365,6 +365,15 @@ SSD1289_Init(void)
 
 	SSD1289_Init_Magic();
 
+	SysCtlDelay(1000000);
+
+	SSD1289_Init_Magic();
+
+	SysCtlDelay(1000000);
+
+	SSD1289_Init_Magic();
+
+
 	Pant(0x0000);
 }
 
