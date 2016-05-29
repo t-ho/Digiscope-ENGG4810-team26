@@ -55,7 +55,7 @@ public class Visualizer {
 	 * @param xYSeries 
 	 * @param noOfSamples
 	 */
-	public void addSeriesToDataset(int channelIndex, XYSeries xYSeries) {
+	public void addSeriesToDataset(int channelIndex, XYSeries xYSeries, int samplePeriod) {
 		if(xYSeries != null) {
 			datasets[channelIndex].removeAllSeries();
 			datasets[channelIndex].addSeries(xYSeries);
@@ -63,7 +63,7 @@ public class Visualizer {
 				renderers[channelIndex].setSeriesPaint(0, Constant.A_COLOR);
 				int noOfSamples = getSeries(channelIndex).getItemCount();
 				XYSeries marker = new XYSeries("Trigger Marker");
-				double x = noOfSamples / 2;
+				double x = (noOfSamples * samplePeriod) / 2;
 				double y1 = - Constant.VERTICAL_GRID_SPACINGS;
 				double y2 = Constant.VERTICAL_GRID_SPACINGS;
 				marker.add(x, y1);
@@ -75,7 +75,7 @@ public class Visualizer {
 				renderers[channelIndex].setSeriesPaint(0, Constant.B_COLOR);
 				int noOfSamples = getSeries(channelIndex).getItemCount();
 				XYSeries marker = new XYSeries("Trigger Marker");
-				double x = noOfSamples / 2;
+				double x = (noOfSamples * samplePeriod) / 2;
 				double y1 = - Constant.VERTICAL_GRID_SPACINGS;
 				double y2 = Constant.VERTICAL_GRID_SPACINGS;
 				marker.add(x, y1);
@@ -226,11 +226,12 @@ public class Visualizer {
 	 * Set value for horizontal grid spacings.
 	 * The horizontal axis has Constant.HORIZONTAL_GRID_SPACINGS.
 	 * @param value The value in microseconds
-	 * @param noOfSamples 
+	 * @param noOfSamples
+	 * @param samplePeriod
 	 */
-	public void setValueForHorizontalGridSpacing(double value, int noOfSamples) {
+	public void setValueForHorizontalGridSpacing(double value, int noOfSamples, int samplePeriod) {
 		NumberTickUnit tickUnit = new NumberTickUnit(value);
-		double lower = (noOfSamples - Constant.HORIZONTAL_GRID_SPACINGS * value) / 2;
+		double lower = (noOfSamples * samplePeriod - Constant.HORIZONTAL_GRID_SPACINGS * value) / 2;
 		double upper = lower + Constant.HORIZONTAL_GRID_SPACINGS * value;
 		commonHorizontalAxis.setTickUnit(tickUnit);
 		commonHorizontalAxis.setRange(lower, upper);

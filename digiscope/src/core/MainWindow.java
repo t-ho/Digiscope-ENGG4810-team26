@@ -61,6 +61,7 @@ public class MainWindow extends MainWindowUi
 	private PacketWriter packetWriter_;
 	private PacketReader packetReader_;
 	private InputStreamHandler inputStreamHandler_;
+	private int samplePeriod_;
 
 	private int previousVerticalRangeAIndex_;
 	private int previousVerticalRangeBIndex_;
@@ -107,6 +108,7 @@ public class MainWindow extends MainWindowUi
 		visualizer_ = new Visualizer();
 		chartPanel_ = createDefaultChartPanel(visualizer_.getChart());
 		filterFile_ = new FilterFile();
+		samplePeriod_ = Constant.DEFAULT_SAMPLE_PERIOD;
 		previousVerticalRangeAIndex_ = verticalRangeAComboBox.getSelectedIndex();
 		previousVerticalRangeBIndex_ = verticalRangeBComboBox.getSelectedIndex();
 		previousHorizontalRangeIndex_ = horizontalRangeComboBox.getSelectedIndex();
@@ -854,7 +856,7 @@ public class MainWindow extends MainWindowUi
 				filterDivisionInfoLabel.setEnabled(true);
 			}
 			XYSeries xYSeries = createXYSeriesWithOffsets(channelName, rawSeries, horizontalOffset, verticalOffset);
-			visualizer_.addSeriesToDataset(channelIndex, xYSeries);
+			visualizer_.addSeriesToDataset(channelIndex, xYSeries, samplePeriod_);
 			showMeasurementResults(channelIndex);
 		}
 	}
@@ -1151,7 +1153,13 @@ public class MainWindow extends MainWindowUi
 			if(horizontalRange.getLowerBound() < 0) {
 				startIndex = 0;
 			} else {
-				startIndex = (int) horizontalRange.getLowerBound();
+				int remainder = ((int) horizontalRange.getLowerBound()) % samplePeriod_;
+				int index = ((int) horizontalRange.getLowerBound()) / samplePeriod_;
+				if (remainder == 0) {
+					startIndex = index;
+				} else {
+					startIndex = index + 1;
+				}
 			}
 			for (int i = startIndex; i < xYSeries.getItemCount(); i++) {
 				double time = xYSeries.getDataItem(i).getXValue();
@@ -1388,7 +1396,7 @@ public class MainWindow extends MainWindowUi
 		horizontalRangeComboBox.addActionListener(this);
 
 		int horizontalRange = microSeconds;
-		visualizer_.setValueForHorizontalGridSpacing(horizontalRange, (int) noOfSamplesSpinner.getValue());
+		visualizer_.setValueForHorizontalGridSpacing(horizontalRange, (int) noOfSamplesSpinner.getValue(), samplePeriod_);
 		if (horizontalRangeComboBox.getSelectedIndex() > previousHorizontalRangeIndex_) {
 			if (rawXYSeries.containsKey(Constant.MATH_CHANNEL)) {
 				calculateMathChannel(expressionTextArea.getText().trim());
@@ -1622,10 +1630,11 @@ public class MainWindow extends MainWindowUi
 	 * Call this method to re-center trigger point
 	 * @param noOfSamples
 	 */
-	public void refreshHorizontalRange(int noOfSamples) {
+	public void refreshHorizontalRange(int noOfSamples, int samplePeriod) {
+		samplePeriod_ = samplePeriod;
 		String timeString = (String) horizontalRangeComboBox.getSelectedItem();
 		int horizontalRange = convertTimeStringToMicroSeconds(timeString);
-		visualizer_.setValueForHorizontalGridSpacing(horizontalRange, noOfSamples);
+		visualizer_.setValueForHorizontalGridSpacing(horizontalRange, noOfSamples, samplePeriod);
 		
 	}
 

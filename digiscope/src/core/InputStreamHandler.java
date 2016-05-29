@@ -155,7 +155,7 @@ public class InputStreamHandler extends Thread {
 								aMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.A_INDEX);
 								maxDisplayTime = mainWindow_.getMaxDisplayTime();
 								aTotalOfSamples = 0;
-								mainWindow_.refreshHorizontalRange(nSamples);
+								mainWindow_.refreshHorizontalRange(nSamples, aPeriod);
 							}
 							for (short i = 0; i < nSamples; i++) {
 								double voltage = (aMaxDiplayVoltage - aMinDiplayVoltage) * ((double) samples[i] / 255.0)
@@ -188,7 +188,7 @@ public class InputStreamHandler extends Thread {
 								bMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.B_INDEX);
 								maxDisplayTime = mainWindow_.getMaxDisplayTime();
 								bTotalOfSamples = 0;
-								mainWindow_.refreshHorizontalRange(nSamples);
+								mainWindow_.refreshHorizontalRange(nSamples, bPeriod);
 							}
 							for (short i = 0; i < nSamples; i++) {
 								double voltage = (bMaxDiplayVoltage - bMinDiplayVoltage) * ((double) samples[i] / 255.0)
@@ -221,7 +221,7 @@ public class InputStreamHandler extends Thread {
 								aMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.A_INDEX);
 								maxDisplayTime = mainWindow_.getMaxDisplayTime();
 								aTotalOfSamples = 0;
-								mainWindow_.refreshHorizontalRange(nSamples);
+								mainWindow_.refreshHorizontalRange(nSamples, aPeriod);
 							}
 							for (short i = 0; i < nSamples; i++) {
 								double voltage = (aMaxDiplayVoltage - aMinDiplayVoltage)
@@ -254,7 +254,7 @@ public class InputStreamHandler extends Thread {
 								bMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.B_INDEX);
 								maxDisplayTime = mainWindow_.getMaxDisplayTime();
 								bTotalOfSamples = 0;
-								mainWindow_.refreshHorizontalRange(nSamples);
+								mainWindow_.refreshHorizontalRange(nSamples, bPeriod);
 							}
 							for (short i = 0; i < nSamples; i++) {
 								double voltage = (bMaxDiplayVoltage - bMinDiplayVoltage)
