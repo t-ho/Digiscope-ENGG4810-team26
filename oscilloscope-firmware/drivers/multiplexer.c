@@ -40,13 +40,10 @@ Multiplexer_Init(Multiplexer *mult)
 {
 	MAP_GPIOPinTypeGPIOOutput(mult->ports[0], mult->pins[0]);
 	MAP_GPIOPinTypeGPIOOutput(mult->ports[1], mult->pins[1]);
-	MAP_GPIOPinTypeGPIOOutput(mult->ports[2], mult->pins[2]);
 
 	MAP_GPIOPadConfigSet(mult->ports[0], mult->pins[0], GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
 	MAP_GPIOPadConfigSet(mult->ports[1], mult->pins[1], GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
-	MAP_GPIOPadConfigSet(mult->ports[2], mult->pins[2], GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
 
 	MULTPINWRITE_0(0);
-	MULTPINWRITE_0(0);
-	MULTPINWRITE_0(0);
+	MULTPINWRITE_0(1);
 }

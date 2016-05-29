@@ -150,6 +150,8 @@ int main(void)
 	MAP_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_1);
 	MAP_GPIOPadConfigSet(GPIO_PORTN_BASE, GPIO_PIN_1, GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
 
+	FrontEnd_Init();
+
 	EEPROM_Init();
 
     Init_Net();

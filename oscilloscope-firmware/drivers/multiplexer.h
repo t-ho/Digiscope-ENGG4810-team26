@@ -11,8 +11,8 @@
 #define DRIVERS_MULTIPLEXER_H_
 
 typedef struct Multiplexer {
-	uint32_t ports[3];
-	uint8_t pins[3];
+	uint32_t ports[2];
+	uint8_t pins[2];
 } Multiplexer;
 
 extern void MultiplexerSet(Multiplexer *mult, uint8_t val);

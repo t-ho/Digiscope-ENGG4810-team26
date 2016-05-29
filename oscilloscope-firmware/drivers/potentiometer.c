@@ -58,12 +58,10 @@ Potentiometer_Init(Potentiometer *pot)
 	MAP_GPIOPinTypeGPIOOutput(pot->ports[POT_PIN_MOSI], pot->pins[POT_PIN_MOSI]);
 	MAP_GPIOPinTypeGPIOOutput(pot->ports[POT_PIN_CE], pot->pins[POT_PIN_CE]);
 	MAP_GPIOPinTypeGPIOOutput(pot->ports[POT_PIN_CLK], pot->pins[POT_PIN_CLK]);
-	MAP_GPIOPinTypeGPIOInput(pot->ports[POT_PIN_MISO], pot->pins[POT_PIN_MISO]);
 
 	MAP_GPIOPadConfigSet(pot->ports[POT_PIN_CE], pot->pins[POT_PIN_CE], GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
 	MAP_GPIOPadConfigSet(pot->ports[POT_PIN_MOSI], pot->pins[POT_PIN_MOSI], GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
 	MAP_GPIOPadConfigSet(pot->ports[POT_PIN_CLK], pot->pins[POT_PIN_CLK], GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
-	MAP_GPIOPadConfigSet(pot->ports[POT_PIN_MISO], pot->pins[POT_PIN_MISO], GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD_WPU);
 
 	POTPINWRITE_1(CE);
 	POTPINWRITE_0(CLK);
