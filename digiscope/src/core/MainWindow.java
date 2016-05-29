@@ -128,27 +128,6 @@ public class MainWindow extends MainWindowUi
 		sentP2PVoltageCommand_ = false;
 		previousP2PVoltageValue_ = (int) p2pVoltageSpinner.getValue();
 		previousGeneratorFrequency_ = (int) generatorFrequencySpinner.getValue();
-		// test
-		// Channel A
-		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
-		for (double i = 0, j = 0; i < 25000; i = i + 1, j = j + 2 * Math.PI/200) {
-			aSeries.add(i, 1 * Math.sin(j));
-		}
-//		 Test Filter
-//		 aSeries = new XYSeries(Constant.CHANNEL_A);
-//		 aSeries.add(0, 3);
-//		 aSeries.add(1, 4);
-//		 aSeries.add(2, 5);
-//		 aSeries.add(3, 6);
-
-		rawXYSeries.put(Constant.CHANNEL_A, aSeries);
-
-		// Channel B
-		XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
-		for (double i = 0, j = 0; i < 25000; i = i + 1, j = j + (2 * Math.PI / 250)) {
-			bSeries.add(i, 1.5 * Math.sin(j));
-		}
-		rawXYSeries.put(Constant.CHANNEL_B, bSeries);
 	}
 
 	private void addListenersToComponents() {
@@ -279,8 +258,6 @@ public class MainWindow extends MainWindowUi
 		CommandPacket commandPacket = new CommandPacket(packetType, Constant.REQUEST, argument);
 		try {
 			packetWriter_.writePacket(commandPacket);
-			System.out.printf("Sent:     Type %2x Indicator %2x Argument %d\n", commandPacket.getType(),
-					Constant.REQUEST, argument);
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(this, "Connection has been lost! Please reconnect!", "Error",
 					JOptionPane.ERROR_MESSAGE);

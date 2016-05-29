@@ -45,7 +45,6 @@ public class ExpressionDialog extends ExpressionDialogUi implements ActionListen
 	}
 
 	private void addListionersToComponents() {
-		// TODO
 		for(int i = 0; i < buttons.length; i++) {
 			buttons[i].addActionListener(this);
 		}
@@ -66,7 +65,6 @@ public class ExpressionDialog extends ExpressionDialogUi implements ActionListen
 	}
 
 	private void okButtonActionPerformed(ActionEvent event) {
-		// TODO
 		String expression = expressionTextArea.getText().trim();
 		if(!expression.equals("")) {
 			if (expression.contains("A") || expression.contains("B") || expression.contains("F")) {
@@ -96,13 +94,11 @@ public class ExpressionDialog extends ExpressionDialogUi implements ActionListen
 	}
 
 	private void cancelButtonActionPerformed(ActionEvent event) {
-		// TODO
 		this.dispose();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		// TODO
 		String currentString = expressionTextArea.getText();
 		if(event.getActionCommand().equals("Del")) {
 			if(currentString.length() > 0) {
