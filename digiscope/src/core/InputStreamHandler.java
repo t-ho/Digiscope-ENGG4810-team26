@@ -57,7 +57,7 @@ public class InputStreamHandler extends Thread {
 						CommandPacket commandPacket = (CommandPacket) packet;
 						/// Test
 						if(type != PacketType.KEEP_ALIVE) {
-//							System.out.printf("Received: Type %2x Indicator %2x argument %d\n\n",commandPacket.getType(), commandPacket.getIndicator(), commandPacket.getArgument());
+							System.out.printf("Received: Type %2x Indicator %2x argument %d\n\n",commandPacket.getType(), commandPacket.getIndicator(), commandPacket.getArgument());
 						}
 						/// Test
 						byte indicator = commandPacket.getIndicator();
@@ -155,7 +155,6 @@ public class InputStreamHandler extends Thread {
 								aMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.A_INDEX);
 								maxDisplayTime = mainWindow_.getMaxDisplayTime();
 								aTotalOfSamples = 0;
-								mainWindow_.setNoOfSamples(nSamples);
 								mainWindow_.refreshHorizontalRange(nSamples);
 							}
 							for (short i = 0; i < nSamples; i++) {
@@ -189,7 +188,6 @@ public class InputStreamHandler extends Thread {
 								bMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.B_INDEX);
 								maxDisplayTime = mainWindow_.getMaxDisplayTime();
 								bTotalOfSamples = 0;
-								mainWindow_.setNoOfSamples(nSamples);
 								mainWindow_.refreshHorizontalRange(nSamples);
 							}
 							for (short i = 0; i < nSamples; i++) {
@@ -223,7 +221,6 @@ public class InputStreamHandler extends Thread {
 								aMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.A_INDEX);
 								maxDisplayTime = mainWindow_.getMaxDisplayTime();
 								aTotalOfSamples = 0;
-								mainWindow_.setNoOfSamples(nSamples);
 								mainWindow_.refreshHorizontalRange(nSamples);
 							}
 							for (short i = 0; i < nSamples; i++) {
@@ -257,7 +254,6 @@ public class InputStreamHandler extends Thread {
 								bMinDiplayVoltage = mainWindow_.getMinDisplayVoltage(Constant.B_INDEX);
 								maxDisplayTime = mainWindow_.getMaxDisplayTime();
 								bTotalOfSamples = 0;
-								mainWindow_.setNoOfSamples(nSamples);
 								mainWindow_.refreshHorizontalRange(nSamples);
 							}
 							for (short i = 0; i < nSamples; i++) {
