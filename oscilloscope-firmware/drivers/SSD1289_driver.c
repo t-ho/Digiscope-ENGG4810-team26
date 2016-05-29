@@ -357,6 +357,10 @@ SSD1289_Init(void)
 		MAP_GPIOPadConfigSet(LCD_BASES[i], LCD_PINS[i], GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
 	}
 
+	/* Don't know why this is needed, but won't initialize without it */
+	gpio_out_data(0xFF);
+	SysCtlDelay(10000);
+
 	Backlight_Init();
 
 	SSD1289_Init_Magic();
