@@ -385,9 +385,21 @@ TriggerGetChannel(void)
 void
 TriggerSetChannel(Channel channel)
 {
+	switch (channel)
+	{
+	case CHANNEL_A:
+	case CHANNEL_B:
+		break;
+	default:
+		channel = CHANNEL_A;
+	}
+
 	static char channelName[] = "Channel A";
 
 	currentChannel = channel;
+
+	EEPROMSave(EEPROM_TRIGGER_CHANNEL, currentChannel);
+
 	channelName[8] = 'A' + channel;
 
 	TriggerSetChannelText(channelName);
@@ -648,7 +660,7 @@ Trigger_Init(void)
 void
 TriggerNotify(void)
 {
-    TriggerSetChannel(TriggerGetChannel());
+    TriggerSetChannel((Channel)EEPROMLoad(EEPROM_TRIGGER_CHANNEL));
     TriggerSetMode((TriggerMode)EEPROMLoad(EEPROM_TRIGGER_MODE));
     TriggerSetType((TriggerType)EEPROMLoad(EEPROM_TRIGGER_TYPE));
     TriggerSetThreshold(EEPROMLoad(EEPROM_TRIGGER_THRESHOLD));
