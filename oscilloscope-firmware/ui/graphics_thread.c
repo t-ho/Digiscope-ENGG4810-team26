@@ -90,7 +90,7 @@ void OnRange_A(tWidget *psWidget)
 {
 	WidgetRemove((tWidget *)&menus[current_menu]);
 	current_menu = RANGE_MENU;
-	SetDisplayChannel(0);
+	SetDisplayChannel(CHANNEL_A);
     CanvasTextSet(&g_sTitle, "Channel A");
 	WidgetAdd(WIDGET_ROOT, (tWidget *)&menus[current_menu]);
     WidgetPaint(WIDGET_ROOT);
@@ -100,7 +100,7 @@ void OnRange_B(tWidget *psWidget)
 {
 	WidgetRemove((tWidget *)&menus[current_menu]);
 	current_menu = RANGE_MENU;
-	SetDisplayChannel(1);
+	SetDisplayChannel(CHANNEL_B);
 	CanvasTextSet(&g_sTitle, "Channel B");
 	WidgetAdd(WIDGET_ROOT, (tWidget *)&menus[current_menu]);
     WidgetPaint(WIDGET_ROOT);
@@ -382,11 +382,12 @@ UI_Task(UArg arg0, UArg arg1)
     			break;
     		case COMMAND_NUM_SAMPLES:
     			TriggerSetNumSamples(cmd.args[0]);
+    			break;
     		case COMMAND_COUPLING_A:
-    			FrontEndSetCoupling(CHANNEL_A, cmd.args[0]);
+    			FrontEndSetCoupling(CHANNEL_A, (FrontendCoupling)cmd.args[0]);
     			break;
     		case COMMAND_COUPLING_B:
-    			FrontEndSetCoupling(CHANNEL_B, cmd.args[0]);
+    			FrontEndSetCoupling(CHANNEL_B, (FrontendCoupling)cmd.args[0]);
     			break;
     		case COMMAND_SAMPLE_LENGTH:
     			TriggerSetSampleSize((SampleSize)cmd.args[0]);
