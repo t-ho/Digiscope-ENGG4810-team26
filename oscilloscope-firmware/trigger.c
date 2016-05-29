@@ -90,7 +90,12 @@ sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_
 
 		if (currentState == TRIGGER_STATE_ARMED && countdown <= 0 && offset > 0)
 		{
-			if (trig_src[offset + i] > realThreshold && trig_src[offset + i - 1] <= realThreshold)
+			if (currentMode == TRIGGER_MODE_AUTO)
+			{
+				*trigger_index = offset + i;
+				TriggerSetState(TRIGGER_STATE_TRIGGERED);
+			}
+			else if (trig_src[offset + i] > realThreshold && trig_src[offset + i - 1] <= realThreshold)
 			{
 				if (currentType == TRIGGER_TYPE_RISING || currentType == TRIGGER_TYPE_LEVEL)
 				{
