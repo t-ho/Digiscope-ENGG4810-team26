@@ -17,6 +17,7 @@
 #include "trigger.h"
 #include "adc.h"
 #include "net.h"
+#include "eeprom.h"
 
 #include "ui/graphics_thread.h"
 #include "ui/trigger_menu.h"
@@ -247,6 +248,8 @@ TriggerSetThreshold(int32_t threshold)
 
 	currentThreshold = threshold;
 
+	EEPROMSave(EEPROM_TRIGGER_THRESHOLD, threshold);
+
 	if (currentSampleSize == SAMPLE_SIZE_8_BIT)
 	{
 		realThreshold = (255 * (currentThreshold + 1650000.0)) / 3300000;
@@ -279,7 +282,18 @@ TriggerGetMode(void)
 void
 TriggerSetMode(TriggerMode mode)
 {
+	switch (mode)
+	{
+	case TRIGGER_MODE_AUTO:
+	case TRIGGER_MODE_NORMAL:
+	case TRIGGER_MODE_SINGLE:
+		break;
+	default:
+		mode = TRIGGER_MODE_AUTO;
+	}
+
 	currentMode = mode;
+	EEPROMSave(EEPROM_TRIGGER_MODE, mode);
 
 	// Set state as appropriate
 	if (TriggerGetMode() == TRIGGER_MODE_SINGLE)
@@ -310,7 +324,19 @@ TriggerGetType(void)
 void
 TriggerSetType(TriggerType type)
 {
+	switch (type)
+	{
+	case TRIGGER_TYPE_FALLING:
+	case TRIGGER_TYPE_RISING:
+	case TRIGGER_TYPE_LEVEL:
+		break;
+	default:
+		type = TRIGGER_TYPE_RISING;
+	}
+
 	currentType = type;
+
+	EEPROMSave(EEPROM_TRIGGER_TYPE, type);
 
 	TriggerSetTypeText(TriggerTypeNames[type]);
 
@@ -442,6 +468,15 @@ TriggerGetSampleSize(void)
 void
 TriggerSetSampleSize(SampleSize sampleSize)
 {
+	switch (sampleSize)
+	{
+	case SAMPLE_SIZE_8_BIT:
+	case SAMPLE_SIZE_12_BIT:
+		break;
+	default:
+		sampleSize = SAMPLE_SIZE_12_BIT;
+	}
+
 	Semaphore_pend(settingslock, BIOS_WAIT_FOREVER);
 
 	ResetBuffers();
@@ -462,6 +497,8 @@ TriggerSetSampleSize(SampleSize sampleSize)
 	{
 		currentSampleSize = sampleSize;
 	}
+
+	EEPROMSave(EEPROM_TRIGGER_SAMPLESIZE, currentSampleSize);
 
 	TriggerSetThreshold(TriggerGetThreshold());
 
@@ -493,6 +530,8 @@ TriggerSetNumSamples(uint32_t numSamples)
 	}
 
 	currentNumSamples = numSamples;
+
+	EEPROMSave(EEPROM_TRIGGER_NUMSAMPLES, currentNumSamples);
 
 	Command cmd;
 	cmd.type = COMMAND_NUM_SAMPLES;
@@ -599,8 +638,9 @@ void
 TriggerNotify(void)
 {
     TriggerSetChannel(TriggerGetChannel());
-    TriggerSetMode(TriggerGetMode());
-    TriggerSetType(TriggerGetType());
-    TriggerSetThreshold(TriggerGetThreshold());
-    TriggerSetSampleSize(TriggerGetSampleSize());
+    TriggerSetMode((TriggerMode)EEPROMLoad(EEPROM_TRIGGER_MODE));
+    TriggerSetType((TriggerType)EEPROMLoad(EEPROM_TRIGGER_TYPE));
+    TriggerSetThreshold(EEPROMLoad(EEPROM_TRIGGER_THRESHOLD));
+    TriggerSetSampleSize((SampleSize)EEPROMLoad(EEPROM_TRIGGER_SAMPLESIZE));
+    TriggerSetNumSamples(EEPROMLoad(EEPROM_TRIGGER_NUMSAMPLES));
 }
