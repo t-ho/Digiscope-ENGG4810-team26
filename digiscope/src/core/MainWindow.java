@@ -1630,10 +1630,11 @@ public class MainWindow extends MainWindowUi
 	 * Call this method to re-center trigger point
 	 * @param noOfSamples
 	 */
-	public void refreshHorizontalRange(int noOfSamples, int samplePeriod) {
+	public void refreshHorizontalRange(int samplePeriod) { //TODO
 		samplePeriod_ = samplePeriod;
 		String timeString = (String) horizontalRangeComboBox.getSelectedItem();
 		int horizontalRange = convertTimeStringToMicroSeconds(timeString);
+		int noOfSamples = (int) noOfSamplesSpinner.getValue();
 		visualizer_.setValueForHorizontalGridSpacing(horizontalRange, noOfSamples, samplePeriod);
 		
 	}
