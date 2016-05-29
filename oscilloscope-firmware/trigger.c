@@ -90,12 +90,7 @@ sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_
 
 		if (currentState == TRIGGER_STATE_ARMED && countdown <= 0 && offset > 0)
 		{
-			if (currentMode == TRIGGER_MODE_AUTO)
-			{
-				*trigger_index = offset + i;
-				TriggerSetState(TRIGGER_STATE_TRIGGERED);
-			}
-			else if (trig_src[offset + i] > realThreshold && trig_src[offset + i - 1] <= realThreshold)
+			if (trig_src[offset + i] > realThreshold && trig_src[offset + i - 1] <= realThreshold)
 			{
 				if (currentType == TRIGGER_TYPE_RISING || currentType == TRIGGER_TYPE_LEVEL)
 				{
@@ -107,7 +102,6 @@ sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_
 			{
 				if (currentType == TRIGGER_TYPE_FALLING || currentType == TRIGGER_TYPE_LEVEL)
 				{
-
 					*trigger_index = offset + i;
 					TriggerSetState(TRIGGER_STATE_TRIGGERED);
 				}
@@ -143,7 +137,6 @@ sampleCopy12(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger
 			{
 				if (currentType == TRIGGER_TYPE_FALLING || currentType == TRIGGER_TYPE_LEVEL)
 				{
-
 					*trigger_index = offset + i;
 					TriggerSetState(TRIGGER_STATE_TRIGGERED);
 				}
@@ -153,10 +146,11 @@ sampleCopy12(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger
 }
 
 static void
-triggerSearchTask(UArg arg0, UArg arg1)
+triggerSearchTaskISR(UArg arg0, UArg arg1)
 {
 	int32_t trigger_index;
 	int32_t countdown = 0;
+	uint32_t last_auto = 0;
 
 	while (1)
 	{
@@ -205,6 +199,8 @@ triggerSearchTask(UArg arg0, UArg arg1)
 			// Check if enough new samples have been taken
 			if (dist > (currentNumSamples / 2))
 			{
+				last_auto = Clock_getTicks();
+
 				// Transmit Samples
 				SendSamples(trigger_index, currentNumSamples);
 
@@ -213,7 +209,7 @@ triggerSearchTask(UArg arg0, UArg arg1)
 				// Wait for the net task to finish transmitting
 				Semaphore_pend(bufferlock, BIOS_WAIT_FOREVER);
 
-				countdown = currentNumSamples / 2;
+				countdown = currentNumSamples;
 			}
 		}
 		// Check if trigger has been forced
@@ -221,6 +217,12 @@ triggerSearchTask(UArg arg0, UArg arg1)
 		{
 			trigger_index = offset;
 			forceTriggerFlag = false;
+			TriggerSetState(TRIGGER_STATE_TRIGGERED);
+		}
+		else if (currentMode == TRIGGER_MODE_AUTO && ((Clock_getTicks() - last_auto) > (FrontEndGetHorDiv() / 2)))
+		{
+			last_auto = Clock_getTicks();
+			trigger_index = offset;
 			TriggerSetState(TRIGGER_STATE_TRIGGERED);
 		}
 
@@ -637,7 +639,7 @@ Trigger_Init(void)
     Task_Params_init(&taskParams);
 	taskParams.stackSize = 768;
     taskParams.priority = 10;
-    taskHandle = Task_create((Task_FuncPtr)triggerSearchTask, &taskParams, &task_eb);
+    taskHandle = Task_create((Task_FuncPtr)triggerSearchTaskISR, &taskParams, &task_eb);
 
     if (taskHandle == NULL)
     {
