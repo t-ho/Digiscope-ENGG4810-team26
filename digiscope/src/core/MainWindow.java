@@ -1383,6 +1383,15 @@ public class MainWindow extends MainWindowUi
 	public void setPacketReader(PacketReader packetReader_) {
 		this.packetReader_ = packetReader_;
 	}
+	
+	/**
+	 * Show sample rate 
+	 * @param samplePeriod
+	 */
+	public void showSampleRate(int samplePeriod) {
+		String rate = Constant.roundString((double) 1000000 / samplePeriod);
+		sampleRateValueLabel.setText(rate + " samples/s");
+	}
 
 	/**
 	 * Set horizontal range
@@ -1627,11 +1636,12 @@ public class MainWindow extends MainWindowUi
 	
 	/**
 	 * Refresh horizontal range with new number of samples.
-	 * Call this method to re-center trigger point
+	 * Call this method to re-center trigger point. It also updates sample rate.
 	 * @param noOfSamples
 	 */
 	public void refreshHorizontalRange(int samplePeriod) {
 		samplePeriod_ = samplePeriod;
+		showSampleRate(samplePeriod);
 		String timeString = (String) horizontalRangeComboBox.getSelectedItem();
 		int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 		int noOfSamples = (int) noOfSamplesSpinner.getValue();
