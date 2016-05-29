@@ -34,6 +34,9 @@ public class Visualizer {
 	private NumberAxis[] verticalAxes;
 	private XYItemRenderer[] renderers = new XYItemRenderer[Constant.NUMBER_OF_CHANNELS];
 
+	/**
+	 * Constructor
+	 */
 	public Visualizer() {
 		chart = createDefaultChart();
 		xYPlot = chart.getXYPlot();

@@ -128,27 +128,6 @@ public class MainWindow extends MainWindowUi
 		sentP2PVoltageCommand_ = false;
 		previousP2PVoltageValue_ = (int) p2pVoltageSpinner.getValue();
 		previousGeneratorFrequency_ = (int) generatorFrequencySpinner.getValue();
-		// test
-		// Channel A
-		XYSeries aSeries = new XYSeries(Constant.CHANNEL_A);
-		for (double i = 0, j = 0; i < 25000; i = i + 1, j = j + 2 * Math.PI/200) {
-			aSeries.add(i, 1 * Math.sin(j));
-		}
-//		 Test Filter
-//		 aSeries = new XYSeries(Constant.CHANNEL_A);
-//		 aSeries.add(0, 3);
-//		 aSeries.add(1, 4);
-//		 aSeries.add(2, 5);
-//		 aSeries.add(3, 6);
-
-		rawXYSeries.put(Constant.CHANNEL_A, aSeries);
-
-		// Channel B
-		XYSeries bSeries = new XYSeries(Constant.CHANNEL_B);
-		for (double i = 0, j = 0; i < 25000; i = i + 1, j = j + (2 * Math.PI / 250)) {
-			bSeries.add(i, 1.5 * Math.sin(j));
-		}
-		rawXYSeries.put(Constant.CHANNEL_B, bSeries);
 	}
 
 	private void addListenersToComponents() {
@@ -279,8 +258,6 @@ public class MainWindow extends MainWindowUi
 		CommandPacket commandPacket = new CommandPacket(packetType, Constant.REQUEST, argument);
 		try {
 			packetWriter_.writePacket(commandPacket);
-			System.out.printf("Sent:     Type %2x Indicator %2x Argument %d\n", commandPacket.getType(),
-					Constant.REQUEST, argument);
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(this, "Connection has been lost! Please reconnect!", "Error",
 					JOptionPane.ERROR_MESSAGE);
@@ -1194,10 +1171,6 @@ public class MainWindow extends MainWindowUi
 				result.put(Constant.MAX_P2P_VOLTAGE, maxVoltage - minVoltage);
 				result.put(Constant.STANDARD_DEVIATION_VOLTAGE, deviation);
 				// Calculate frequency
-				double firstZeroCrossing = -1;
-				double secondZeroCrossing = -1;
-				boolean isReady = false;
-				
 				ArrayList<Double> zeroCrossings = new ArrayList<>();
 				
 				for (int i = startIndex + 1; i < xYSeries.getItemCount(); i++) {
@@ -1205,29 +1178,23 @@ public class MainWindow extends MainWindowUi
 					double voltage1 = xYSeries.getDataItem(i).getYValue();
 					double voltage2 = xYSeries.getDataItem(i - 1).getYValue();
 
-					if (time1 > horizontalRange.getUpperBound())
-					{
+					if (time1 > horizontalRange.getUpperBound()) {
 						break;
 					}
 					
-					if ((voltage1 > 0 && voltage2 < 0) || (voltage1 < 0 && voltage2 > 0))
-					{
+					if ((voltage1 >= 0 && voltage2 < 0) || (voltage1 < 0 && voltage2 > 0)) {
 						zeroCrossings.add(time1);
 					}
 				}
 				
-				if (zeroCrossings.size() > 1)
-				{				
+				if (zeroCrossings.size() > 1) {				
 					double total = 0;
 					
-					for (int i = 1; i < zeroCrossings.size(); i++)
-					{
+					for (int i = 1; i < zeroCrossings.size(); i++) {
 						total += (zeroCrossings.get(i) - zeroCrossings.get(i - 1));
 					}
 					
 					double avgPeriod = (2 * total / 1000000) / (zeroCrossings.size() - 1);
-					
-					System.out.println(avgPeriod);
 					
 					double frequency = 1 / avgPeriod;
 					result.put(Constant.FREQUENCY, frequency);
@@ -1392,6 +1359,15 @@ public class MainWindow extends MainWindowUi
 
 	public void setPacketReader(PacketReader packetReader_) {
 		this.packetReader_ = packetReader_;
+	}
+	
+	/**
+	 * Show sample rate 
+	 * @param samplePeriod
+	 */
+	public void showSampleRate(int samplePeriod) {
+		String rate = Constant.roundString((double) 1000000 / samplePeriod);
+		sampleRateValueLabel.setText(rate + " samples/s");
 	}
 
 	/**
@@ -1637,11 +1613,12 @@ public class MainWindow extends MainWindowUi
 	
 	/**
 	 * Refresh horizontal range with new number of samples.
-	 * Call this method to re-center trigger point
+	 * Call this method to re-center trigger point. It also updates sample rate.
 	 * @param noOfSamples
 	 */
 	public void refreshHorizontalRange(int samplePeriod) {
 		samplePeriod_ = samplePeriod;
+		showSampleRate(samplePeriod);
 		String timeString = (String) horizontalRangeComboBox.getSelectedItem();
 		int horizontalRange = convertTimeStringToMicroSeconds(timeString);
 		int noOfSamples = (int) noOfSamplesSpinner.getValue();

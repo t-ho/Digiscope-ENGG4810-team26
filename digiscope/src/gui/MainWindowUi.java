@@ -1,7 +1,5 @@
 package gui;
 
-import data.Constant;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -24,12 +22,13 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import org.jfree.data.xy.XYSeries;
+
+import data.Constant;
 
 /**
  *
@@ -203,6 +202,8 @@ public class MainWindowUi extends JFrame {
     protected JButton removeExpressionButton;
     protected JButton removeFilterButton;
     private JPanel rightPanel_;
+    private JLabel sampleRateLabel_;
+    protected JLabel sampleRateValueLabel;
     protected JToggleButton samplingModeToggleButton;
     private JScrollPane scrollPane;
     private JLabel spaceLabel_;
@@ -215,7 +216,9 @@ public class MainWindowUi extends JFrame {
     protected JLabel standardDeviationVoltageMathLabel;
     private JLabel standardDeviationVoltageMathLabel_;
     private JLabel thresholdLabel2_;
-    private JToolBar toolBar_;
+    private JPanel toolBarLeftPanel_;
+    private JPanel toolBarRightPanel_;
+    private JPanel toolBarPanel_;
     private JPanel triggerBottomLeftPanel3_;
     private JPanel triggerBottomRightPanel3_;
     private JPanel triggerMiddleLeftPanel1_;
@@ -355,6 +358,8 @@ public class MainWindowUi extends JFrame {
         triggerStateLabel_ = new JLabel();
         triggerStateLabel = new JLabel();
         triggerTopRightPanel1_ = new JPanel();
+        sampleRateLabel_ = new JLabel();
+        sampleRateValueLabel = new JLabel();
         samplingModeToggleButton = new JToggleButton();
         triggerMiddleLeftPanel1_ = new JPanel();
         triggerModeLabel_ = new JLabel();
@@ -538,7 +543,9 @@ public class MainWindowUi extends JFrame {
         filterDivisionInfoLabel = new JLabel();
         horizontalDivisionInfoLabel = new JLabel();
         canvasPanel_ = new JPanel();
-        toolBar_ = new JToolBar();
+        toolBarLeftPanel_ = new JPanel();
+        toolBarRightPanel_ = new JPanel();
+        toolBarPanel_ = new JPanel();
         cursorLabel_ = new JLabel();
         cursorComboBox = new JComboBox<String>();
         spaceLabel_ = new JLabel();
@@ -1567,25 +1574,42 @@ public class MainWindowUi extends JFrame {
         canvasPanel_.setLayout(new BorderLayout());
         rightPanel_.add(canvasPanel_, BorderLayout.CENTER);
 
-        toolBar_.setFloatable(false);
-        toolBar_.setRollover(true);
-        toolBar_.setPreferredSize(new Dimension(100, 40));
+        toolBarPanel_.setPreferredSize(new Dimension(776, 40));
+        toolBarPanel_.setLayout(new BorderLayout());
+        
+        toolBarLeftPanel_.setPreferredSize(new Dimension(380, 40));
+        toolBarLeftPanel_.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 10));
+
+        spaceLabel_.setText("     ");
+        toolBarLeftPanel_.add(spaceLabel_);
 
         cursorLabel_.setText(" Cursor on: ");
-        toolBar_.add(cursorLabel_);
+        toolBarLeftPanel_.add(cursorLabel_);
 
         cursorComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "Disabled" }));
         cursorComboBox.setMaximumSize(new Dimension(120, 20));
-        toolBar_.add(cursorComboBox);
-
-        spaceLabel_.setText("  ");
-        toolBar_.add(spaceLabel_);
+        cursorComboBox.setPreferredSize(new Dimension(120, 20));
+        toolBarLeftPanel_.add(cursorComboBox);
 
         cursorVerticalValueLabel.setText("N/A");
         cursorVerticalValueLabel.setBorder(BorderFactory.createTitledBorder(""));
-        toolBar_.add(cursorVerticalValueLabel);
+        toolBarLeftPanel_.add(cursorVerticalValueLabel);
+        
+        toolBarPanel_.add(toolBarLeftPanel_, BorderLayout.WEST);
+        
+        toolBarRightPanel_.setPreferredSize(new Dimension(380, 40));
+        toolBarRightPanel_.setLayout(new FlowLayout(FlowLayout.TRAILING, 8, 10));
+        
+        sampleRateLabel_.setText("Sample Rate:");
+        toolBarRightPanel_.add(sampleRateLabel_);
+        
+        sampleRateValueLabel.setText("N/A");
+        sampleRateValueLabel.setBorder(BorderFactory.createTitledBorder(""));
+        toolBarRightPanel_.add(sampleRateValueLabel);
 
-        rightPanel_.add(toolBar_, BorderLayout.NORTH);
+        toolBarPanel_.add(toolBarRightPanel_, BorderLayout.EAST);
+        
+        rightPanel_.add(toolBarPanel_, BorderLayout.NORTH);
 
         getContentPane().add(rightPanel_, BorderLayout.CENTER);
 

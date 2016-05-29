@@ -24,6 +24,9 @@ public class LaunchWindow extends LaunchWindowUi {
 	private static final long serialVersionUID = 1L;
 	private MainWindow mainWindow_;
 
+	/**
+	 * Constructor
+	 */
 	public LaunchWindow() {
 		super();
 		addListenersToComponents();
@@ -46,19 +49,18 @@ public class LaunchWindow extends LaunchWindowUi {
 		});
 	}
 
-
+	/**
+	 * Connect to the hardware when connect button is clicked
+	 * @param event
+	 */
 	private void connectButtonActionPerformed(ActionEvent event) {
-		//TODO
-//		connect();
 		connect(ipAddressTextField.getText());
 	}
 
 	private void ipAddressTextFieldKeyTyped(KeyEvent keyEvent) {
-		// TODO
 		if (ipAddressTextField.isEditable()) {
 			char keyChar = keyEvent.getKeyChar();
 			if (keyChar == KeyEvent.VK_ENTER) {
-				// connect();
 				connect(ipAddressTextField.getText());
 			} else if ((keyChar < '0' || keyChar > '9') && (keyChar != '.') 
 					&& (keyChar != KeyEvent.VK_BACK_SPACE)) {
