@@ -856,7 +856,8 @@ public class MainWindow extends MainWindowUi
 				filterDivisionInfoLabel.setEnabled(true);
 			}
 			XYSeries xYSeries = createXYSeriesWithOffsets(channelName, rawSeries, horizontalOffset, verticalOffset);
-			visualizer_.addSeriesToDataset(channelIndex, xYSeries, samplePeriod_);
+			int noOfSamples = (int) noOfSamplesSpinner.getValue();
+			visualizer_.addSeriesToDataset(channelIndex, xYSeries, noOfSamples, samplePeriod_);
 			showMeasurementResults(channelIndex);
 		}
 	}
@@ -1630,7 +1631,7 @@ public class MainWindow extends MainWindowUi
 	 * Call this method to re-center trigger point
 	 * @param noOfSamples
 	 */
-	public void refreshHorizontalRange(int samplePeriod) { //TODO
+	public void refreshHorizontalRange(int samplePeriod) {
 		samplePeriod_ = samplePeriod;
 		String timeString = (String) horizontalRangeComboBox.getSelectedItem();
 		int horizontalRange = convertTimeStringToMicroSeconds(timeString);

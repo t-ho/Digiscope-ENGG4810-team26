@@ -55,13 +55,12 @@ public class Visualizer {
 	 * @param xYSeries 
 	 * @param noOfSamples
 	 */
-	public void addSeriesToDataset(int channelIndex, XYSeries xYSeries, int samplePeriod) {
+	public void addSeriesToDataset(int channelIndex, XYSeries xYSeries, int noOfSamples, int samplePeriod) {
 		if(xYSeries != null) {
 			datasets[channelIndex].removeAllSeries();
 			datasets[channelIndex].addSeries(xYSeries);
 			if(channelIndex == Constant.A_INDEX) {
 				renderers[channelIndex].setSeriesPaint(0, Constant.A_COLOR);
-				int noOfSamples = getSeries(channelIndex).getItemCount();
 				XYSeries marker = new XYSeries("Trigger Marker");
 				double x = (noOfSamples * samplePeriod) / 2;
 				double y1 = - Constant.VERTICAL_GRID_SPACINGS;
@@ -73,7 +72,6 @@ public class Visualizer {
 				renderers[channelIndex].setSeriesVisibleInLegend(1, false);
 			} else if(channelIndex == Constant.B_INDEX) {
 				renderers[channelIndex].setSeriesPaint(0, Constant.B_COLOR);
-				int noOfSamples = getSeries(channelIndex).getItemCount();
 				XYSeries marker = new XYSeries("Trigger Marker");
 				double x = (noOfSamples * samplePeriod) / 2;
 				double y1 = - Constant.VERTICAL_GRID_SPACINGS;
