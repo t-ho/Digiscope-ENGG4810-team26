@@ -23,6 +23,8 @@ public class Constant {
 	public static final String DEFAULT_IP_ADDRESS = "192.168.137.8";
 	
 	public static final int DEFAULT_NUMBER_OF_SAMPLES = 25000;
+
+	public static final int DEFAULT_SAMPLE_PERIOD = 1; // 1 microsecond
 	
 	public static final int FIR = 1;
 	public static final int IIR = 2;
