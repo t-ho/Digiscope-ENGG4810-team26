@@ -167,8 +167,7 @@ int main(void)
      /* Turn on user LED */
     GPIO_write(Board_LED0, Board_LED_ON);
 
-    System_printf("Starting the example\nSystem provider is set to SysMin. "
-                  "Halt the target to view any SysMin contents in ROV.\n");
+    System_printf("Starting ENGG4810 Team 26 Oscilloscope.\n");
     /* SysMin will only print to the console when you call flush or exit */
     System_flush();
 
