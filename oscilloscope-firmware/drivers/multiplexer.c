@@ -22,7 +22,7 @@ void
 MultiplexerSet(Multiplexer *mult, uint8_t val)
 {
 	int i;
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < 2; i++)
 	{
 		if (val & (1 << i))
 		{
