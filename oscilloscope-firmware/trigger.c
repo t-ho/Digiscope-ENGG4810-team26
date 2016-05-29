@@ -88,27 +88,25 @@ sampleCopy8(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger_
 		channel_A_samples_8[offset + i] = src_a[i * skip] >> 4;
 		channel_B_samples_8[offset + i] = src_b[i * skip] >> 4;
 
-		if (currentState == TRIGGER_STATE_ARMED && countdown <= 0)
+		if (currentState == TRIGGER_STATE_ARMED && countdown <= 0 && offset > 0)
 		{
-
-			switch(currentType)
+			if (trig_src[offset + i] > realThreshold && trig_src[offset + i - 1] <= realThreshold)
 			{
-			case TRIGGER_TYPE_LEVEL:
-				if (!(trig_src[offset + i] > realThreshold))
-					continue;
-				break;
-			case TRIGGER_TYPE_RISING:
-				if (!(trig_src[offset + i] > realThreshold && trig_src[offset + i - 1] <= realThreshold))
-					continue;
-				break;
-			case TRIGGER_TYPE_FALLING:
-				if (!(trig_src[offset + i] < realThreshold && trig_src[offset + i - 1] >= realThreshold))
-					continue;
-				break;
+				if (currentType == TRIGGER_TYPE_RISING || currentType == TRIGGER_TYPE_LEVEL)
+				{
+					*trigger_index = offset + i;
+					TriggerSetState(TRIGGER_STATE_TRIGGERED);
+				}
 			}
+			else if (trig_src[offset + i] < realThreshold && trig_src[offset + i - 1] >= realThreshold)
+			{
+				if (currentType == TRIGGER_TYPE_FALLING || currentType == TRIGGER_TYPE_LEVEL)
+				{
 
-			*trigger_index = offset + i;
-			TriggerSetState(TRIGGER_STATE_TRIGGERED);
+					*trigger_index = offset + i;
+					TriggerSetState(TRIGGER_STATE_TRIGGERED);
+				}
+			}
 		}
 	}
 }
@@ -126,26 +124,25 @@ sampleCopy12(uint16_t* src_a, uint16_t* src_b, uint32_t offset, int32_t *trigger
 		channel_A_samples_12[offset + i] = src_a[i * skip];
 		channel_B_samples_12[offset + i] = src_b[i * skip];
 
-		if (currentState == TRIGGER_STATE_ARMED && countdown <= 0)
+		if (currentState == TRIGGER_STATE_ARMED && countdown <= 0 && offset > 0)
 		{
-			switch(currentType)
+			if (trig_src[offset + i] > realThreshold && trig_src[offset + i - 1] <= realThreshold)
 			{
-			case TRIGGER_TYPE_LEVEL:
-				if (!(trig_src[offset + i] > realThreshold))
-					continue;
-				break;
-			case TRIGGER_TYPE_RISING:
-				if (!(trig_src[offset + i] > realThreshold && trig_src[offset + i - 1] <= realThreshold))
-					continue;
-				break;
-			case TRIGGER_TYPE_FALLING:
-				if (!(trig_src[offset + i] < realThreshold && trig_src[offset + i - 1] >= realThreshold))
-					continue;
-				break;
+				if (currentType == TRIGGER_TYPE_RISING || currentType == TRIGGER_TYPE_LEVEL)
+				{
+					*trigger_index = offset + i;
+					TriggerSetState(TRIGGER_STATE_TRIGGERED);
+				}
 			}
+			else if (trig_src[offset + i] < realThreshold && trig_src[offset + i - 1] >= realThreshold)
+			{
+				if (currentType == TRIGGER_TYPE_FALLING || currentType == TRIGGER_TYPE_LEVEL)
+				{
 
-			*trigger_index = offset + i;
-			TriggerSetState(TRIGGER_STATE_TRIGGERED);
+					*trigger_index = offset + i;
+					TriggerSetState(TRIGGER_STATE_TRIGGERED);
+				}
+			}
 		}
 	}
 }

@@ -75,7 +75,7 @@ OnVertRangeDown(tWidget *psWidget)
 static void
 OnRangeCoupling(tWidget *psWidget)
 {
-	FrontEndSetCoupling(display_channel, !FrontEndGetCoupling(display_channel));
+	FrontEndSetCoupling(display_channel, (FrontendCoupling)!FrontEndGetCoupling(display_channel));
 }
 
 void

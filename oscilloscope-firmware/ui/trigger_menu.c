@@ -100,7 +100,7 @@ OnTriggerThresholdDecrease(tWidget *psWidget)
 static void
 OnTriggerChannel(tWidget *psWidget)
 {
-	TriggerSetChannel(!TriggerGetChannel());
+	TriggerSetChannel((Channel)!TriggerGetChannel());
 }
 
 void
