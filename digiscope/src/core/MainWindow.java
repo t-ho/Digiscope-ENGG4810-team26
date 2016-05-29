@@ -1194,10 +1194,6 @@ public class MainWindow extends MainWindowUi
 				result.put(Constant.MAX_P2P_VOLTAGE, maxVoltage - minVoltage);
 				result.put(Constant.STANDARD_DEVIATION_VOLTAGE, deviation);
 				// Calculate frequency
-				double firstZeroCrossing = -1;
-				double secondZeroCrossing = -1;
-				boolean isReady = false;
-				
 				ArrayList<Double> zeroCrossings = new ArrayList<>();
 				
 				for (int i = startIndex + 1; i < xYSeries.getItemCount(); i++) {
@@ -1205,29 +1201,23 @@ public class MainWindow extends MainWindowUi
 					double voltage1 = xYSeries.getDataItem(i).getYValue();
 					double voltage2 = xYSeries.getDataItem(i - 1).getYValue();
 
-					if (time1 > horizontalRange.getUpperBound())
-					{
+					if (time1 > horizontalRange.getUpperBound()) {
 						break;
 					}
 					
-					if ((voltage1 > 0 && voltage2 < 0) || (voltage1 < 0 && voltage2 > 0))
-					{
+					if ((voltage1 >= 0 && voltage2 < 0) || (voltage1 < 0 && voltage2 > 0)) {
 						zeroCrossings.add(time1);
 					}
 				}
 				
-				if (zeroCrossings.size() > 1)
-				{				
+				if (zeroCrossings.size() > 1) {				
 					double total = 0;
 					
-					for (int i = 1; i < zeroCrossings.size(); i++)
-					{
+					for (int i = 1; i < zeroCrossings.size(); i++) {
 						total += (zeroCrossings.get(i) - zeroCrossings.get(i - 1));
 					}
 					
 					double avgPeriod = (2 * total / 1000000) / (zeroCrossings.size() - 1);
-					
-					System.out.println(avgPeriod);
 					
 					double frequency = 1 / avgPeriod;
 					result.put(Constant.FREQUENCY, frequency);
