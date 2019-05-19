@@ -1,87 +1,20 @@
-# Setup Digiscope in Eclipse
+# Digiscope
+![digiscope-ui](https://i.imgur.com/v4RnMsg.jpg)
 
-## Install Eclipse IDE
-- Install [Java SE Development Kit 8 - JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
+The Digiscope is an Ethernet controlled digital oscilloscope. Where a standard
+digital oscilloscope would be solely standalone and controlled by various knobs
+and buttons, the Digiscope is principally controlled by one of two means:
+* A touchscreen TFT LCD display
+* PC software
 
-- Install [Eclipse IDE](https://eclipse.org/downloads/).
+[![Digiscope-20khz](https://i.imgur.com/IsoX6Y1.gif)](https://youtu.be/0QXT5xY2Ptk)
 
-## Import Digiscope project into Eclipse IDE
-1. Open Eclipse IDE
+## Task allocation
+| Team member | Area of Responsibility |
+|------------|------------------------|
+| Toan Ho | <ul><li>Software readme and repository maintenance</li><li>Communication protocol specification and implementation</li><li>Graphical user interface (GUI) of software</li><li>Waveform visualization</li><li>Waveform data manipulation</li><li>Digital Filtering</li><li>Math Channel</li></ul> |
+| Ryan Fitzsimon | <ul><li>Firmware readme and repository maintenance</li><li>Signal sampling</li><li>Trigger event detection</li><li>Communication protocol specification and implementation</li><li>Touch screen communication and interface design</li><li>Electronic control of analog front end</li><li>Firmware component of function generator</li></ul> |
+| Christopher Low | <ul><li>Component purchases/BOM</li><li>Hardware section of function generator</li><li>Analog Frontend: Low pass anti-aliasing filter, bandpass filter, DC offset, amplifiers</li></ul> |
+| Joshua Mason | <ul><li>Altium PCB design</li><li>Power supply</li><li>Hardware layout</li><li>Analog front end (with Christopher)</li><li>Soldering (with Christopher)</li></ul>
 
-   ![Screenshot 1](http://i.imgur.com/HroQgMD.png)
-
-2. In Eclipse, choose `File > Import`. Then in the pop-up window(below), choose `Projects from Git` under `Git` category, click `Next`.
-
-   ![Screenshot 2](http://i.imgur.com/kss0tKf.png)
-
-3. In the next window, select `Clone URI`, then click `Next`.
-
-   ![Screenshot 3](http://i.imgur.com/VQarYv0.png)
-
-4. In the location panel, copy the repository `https://source.eait.uq.edu.au/git/engg4810-team26` into URI field as figure below. In the Authentication panel, provide the username and password. Then click `Next`.
-
-   ![Screenshot 4](http://i.imgur.com/XbxlKvg.png)
-
-5. In `Brand selection` window, choose `master` brand.
-
-   ![Screenshot 5](http://i.imgur.com/UiPiqBd.png)
-
-6. Next, choose local destination for project.
-
-   ![Screenshot 6](http://i.imgur.com/oqDqv82.png)
-
-7. Select `Import existing Eclipse projects`, then click `Next`.
-
-   ![Screenshot 7](http://i.imgur.com/zhel54v.png)
-
-8. In the `Import Projects` window, select `digiscope` project as follow. Then click `Finish`.
-
-   ![Screenshot 8](http://i.imgur.com/Rymbrub.png)
-
-## To launch the application
-   On the left panel `Project Explorer`, Right click on project `digiscope`, choose `Run As` > `Java Application`. In the pop-up window, select `Digiscope - core` as figure below, then click `Ok`.
-
-   ![Screenshot 9](http://i.imgur.com/7jA2aJu.png)
-
-
-# Java style guidelines
-   The source code is follow the [Java Programming Style Guidelines](http://geosoft.no/development/javastyle.html) from Geotechnical Sofware Services.
-
-
-# Firmware
-
-## Environment Setup
-
-Install Code Composer Studio
-http://processors.wiki.ti.com/index.php/Download_CCS
-
-Open the App Center (`Help > CCS App Center`) and install:
-
-1. TI-RTOS for TivaC
-2. TI ARM Compiler
-3. TivaWare for C Series Software (Complete)
-
-You will need to sign up to the Texas Instruments website in order to download the packages.
-
-Install the latest XDCTools from
-http://software-dl.ti.com/dsps/dsps_public_sw/sdo_sb/targetcontent/rtsc/
-
-## Clone Repository
-The repository can be cloned in a number of ways. If you followed the software setup guidelines above, you will already have a copy. If not, the same process can be followed.
-
-Alternatively, use the command:
-```bash
-git clone https://source.eait.uq.edu.au/git/engg4810-team26
-```
-
-## Import Project
-
-Open Code Composer Studio and open the import menu (`File > Import... `).
-
-Select the (`Code Composer Studio > CCS Projects `) source.
-
-Browse to the directory where you cloned the repository.
-
-Select `oscilloscope-firmware` from the discovered projects list and untick the `Copy projects into workspace` option, then click finish.
-
-After the import is complete you should be able to compile and program the board by clicking the debug button.
+## Please see [Wiki page](https://github.com/t-ho/Digiscope-ENGG4810-team26/wiki) for more details
